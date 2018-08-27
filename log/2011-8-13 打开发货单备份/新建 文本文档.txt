@@ -1,0 +1,54 @@
+
+
+
+alter PROCEDURE [dbo].[sl_invoice_open]       
+                 @LoginId varchar(50),      
+                 @WhId varchar(20),      
+                 @TypId varchar(2),      
+                 @Key varchar(20)      
+AS      
+--exec sl_invoice_open '0010', '008', '0010', '008'
+
+declare @empid varchar(20)    , @IsRecipient varchar(30)
+select @empid =empid  from sys_user where loginid=@LoginId    
+select @IsRecipient=IsRecipient From hr_employee    where code  =@empid  
+
+
+set @Key='%'+@Key      
+declare @IsAdmin bit      
+select @IsAdmin=(select IsAdmin from sys_user where LoginId=@LoginId)--or Tel like @Key      
+select * into #a from sl_invoice where  WhId=@WhId and    
+(    
+@IsAdmin=1 or     
+ClientId in (select Code from crm_client where IsPub=1) or     
+ClientId in (select ClientId from crm_ClientEmp where EmpId=(select EmpId from sys_user where LoginId=@LoginId)) or     
+ClientId in (select Code from crm_client where classid in (select ClassCode From Crm_ActorClientClass where Actorid in  (select GroupID from sys_groupuser  where UserID=@LoginId)   ) )       
+)          
+union 
+select *  from sl_invoice where  WhId=@WhId and    @IsRecipient =1  
+
+
+
+--if @TypId='a'      
+--  select * from #a where DateDiff(d,InvoiceDate,GetDate())<=2      
+--else       
+if @TypId='1'       
+  select * from #a where Code like @Key order by code desc      
+else if @TypId='2'      
+  select * from #a where ClientId in (select Code from crm_client where NickName like @Key+'%' or Tel like @Key+'%') order by code desc      
+else if @TypId='3'      
+  select * from #a where IsChk=0 order by code desc      
+else if @TypId='4'      
+  select * from #a where DateDiff(d,InvoiceDate,GetDate())=0 order by code desc      
+else if @TypId='5'      
+  select * from #a where DateDiff(d,InvoiceDate,GetDate())<=1 order by code desc      
+else if @TypId='6'      
+  select * from #a where DateDiff(d,InvoiceDate,GetDate())<=2 order by code desc      
+else if @TypId='7'      
+  select * from #a where DateDiff(d,InvoiceDate,GetDate())<=6 order by code desc      
+else       
+  select * from #a where DateDiff(d,InvoiceDate,GetDate())<=2 order by code desc      
+drop table #a      
+      
+
+   

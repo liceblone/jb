@@ -1,0 +1,272 @@
+sp_helptext sl_client_profit
+--   sl_client_profit '','2009-2-1','2009-6-1',''    
+    
+CREATE       PROCEDURE [dbo].[sl_client_profit]                           
+                 @WhId varchar(20),                          
+                 @BeginDate DateTime,                          
+                 @EndDate Datetime,                          
+                 @SaleManId varchar(20)                          
+AS                
+       /*              
+drop table #a    
+    
+ declare              
+             @WhId varchar(20),                          
+                 @BeginDate DateTime,                          
+                 @EndDate Datetime,                          
+                 @SaleManId varchar(20)             
+                  
+set              @WhId=''                      
+set              @BeginDate='2006-1-1'                     
+set              @EndDate='2007-2-1'                    
+set              @SaleManId =''            
+*/            
+    
+declare @TaxRate decimal(19,6)                  
+select @TaxRate =MoneyX from sys_parameters where Id=6                  
+                  
+create table #a  
+(  
+ClientId varchar(20),  
+xDate smalldatetime ,  
+GetFund decimal(19,5),  
+Fund decimal(19,5),   
+ NoTaxFund decimal(19,5),  
+TaxAmt decimal(19,5)  
+)  
+--declare @SaleManId varchar(20)                          
+--set @salemanid='0018'                          
+                        
+--2006-7-22改动  以审核数据统计  2006-7-24加一栅位除税毛利                      
+                        
+   if @WhId is null set @WhId=''                          
+   set @WhId=@WhId+'%'                          
+    
+insert into #a  
+   select ClientId,InvoiceDate as xDate,GetFund,Profit as Fund , Profit*(1-@TaxRate) as NoTaxFund,Profit*@TaxRate as TaxAmt   from sl_invoice   
+      where IsChk=1 and WhId like @WhId and InvoiceDate>=@BeginDate and InvoiceDate<=@EndDate    and Profit<>GetFund and Profit>0 --2007-6-15add    
+   union all                          
+   select '',RetailDate,GetFund,Profit , Profit*(1-@TaxRate) as NoTaxFund,Profit*@TaxRate as TaxAmt  from sl_retail   
+      where IsChk=1 and  WhId like @WhId and RetailDate>=@BeginDate and RetailDate<=@EndDate   and Profit<>GetFund and Profit>0                
+   union all                          
+   select ClientId,InDate,PayFund,PayFund , PayFund  as NoTaxFund,0 as TaxAmt from fn_shldin   
+       where ItemId='0100' and WhId like @WhId and InDate between @BeginDate and @EndDate                          
+   union all                          
+   select ClientId,OutDate,-PayFund,-PayFund , -PayFund as NoTaxFund,0 as TaxAmt   from fn_shldout where ItemId='0100' and WhId like @WhId and OutDate between @BeginDate and @EndDate                          
+   union all                          
+   select m.ClientId,ClsDate,-d.RmnQty*d.Price,-d.RmnQty*(d.Price-d.Cost) ,-d.RmnQty*(d.Price-d.Cost)*@TaxRate as NoTaxFund, -(d.RmnQty*d.Price*@TaxRate) as TaxAmt  from sl_invoicedl d inner join sl_invoice m on d.InvoiceId=m.Code where IsChk=1   and  m.W
+hId like @WhId and d.ClsDate>=@BeginDate and d.ClsDate<=@EndDate    and isnull(d.Cost,0) >0    
+   union all                          
+   select ClientId,ReturnDate,-GetFund,-Profit , -Profit*(1-@TaxRate) as NoTaxFund,-Profit*@TaxRate as TaxAmt  from sl_return where IsChk=1 and  WhId like @WhId and ReturnDate>=@BeginDate and ReturnDate<=@EndDate   and Profit<>GetFund and Profit>0 --2007-
+6-15add    
+    
+--2007-6-15 当成本价为空时取进价    
+/* */    
+ ----------------------------------------销售    
+         select M.Code,DL.Cost,Dl.WareID ,InvoiceID into #TmpSL    
+         from sl_invoice   M     
+         join sl_invoiceDL DL on M.Code =Dl.InvoiceID    
+         where M.IsChk=1 and M.WhId like @WhId and M.InvoiceDate>=@BeginDate and M.InvoiceDate<=@EndDate and (M.Profit=M.GetFund or  M.Profit<0 or isnull(Dl.Cost,0)=0 )--2007-6-15add    
+    
+         update #TmpSL set Cost=isnull(B.Cost,B.Price)    
+         from   #TmpSL  A    
+         join   Wr_Ware B on A.Wareid=B.id    where isnull(A.Cost,0)=0    
+         update #TmpSL set Cost=isnull(B.Price,0)    
+         from   #TmpSL  A    
+         join   ph_arriveDL B on A.Wareid=B.wareid where isnull(A.Cost,0)=0    
+         update #TmpSL set Cost=isnull(B.Price,0)    
+         from   #TmpSL  A    
+         join   wh_inDL B on A.Wareid=B.wareid     where isnull(A.Cost,0)=0    
+    
+    
+insert into #a    
+         select M.ClientId,M.InvoiceDate as xDate,M.GetFund,   DL.Qty*(Dl.Price-DD.Cost)*(WareFund-GetFund)   as Fund , DL.Qty*(Dl.Price-DD.Cost)*(WareFund-GetFund)*(1-@TaxRate) as NoTaxFund,DL.Qty*(Dl.Price-DD.Cost)*(WareFund-GetFund)*@TaxRate as TaxAmt 
+  
+    
+         from sl_invoice   M     
+         join sl_invoiceDL DL on M.Code =Dl.InvoiceID    
+         join #TmpSL       DD on M.Code =DD.InvoiceID and DD.InvoiceID=DL.InvoiceID and DD.wareid=Dl.WareID    
+         where M.IsChk=1 and M.WhId like @WhId and M.InvoiceDate>=@BeginDate and M.InvoiceDate<=@EndDate and (M.Profit=M.GetFund or  M.Profit<0 or isnull(Dl.Cost,0)=0 )--2007-6-15add    
+drop table    #TmpSL           
+           
+    
+---------------------------------零售    
+         select M.Code,DL.Cost,Dl.WareID ,Dl.RetailID into #TmpRT    
+         from sl_retail    M     
+         join sl_retailDL  DL on M.Code=Dl.RetailID    
+         where M.IsChk=1 and  M.WhId like @WhId and M.RetailDate>=@BeginDate and M.RetailDate<=@EndDate   and ( M.Profit=M.GetFund or M.Profit<0 or  isnull(Dl.Cost,0)<=0)    
+     
+         update #TmpRT set Cost=isnull(B.Cost,B.Price)    
+         from   #TmpRT  A    
+         join   Wr_Ware B on A.Wareid=B.id    where isnull(A.Cost,0)=0    
+         update #TmpRT set Cost=isnull(B.Price,0)    
+         from   #TmpRT  A    
+         join   ph_arriveDL B on A.Wareid=B.wareid where isnull(A.Cost,0)=0    
+         update #TmpRT set Cost=isnull(B.Price,0)    
+         from   #TmpRT  A    
+         join   wh_inDL B on A.Wareid=B.wareid     where isnull(A.Cost,0)=0    
+    
+insert into #a    
+         select '',M.RetailDate,M.GetFund,DL.Qty*(Dl.Price-DD.Cost)*(WareFund-GetFund)    , DL.Qty*(Dl.Price-DD.Cost)*(WareFund-GetFund)   *(1-@TaxRate) as NoTaxFund,DL.Qty*(Dl.Price-DD.Cost)*(WareFund-GetFund)   *@TaxRate as TaxAmt     
+         from sl_retail    M     
+         join sl_retailDL  DL on M.Code=Dl.RetailID    
+         join #TmpRT       DD on M.Code =DD.RetailID and DD.RetailID=DL.RetailID and DD.wareid=Dl.WareID    
+         where M.IsChk=1 and  M.WhId like @WhId and M.RetailDate>=@BeginDate and M.RetailDate<=@EndDate   and ( M.Profit=M.GetFund or M.Profit<0 or  isnull(Dl.Cost,0)<=0)    
+drop table #TmpRT    
+    
+---------------------------------------------------------补货    
+         select M.Code,D.Cost,D.WareID ,InvoiceId into #TmpSLB    
+         from sl_invoicedl d     
+         inner join sl_invoice m on d.InvoiceId=m.Code     
+         where IsChk=1   and  m.WhId like @WhId and d.ClsDate>=@BeginDate and d.ClsDate<=@EndDate    and isnull(d.Cost,0) <=0    
+    
+         update #TmpSLB set Cost=isnull(B.Cost,B.Price)    
+         from   #TmpSLB  A    
+         join   Wr_Ware B on A.Wareid=B.id    where isnull(A.Cost,0)=0    
+         update #TmpSLB set Cost=isnull(B.Price,0)    
+         from   #TmpSLB  A    
+         join   ph_arriveDL B on A.Wareid=B.wareid where isnull(A.Cost,0)=0    
+         update #TmpSLB set Cost=isnull(B.Price,0)    
+         from   #TmpSLB  A    
+         join   wh_inDL B on A.Wareid=B.wareid     where isnull(A.Cost,0)=0    
+    
+insert into #a    
+         select m.ClientId,ClsDate,-d.RmnQty*d.Price,d.RmnQty*(d.Price-DD.Cost) ,-d.RmnQty*(d.Price-DD.Cost)*@TaxRate as NoTaxFund, -(d.RmnQty*d.Price*@TaxRate) as TaxAmt     
+         from sl_invoicedl d     
+         inner join sl_invoice m on d.InvoiceId=m.Code     
+         join #TmpSLB       DD on M.Code =DD.InvoiceId and DD.InvoiceId=d.InvoiceId and DD.wareid=d.WareID    
+         where IsChk=1   and  m.WhId like @WhId and d.ClsDate>=@BeginDate and d.ClsDate<=@EndDate    and isnull(d.Cost,0) <=0    
+drop table #TmpSLB    
+    
+    
+-----------------------------------------------------退货    
+        select M.Code,0.0 as Cost,Dl.WareID ,ReturnID into #TmpRe    
+        from sl_return    M     
+        join sl_returnDL  DL  on M.Code=Dl.ReturnID     
+        where IsChk=1 and  WhId like @WhId and ReturnDate>=@BeginDate and ReturnDate<=@EndDate   and (Profit=GetFund or Profit<0  )--2007-6-15add    
+    
+    
+         update #TmpRe set Cost=isnull(B.Cost,B.Price)    
+         from   #TmpRe  A    
+         join   Wr_Ware B on A.Wareid=B.id    where isnull(A.Cost,0)=0    
+         update #TmpRe set Cost=isnull(B.Price,0)    
+         from   #TmpRe  A    
+         join   ph_arriveDL B on A.Wareid=B.wareid where isnull(A.Cost,0)=0    
+         update #TmpRe set Cost=isnull(B.Price,0)    
+         from   #TmpRe  A    
+         join   wh_inDL B on A.Wareid=B.wareid     where isnull(A.Cost,0)=0    
+    
+insert into #a    
+        select ClientId,ReturnDate,-GetFund,-DL.Qty*(Dl.Price-DD.Cost)*(WareFund-GetFund)  , -DL.Qty*(Dl.Price-DD.Cost)*(WareFund-GetFund) *(1-@TaxRate) as NoTaxFund,-DL.Qty*(Dl.Price-DD.Cost)*(WareFund-GetFund) *@TaxRate as TaxAmt      
+        from sl_return    M     
+        join sl_returnDL  DL  on M.Code=Dl.ReturnID     
+        join #TmpRe       DD on M.Code =DD.ReturnID and DD.ReturnID=DL.ReturnID and DD.wareid=Dl.WareID    
+    
+        where IsChk=1 and  WhId like @WhId and ReturnDate>=@BeginDate and ReturnDate<=@EndDate   and (Profit=GetFund or Profit<0  )--2007-6-15add    
+drop table #TmpRe    
+    
+    
+    
+    
+    
+    
+                           
+--drop table #a            
+--select *From #a            
+            
+/*           
+declare              
+             @WhId varchar(20),                          
+                 @BeginDate DateTime,                          
+                 @EndDate Datetime,                          
+                 @SaleManId varchar(20)             
+                  
+set              @WhId=''                      
+set              @BeginDate='2006-1-1'                     
+set              @EndDate='2007-2-1'                    
+set              @SaleManId =''             
+*/            
+  select Code,Name,Balance as Jan,Balance as Janr,                          
+                    Balance as Feb,Balance as Febr,                          
+                    Balance as Mar,Balance as Marr,                          
+                    Balance as Apr,Balance as Aprr,                          
+                    Balance as May,Balance as Mayr,                          
+                    Balance as Jun,Balance as Junr,                          
+                    Balance as Jul,Balance as Julr,                          
+                    Balance as Aug,Balance as Augr,                          
+                    Balance as Sep,Balance as Sepr,                          
+                    Balance as Oct,Balance as Octr,                          
+                    Balance as Nov,Balance as Novr,                          
+                    Balance as Dece,Balance as Decer,                          
+                    Balance as tFund,Balance as tFundr,                               
+                    Balance as gFund,                          
+                    Balance as tgRate,                          
+                    Balance as times     ,                    
+                    Balance as NoTaxFund ,                      
+                    Balance as TaxAmt                       
+   into #b from crm_client where (@SaleManId='' or code in (select ClientId from sl_empclient where EmpId=@SaleManId) ) and classid in (select Code from crm_clientclass where IsCountSale =1 )      
+   union all                          
+   select '','零  售',null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null where @SaleManId=''                          
+                        
+              
+   update #b set   Jan=(select sum(Fund) from #a where ClientId=Code and DatePart(month,xDate)=1),                                            
+                 Feb=(select sum(Fund) from #a where ClientId=Code and DatePart(month,xDate)=2),                          
+                 Mar=(select sum(Fund) from #a where ClientId=Code and DatePart(month,xDate)=3),                          
+                 Apr=(select sum(Fund) from #a where ClientId=Code and DatePart(month,xDate)=4),                          
+                 May=(select sum(Fund) from #a where ClientId=Code and DatePart(month,xDate)=5),                          
+                 Jun=(select sum(Fund) from #a where ClientId=Code and DatePart(month,xDate)=6),                          
+        Jul=(select sum(Fund) from #a where ClientId=Code and DatePart(month,xDate)=7),                          
+                 Aug=(select sum(Fund) from #a where ClientId=Code and DatePart(month,xDate)=8),                          
+                 Sep=(select sum(Fund) from #a where ClientId=Code and DatePart(month,xDate)=9),                          
+                 Oct=(select sum(Fund) from #a where ClientId=Code and DatePart(month,xDate)=10),                          
+                 Nov=(select sum(Fund) from #a where ClientId=Code and DatePart(month,xDate)=11),                          
+                 Dece=(select sum(Fund) from #a where ClientId=Code and DatePart(month,xDate)=12),                          
+                 tFund=(select sum(Fund) from #a where ClientId=Code),                          
+                 gFund=(select sum(GetFund) from #a where ClientId=Code),                          
+   --              tgRate=convert(decimal(3,1) , 100*(   select sum(NoTaxFund) from #a where ClientId=Code)/ ( select sum(GetFund) from #a where ClientId=Code  )),                                                      
+                 times=(select count(*) from #a where ClientId=Code) ,                      
+                 NoTaxFund =(select sum(NoTaxFund) from #a where ClientId=Code),                       
+                 TaxAmt =(select sum(TaxAmt) from #a where ClientId=Code)          
+          
+--  ,   tgRate=convert(decimal(4,1) , 100*(   select sum(NoTaxFund) from #a where ClientId=Code)/ isnull(( select sum(GetFund) from #a where ClientId=Code  ),1))                                                          
+--select NoTaxFund, isnull(gFund,1) ,  *From #b  where isnull(gFund,1)=0          
+update #b set tgRate= convert(decimal(10,2) , 100*NoTaxFund/ gFund  )  where   isnull(gFund,0)<>0                                                  
+                                                   
+                        
+/*                          
+                 Janr=(select sum(Profit) from #a where ClientId=Code and DatePart(month,xDate)=1),                          
+                 Febr=(select sum(Profit) from #a where ClientId=Code and DatePart(month,xDate)=2),                          
+                 Marr=(select sum(Profit) from #a where ClientId=Code and DatePart(month,xDate)=3),                          
+                 Aprr=(select sum(Profit) from #a where ClientId=Code and DatePart(month,xDate)=4),                          
+                 Mayr=(select sum(Profit) from #a where ClientId=Code and DatePart(month,xDate)=5),                          
+                 Junr=(select sum(Profit) from #a where ClientId=Code and DatePart(month,xDate)=6),                          
+                 Julr=(select sum(Profit) from #a where ClientId=Code and DatePart(month,xDate)=7),                          
+                 Augr=(select sum(Profit) from #a where ClientId=Code and DatePart(month,xDate)=8),                          
+                 Sepr=(select sum(Profit) from #a where ClientId=Code and DatePart(month,xDate)=9),                          
+                 Octr=(select sum(Profit) from #a where ClientId=Code and DatePart(month,xDate)=10),                          
+                 Novr=(select sum(Profit) from #a where ClientId=Code and DatePart(month,xDate)=11),                          
+                 Decer=(select sum(Profit) from #a where ClientId=Code and DatePart(month,xDate)=12),                          
+                 tFundr=(select sum(Profit) from #a where ClientId=Code),                          
+*/                          
+  -- update #b set tgRate=0--tFund/gFund                       
+                         
+   select -1 as xOrder,'clBlack' as FntClr,Code,Name,Jan,Feb,Mar,Apr,May,Jun,Jul,Aug,Sep,Oct,Nov,Dece,tFund,gFund,Janr,Febr,Marr,Aprr,Mayr,Junr,Julr,Augr,Sepr,Octr,Novr,Decer,tFundr,times,tgRate ,   
+NoTaxFund ,TaxAmt from #b  where gFund<>0                   
+      
+        
+   union all                          
+   select 0,'clRed',null,'合计',sum(Jan),sum(Feb),sum(Mar),sum(Apr),sum(May),                      
+  sum(Jun),sum(Jul),sum(Aug),sum(Sep),sum(Oct),sum(Nov),sum(Dece),sum(tFund),                      
+  sum(gFund),sum(Janr),sum(Febr),sum(Marr),sum(Aprr),sum(Mayr),sum(Junr),                      
+  sum(Julr),sum(Augr),sum(Sepr),sum(  Octr),sum(Novr),sum(Decer),sum(tFundr),                      
+  sum(times),convert(decimal(4,1),sum(NoTaxFund)/sum(gFund)*100) ,sum(NoTaxFund) ,sum(TaxAmt)  from #b                          
+   order by xOrder,tFund desc,times desc                          
+                      
+                          
+   drop table #b                        
+      drop table #a                  
+            
+          
+        
+    
+  

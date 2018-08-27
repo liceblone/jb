@@ -1,0 +1,19 @@
+[Path]
+url=http://www.xts.com.cn/jb/update.inf
+pic=pic\aa.jpg
+[Version]
+version=0
+[Exe]
+exe=jingbei.exe
+Title=晶贝电子销售系统
+
+
+用户名：wu107283
+密码：46561911
+
+
+
+quick report 要用当前目录下的版本
+
+
+总机057189908000  

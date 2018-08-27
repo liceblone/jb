@@ -1,0 +1,24 @@
+本仓库 调出单导入加客户 ok
+
+条码调拨确认数量不对  ok
+
+
+发货单，条码删除
+
+
+本仓库调出显示近3天发货单  ok
+
+
+采购到货不变。调拨出库扫条码，或生成条码。
+
+
+发货单按照发货订单
+
+
+
+
+select * from wh_move where Code='mvot00234358'
+
+select * from wh_out where Code='OT00234358'
+
+select * from wh_outdl where outid='OT00234358'

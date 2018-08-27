@@ -1,0 +1,14 @@
+C:\Source\JBSource\瑞萨系统\Client\RsClient\RsClient\bin\Debug\瑞萨管理系统.exe
+C:\Source\JBSource\瑞萨系统\Client\RsClient\RsClient\bin\Debug\瑞萨管理系统.pdb
+C:\Source\JBSource\瑞萨系统\Client\RsClient\RsClient\obj\x86\Debug\ResolveAssemblyReference.cache
+C:\Source\JBSource\瑞萨系统\Client\RsClient\RsClient\obj\x86\Debug\RsClient.Properties.Resources.resources
+C:\Source\JBSource\瑞萨系统\Client\RsClient\RsClient\obj\x86\Debug\GenerateResource.read.1.tlog
+C:\Source\JBSource\瑞萨系统\Client\RsClient\RsClient\obj\x86\Debug\GenerateResource.write.1.tlog
+C:\Source\JBSource\瑞萨系统\Client\RsClient\RsClient\obj\x86\Debug\瑞萨管理系统.exe
+C:\Source\JBSource\瑞萨系统\Client\RsClient\RsClient\obj\x86\Debug\瑞萨管理系统.pdb
+C:\Source\JBSource\瑞萨系统\Client\RsClient\RsClient\bin\Debug\BSGManagement.exe
+C:\Source\JBSource\瑞萨系统\Client\RsClient\RsClient\bin\Debug\DBLinker.exe
+C:\Source\JBSource\瑞萨系统\Client\RsClient\RsClient\bin\Debug\qtintf.dll
+C:\Source\JBSource\瑞萨系统\Client\RsClient\RsClient\bin\Debug\qtintf70.dll
+C:\Source\JBSource\瑞萨系统\Client\RsClient\RsClient\bin\Debug\Config.ini
+C:\Source\JBSource\瑞萨系统\Client\RsClient\RsClient\obj\x86\Debug\RsClient.Form1.resources

@@ -1,0 +1,300 @@
+create Proc Pr_MtrlStorage                                    
+--exec Pr_MtrlStorage @FBeginDate = N'2011-8-9', @FEndDate = N'2011-9-8', @FinoutTypeCode = N'%', @FcltvdCode = N'%', @FinvTypeCode = N'%', @FinvName = N'%', @FgoodCode = N'%', @FcolorCode = N'%', @FGrpFld = N''                                   
+@FBeginDate smalldatetime,                                    
+@FEndDate smalldatetime,                                    
+@FinoutTypeCode varchar(50),                                    
+@FcltvdCode     varchar(50),                                    
+@FinvTypeCode   varchar(50),                                    
+@FinvName       varchar(50),                                    
+@FgoodCode      varchar(50),                                    
+@FcolorCode     varchar(50),                                  
+@FGrpFld        varchar(50)='FgoodCode'    ,     
+@FWhCode        varchar(50)='%'                                    
+as                                    
+/*  
+ FBeginDate,FEndDate,FinOutTypeCode,FcltvdCode,FInvTypeCode,FinvName,FgoodCode,FcolorCode                                    
+                                    
+exec Pr_MtrlStorage '2010-2-12','2010-9-6','%','%','%','%','%','%'  , 'FgoodCode'     
+exec Pr_MtrlStorage '02  2 2010 12:00:00:000AM', '03  4 2010 12:00:00:000AM', '%', '%', '%', '%', '%', '%', 'FGoodCode'                                  
+exec Pr_MtrlStorage '02  2 2010 12:00:00:000AM', '03  4 2010 12:00:00:000AM', '%', '%', '%', '%', '%', '%', 'FinvName%'                                  
+              
+  
+declare @FBeginDate smalldatetime,@FEndDate smalldatetime,@FinoutTypeCode varchar(50),@FcltvdCode     varchar(50),@FinvTypeCode   varchar(50),                                    
+@FinvName       varchar(50),@FproductName  varchar(50),@FgoodCode     varchar(50),@FcolorCode    varchar(50)  ,@FGrpFld        varchar(50)  ,@FWhCode varchar(30)                                
+                                    
+set @FBeginDate='2010-1-1'                                    
+set @FEndDate ='2010-8-1'                                    
+set @FinoutTypeCode ='%'                                    
+set @FcltvdCode     ='%'                                    
+set @FinvTypeCode   ='%'                                    
+set @FinvName       ='3208%'                                    
+set @FproductName  ='%'                                    
+set @FgoodCode     ='00108143%'                                    
+set @FcolorCode ='%'                                    
+set @FGrpFld='FcolorCode'                                  
+set @FWhCode='%'  
+                             
+ */                                    
+            
+declare @FSaleReturn varchar(50) ,@FSaleOut varchar(50)            
+select  @FSaleReturn =FParamValue from  TParamsAndValues where FParamCode='010102'            
+select  @FSaleOut    =FParamValue from  TParamsAndValues where FParamCode='010101'            
+                  
+set @FGrpFld=replace(@FGrpFld,'%','')                                  
+select                                      
+--inM.FWhCode,inM.FinDate,inM.FVendorCode, inM.FinOutTypeCode,                                     
+sum(isnull( inDL.FMainQty,0) ) as FMainQty,sum(isnull( inDL.Fprice*inDL.FMainQty,0) ) as FAmt, sum(isnull( inDL.FPackageQty ,0) ) as FPackageQty                             
+,inv.FinvCode ,inM.FinDate as Fdate       ,inM.FWhCode          
+,inM.FinOutTypeCode                    
+--ut.FunitName ,inv.FinvName,inv.FproductName,inv.FgoodCode,inv.FcolorCode                                    
+into  #itemi                                    
+From Twhin inM                                     
+join Twhindl inDL   on inM.FWhinCode=inDL.FWhinCode                                    
+join Tinventory inv on inv.FinvCode=inDL.FinvCode                                    
+left join Tunit ut  on ut.FunitCOde=inv.FmainUnitCOde                                           
+where inM.Fischk=1                                     
+--and   inM.FinDate>=@FBeginDate                 
+and   inM.FinDate<=@FEndDate                                      
+and  isnull(inM.FinOutTypeCode,'')like @FinoutTypeCode                                      
+and  isnull( inM.FVendorCode,'')  like @FcltvdCode                                          
+and  isnull( inv.FinvTypeCode,'') like @FinvTypeCode                                        
+and  isnull( inv.FinvName ,'')    like @FinvName                                               
+and  isnull(inv.FgoodCode ,'')    like @FgoodCode           
+and  isnull(inv.FcolorCode,'')    like @FcolorCode           
+and  isnull(inM.FWhCode,'')       like @FWhCode                             
+group by  inv.FinvCode  ,inM.FinDate      ,inM.FinOutTypeCode   ,inM.FWhCode                                 
+                                                                
+                                    
+select                        
+--OutM.FWhCode,  OutM.FOutDate,OutM.FinOutTypeCode, OutM.Fcltvdcode,                                     
+sum(isnull( OutDL.FOutQty ,0) ) as FMainQty    ,sum(isnull(OutDL.Fprice*OutDL.FOutQty  ,0) )  as FAmt , sum(isnull(OutDL.FPackageQty  ,0) ) as  FPackageQty                            
+,inv.FinvCode ,OutM.FOutDate as Fdate   ,OUTM.FinOutTypeCode      , OutM.FWhCode                       
+      into  #itemo                                
+from TwhoutM   OutM                                    
+join TwhOutdl  OutDL on OutM.FWhOutCode=OutDL.FWhOutCode                             
+join Tinventory inv on inv.FinvCode=OutDL.FinvCode                                    
+left join Tunit ut  on ut.FunitCOde=inv.FmainUnitCOde                                 
+left join TMtrLStorage stg on OutDl.FinvCode=stg.FinvCode                            
+where OutM.Fischk=1                                     
+--and   OutM.FOutDate>=@FBeginDate                                     
+and  OutM.FOutDate<=@FEndDate                                      
+and  isnull(OutM.FinOutTypeCode,'')like @FinoutTypeCode                                      
+and  isnull( OutM.Fcltvdcode,'')   like @FcltvdCode                                          
+and  isnull( inv.FinvTypeCode,'')  like @FinvTypeCode                                        
+and  isnull( inv.FinvName ,'')     like @FinvName                                              
+and  isnull(inv.FgoodCode ,'')     like @FgoodCode                                    
+and  isnull(inv.FcolorCode,'')     like @FcolorCode          
+and  isnull(OutM.FWhCode,'')       like @FWhCode                                 
+ group by  inv.FinvCode   ,OutM.FOutDate   ,OUTM.FinOutTypeCode      , OutM.FWhCode                           
+                                    
+select sum(isnull(FmainQty,0)) as FmainQty ,sum(isnull(FPackageQty ,0)) as FPackageQty,sum(FAmt)  as Famt,FinvCode , Fdate   , FinOutTypeCode ,FWhCode                                    
+ into #tmpi From #itemi  group by  FinvCode , Fdate      , FinOutTypeCode  ,FWhCode                           
+                                    
+select sum(isnull(FmainQty,0)) as FmainQty ,sum(isnull(FPackageQty ,0)) as FPackageQty,sum(FAmt)  as Famt,FinvCode  , Fdate    , FinOutTypeCode ,FWhCode                                
+ into #tmpo From #itemo  group by  FinvCode , Fdate      , FinOutTypeCode  ,FWhCode                           
+                                                                 
+/*                  
+update #tmpo set FGrossProfit=isnull(Ao.Famt ,0)-isnull( Bi.FSellReturnAmt,0)                    
+--select *                     
+from #tmpo  Ao                    
+left join (select sum(isnull( FAmt,0))  as FSellReturnAmt, FinvCode , Fdate From #itemi  where  FinOutTypeCode='011201' group by  FinvCode , Fdate    )                     
+           As Bi on Ao.FinvCode=Bi.FinvCode and Ao.FDate=Bi.Fdate                    
+  */                                  
+--select *From #tmpo                                  
+                                    
+                                    
+      select   ( isnull( stg.FUltimoBalce ,0)    +isnull(tmp.FMainQty,0) ) as Fstorage                               
+              ,  isnull(stg.FUltimoBalcePkgQty,0)+isnull(tmp.FPackageQty,0) as FStoragePkgQty                                  
+        ,( isnull(stg.FUltimoBalce ,0)     *isnull(stg.FUltimoPrice,0)+isnull(tmp.FMainQty,0)*isnull(stg.FavgPrice,0)   )   as FAmt  ,stg.FinvCode    ,tmp.Fdate ,stg.FWhCode    
+      into #bg                                    
+      from TMtrLStorage stg left join #tmpi tmp on stg.FinvCode  =tmp.FinvCode and  tmp.Fdate<@FBeginDate and stg.FWhCode =tmp.FWhCode  --where   tmp.Fdate<@FBeginDate     -- tmp.Fdate is null --or                             
+union   all                               
+      select  isnull(-tmp.FMainQty,0) as Fstorage ,isnull(-tmp.FPackageQty,0) as FStoragePkgQty                    
+             ,isnull(-tmp.FmainQty ,0)*isnull(stg.FavgPrice,0)   ,stg.FinvCode      , tmp.Fdate  ,stg.FWhCode    
+      from TMtrLStorage stg left join #tmpo tmp on stg.FinvCode  =tmp.FinvCode  and tmp.Fdate<@FBeginDate and stg.FWhCode =tmp.FWhCode                                     
+                              
+      select   ( isnull( stg.FUltimoBalce ,0) + isnull(tmp.FMainQty,0) ) as Fstorage  ,isnull(stg.FUltimoBalcePkgQty,0)+isnull(tmp.FPackageQty,0) as FStoragePkgQty                                  
+              ,( isnull(stg.FUltimoBalce ,0)*isnull(stg.FUltimoPrice,0)+isnull(tmp.FMainQty,0)*isnull(stg.FavgPrice,0)  )   as FAmt  ,stg.FinvCode   ,stg.FWhCode    
+        into #ed                                    
+      from TMtrLStorage stg left join #tmpi tmp on stg.FinvCode  =tmp.FinvCode   and stg.FWhCode =tmp.FWhCode    
+union        all                          
+      select   isnull(-tmp.FMainQty,0) as Fstorage ,isnull(-tmp.FPackageQty,0) as FStoragePkgQty                                    
+              ,isnull(-tmp.FmainQty,0)*isnull(stg.FavgPrice,0)   ,stg.FinvCode  ,stg.FWhCode    
+      from TMtrLStorage stg left join #tmpo tmp on stg.FinvCode  =tmp.FinvCode   and stg.FWhCode =tmp.FWhCode    
+                              
+-- select *From TMtrLStorage #bg                              
+                              
+/*                       
+exec Pr_MtrlStorage '2010-2-12','2010-3-6','%','%','%','%','%','%'  , 'FgoodCode'                                            
+ */              
+                               
+    select                           
+    (select sum( Fstorage  )  from #bg   where FinvCode=inv.FinvCode and FWhCode=Wh.FWhCode ) as FBGstorage ,                                    
+    (select sum( FStoragePkgQty  )  from #bg   where FinvCode=inv.FinvCode and FWhCode=Wh.FWhCode ) as FBGStoragePkgQty ,                                    
+    (select sum( FAmt  )   from #bg   where FinvCode=inv.FinvCode and FWhCode=Wh.FWhCode ) as FBGAmt ,                                    
+                                    
+    (select sum( FMainQty )    from #tmpi   where  FinvCode=inv.FinvCode and Fdate>=@FbeginDate and FWhCode=Wh.FWhCode )as FinQty  ,                                    
+    (select sum( FPackageQty  )  from #tmpi   where  FinvCode=inv.FinvCode and Fdate>=@FbeginDate and FWhCode=Wh.FWhCode )as FinPkgQty ,                                    
+    (select sum( isnull(famt,0) )from #tmpi   where  FinvCode=inv.FinvCode and Fdate>=@FbeginDate and FWhCode=Wh.FWhCode )as FinAmt ,                      
+                    
+    (select sum( isnull(FMainQty,0))   from #itemi  where  FinvCode=inv.FinvCode and Fdate>=@FbeginDate and FinOutTypeCode=@FSaleReturn and FWhCode=Wh.FWhCode )as FSellReturnQty  ,                                    
+    (select sum( isnull(famt ,0)   )   from #itemi  where  FinvCode=inv.FinvCode and Fdate>=@FbeginDate and FinOutTypeCode=@FSaleReturn and FWhCode=Wh.FWhCode )as FSellReturnAmt ,                                  
+    (select sum( isnull(FPackageQty,0))from #tmpi   where  FinvCode=inv.FinvCode and Fdate>=@FbeginDate and FinOutTypeCode=@FSaleReturn and FWhCode=Wh.FWhCode )as FSellReturnPkgQty ,                                    
+                                
+    (select sum( FMainQty  )     from #tmpo   where  FinvCode=inv.FinvCode and Fdate>=@FbeginDate and FWhCode=Wh.FWhCode  )as FoutQty  ,                                    
+    (select sum( FPackageQty  )  from #tmpo   where  FinvCode=inv.FinvCode and Fdate>=@FbeginDate and FWhCode=Wh.FWhCode  )as FoutPkgQty ,                                    
+    (select sum( isnull(famt,0)) from #tmpo   where  FinvCode=inv.FinvCode and Fdate>=@FbeginDate and FWhCode=Wh.FWhCode  )as FoutAmt              
+                  
+   ,(select sum(isnull(FMainQty,0))     from #tmpo   where  FinvCode=inv.FinvCode and Fdate>=@FbeginDate  and FinOutTypeCode=@FSaleOut and FWhCode=Wh.FWhCode)as FSaleOutqty                                
+   ,(select sum(isnull(famt,0))   from #tmpo   where  FinvCode=inv.FinvCode and Fdate>=@FbeginDate  and FinOutTypeCode=@FSaleOut and FWhCode=Wh.FWhCode)as FSaleOutAmt                     
+   ,(select sum(isnull(FPackageQty,0))  from #tmpo   where  FinvCode=inv.FinvCode and Fdate>=@FbeginDate  and FinOutTypeCode=@FSaleOut and FWhCode=Wh.FWhCode)as FSaleOutPkgQty                                                                    
+ --as FGrossProfit  ,                             
+    ,(select sum( Fstorage  )    from #ed    where  FinvCode=inv.FinvCode and FWhCode=Wh.FWhCode )as FEdstorage                
+    ,(select sum( FStoragePkgQty  )from #ed    where  FinvCode=inv.FinvCode and FWhCode=Wh.FWhCode )as FEdStoragePkgQty                
+    ,(select sum( FAmt  )     from #ed    where  FinvCode=inv.FinvCode and FWhCode=Wh.FWhCode )as FEdAmt                                      
+    ,(select avg( FAvgPrice  )     from TMtrLStorage  where  FinvCode=inv.FinvCode and FWhCode=Wh.FWhCode )as FAvgPrice                                    
+    ,inv.FinvCode,inv.FinvName,inv.FColorCode,inv.FgoodCode,inv.FMainUnitCode   ,Wh.FWhCode ,Wh.FWhName    
+    into #SS              
+    from Tinventory inv   , TWarehouse   Wh    
+    where  exists  (select FinvCode from TMtrLStorage  where FinvCode=inv.FinvCode )        
+    and  isnull(inv.FinvTypeCode,'')  like @FinvTypeCode                                        
+    and  isnull(inv.FinvName    ,'')  like @FinvName                                               
+    and  isnull(inv.FgoodCode   ,'')  like @FgoodCode                              
+    and  isnull(inv.FcolorCode  ,'')  like @FColorCode            
+    and  isnull(Wh.FWhCode      ,'')  like @FWhCode     
+               
+  
+CREATE TABLE #Rpt(  
+ [FBGstorage] [decimal](38, 6) ,  
+ [FBGStoragePkgQty] [decimal](38, 6) ,  
+ [FBGAmt] [decimal](38, 6) ,  
+ [FinQty] [decimal](38, 6) ,  
+ [FinPkgQty] [decimal](38, 6) ,  
+ [FinAmt] [decimal](38, 11) ,  
+ [FSellReturnQty] [decimal](38, 6) ,  
+ [FSellReturnAmt] [decimal](38, 11) ,  
+ [FSellReturnPkgQty] [decimal](38, 6) ,  
+ [FoutQty] [decimal](38, 6) ,  
+ [FoutPkgQty] [decimal](38, 6) ,  
+ [FoutAmt] [decimal](38, 11) ,  
+ [FSaleOutqty] [decimal](38, 6) ,  
+ [FSaleOutPkgQty] [decimal](38, 6) ,  
+ [FSaleOutAmt] [decimal](38, 11) ,  
+ [FEdstorage] [decimal](38, 6) ,  
+ [FEdStoragePkgQty] [decimal](38, 6) ,  
+ [FEdAmt] [decimal](38, 6) ,  
+ [FAvgPrice] [decimal](38, 6) ,  
+ [FGrossProfit] [decimal](38, 6) ,  
+ [FSaleOutPrice] [decimal](38, 6) ,  
+ [FinvName] [varchar](50) ,  
+ [FColorCode] [varchar](50) ,  
+ [FgoodCode] [varchar](50) ,  
+ [FunitName] [varchar](50) ,  
+ [FWhCode] [varchar](30) ,  
+ [FWhName] [varchar](50) ,  
+)   
+  
+-- drop table T select ','+name+char(10)+'=case when '+name +'=0 then null else '+name+' end ',*From syscolumns where id=object_id('T')  
+                
+if @FGrpFld='FinvName'                                  
+begin            
+ insert into #Rpt                        
+ select              
+ sum( isnull(A.FBGstorage,0)   ) as FBGstorage,  sum( isnull(A.FBGStoragePkgQty,0)) as FBGStoragePkgQty,              
+ sum( isnull(A.FBGAmt,0)   )  as FBGAmt,  sum( isnull(A.FinQty,0)   )   as FinQty,              
+ sum( isnull(A.FinPkgQty,0)   )  as FinPkgQty, sum( isnull(A.FinAmt,0)   )   as FinAmt,              
+ sum( isnull(A.FSellReturnQty,0)) as FSellReturnQty,sum( isnull(A.FSellReturnAmt,0)) as FSellReturnAmt, sum( isnull(A.FSellReturnPkgQty,0))as FSellReturnPkgQty,                          
+ sum( isnull(A.FoutQty,0)   )  as FoutQty,  sum( isnull(A.FoutPkgQty,0)   )  as FoutPkgQty,              
+ sum( isnull(A.FoutAmt,0)   )  as FoutAmt,  sum( isnull(A.FSaleOutqty,0)  )  as FSaleOutqty,    sum( isnull(A.FSaleOutPkgQty,0)   )as FSaleOutPkgQty,             
+ sum( isnull(A.FSaleOutAmt,0)   ) as FSaleOutAmt, sum( isnull(A.FEdstorage,0)   )  as FEdstorage,              
+ sum( isnull(A.FEdStoragePkgQty,0) )as FEdStoragePkgQty, sum( isnull(A.FEdAmt,0)  )  as FEdAmt,               
+ avg( isnull(A.FAvgPrice,0)   )  as FAvgPrice,                 
+ sum(    ( isnull(A.FSaleOutqty,0)   -isnull(A.FSellReturnQty,0)  )* (isnull( A.FSaleOutAmt ,0) / A.FSaleOutqty   -isnull(A.FAvgPrice,0) ) ) as FGrossProfit   ,    
+ avg( (isnull( A.FSaleOutAmt ,0) / A.FSaleOutqty  )  ) as FSaleOutPrice         
+ ,A.FinvName  ,'',''  
+ ,ut.FunitName  ,A.FWhCode ,A.FWhName      
+ from #SS A join Tunit ut on A.FMainUnitCode=ut.FunitCode              
+group by  A.FinvName ,  ut.FunitName  ,A.FWhCode ,A.FWhName    
+                                  
+end                                  
+if @FGrpFld='FcolorCode'                                  
+begin      
+ insert into #Rpt                           
+ select              
+ sum( isnull(A.FBGstorage,0)   ) as FBGstorage,  sum( isnull(A.FBGStoragePkgQty,0)) as FBGStoragePkgQty,              
+ sum( isnull(A.FBGAmt,0)   )  as FBGAmt,   sum( isnull(A.FinQty,0)   )   as FinQty,              
+ sum( isnull(A.FinPkgQty,0)   )  as FinPkgQty,  sum( isnull(A.FinAmt,0)   )   as FinAmt,              
+ sum( isnull(A.FSellReturnQty,0)) as FSellReturnQty, sum( isnull(A.FSellReturnAmt,0) ) as FSellReturnAmt,sum( isnull(A.FSellReturnPkgQty,0))as FSellReturnPkgQty,                    
+ sum( isnull(A.FoutQty,0)   )  as FoutQty,   sum( isnull(A.FoutPkgQty,0)   )  as FoutPkgQty,              
+ sum( isnull(A.FoutAmt,0)   )  as FoutAmt,   sum( isnull(A.FSaleOutqty,0)  )  as FSaleOutqty,   sum( isnull(A.FSaleOutPkgQty,0)   )as FSaleOutPkgQty,              
+ sum( isnull(A.FSaleOutAmt,0)  ) as FSaleOutAmt,  sum( isnull(A.FEdstorage,0 )  )  as FEdstorage,           
+ sum( isnull(A.FEdStoragePkgQty,0)) as FEdStoragePkgQty,sum( isnull(A.FEdAmt,0)    )  as FEdAmt,               
+ avg( isnull(A.FAvgPrice,0)   ) as FAvgPrice,                  
+ sum(    ( isnull(A.FSaleOutqty,0)   -isnull(A.FSellReturnQty,0)  )* (isnull( A.FSaleOutAmt ,0) / A.FSaleOutqty   -isnull(A.FAvgPrice,0)    )  ) as FGrossProfit ,    
+ avg( (isnull( A.FSaleOutAmt ,0) / A.FSaleOutqty  )  ) as FSaleOutPrice          
+ ,A.FinvName , A.FColorCode  ,''  
+ ,ut.FunitName    ,A.FWhCode ,A.FWhName      
+ from #SS A join Tunit ut on A.FMainUnitCode=ut.FunitCode              
+ group by  A.FinvName , A.FColorCode  ,ut.FunitName  ,A.FWhCode ,A.FWhName                              
+end       
+else   --if @FGrpFld='FgoodCode'                                  
+begin      
+ insert into #Rpt            
+ select              
+ sum( isnull(A.FBGstorage,0) )  as FBGstorage,  sum( isnull(A.FBGStoragePkgQty,0)  )as FBGStoragePkgQty,              
+ sum( isnull(A.FBGAmt,0)   )    as FBGAmt,   sum( isnull(A.FinQty,0)    )  as FinQty,              
+ sum( isnull(A.FinPkgQty,0)  )  as FinPkgQty,  sum( isnull(A.FinAmt,0)    )  as FinAmt,              
+ sum( isnull(A.FSellReturnQty,0)) as FSellReturnQty, sum( isnull(A.FSellReturnAmt,0)) as FSellReturnAmt, sum( isnull(A.FSellReturnPkgQty,0))as FSellReturnPkgQty,              
+ sum( isnull(A.FoutQty,0)   )  as FoutQty,   sum( isnull(A.FoutPkgQty,0 )   ) as FoutPkgQty,              
+ sum( isnull(A.FoutAmt,0)   )  as FoutAmt,   sum( isnull(A.FSaleOutqty,0)   ) as FSaleOutqty,    sum( isnull(A.FSaleOutPkgQty,0)   )as FSaleOutPkgQty,           
+ sum( isnull(A.FSaleOutAmt,0)  ) as FSaleOutAmt,  sum( isnull(A.FEdstorage,0 )   ) as FEdstorage,              
+ sum( isnull(A.FEdStoragePkgQty,0)) as FEdStoragePkgQty,sum( isnull(A.FEdAmt,0)    )  as FEdAmt,               
+ avg( isnull(A.FAvgPrice,0)   )as FAvgPrice,     
+ sum(    ( isnull(A.FSaleOutqty,0)   -isnull(A.FSellReturnQty,0)  )* (isnull( A.FSaleOutAmt ,0) / A.FSaleOutqty   -isnull(A.FAvgPrice,0)    )  ) as FGrossProfit    ,    
+ avg( (isnull( A.FSaleOutAmt ,0) / A.FSaleOutqty  )  ) as FSaleOutPrice         
+ , A.FinvName ,isnull( A.FColorCode ,'') FColorCode ,isnull( A.FgoodCode,'')  FgoodCode ,ut.FunitName  ,A.FWhCode ,A.FWhName     
+ from #SS A join Tunit ut on A.FMainUnitCode=ut.FunitCode              
+ group by  A.FinvName ,isnull( A.FColorCode ,'') ,isnull( A.FgoodCode,'') ,ut.FunitName   ,A.FWhCode ,A.FWhName           
+end          
+  
+  
+delete #Rpt where  [FBGstorage] + [FinQty] + [FoutQty]  + [FEdstorage]=0  
+  
+update #Rpt set   
+ FBGstorage   =case when FBGstorage=0  then null else FBGstorage end   ,FBGStoragePkgQty =case when FBGStoragePkgQty=0 then null else FBGStoragePkgQty end   
+,FBGAmt    =case when FBGAmt=0   then null else FBGAmt end    ,FinQty    =case when FinQty=0 then null else FinQty end   
+,FinPkgQty   =case when FinPkgQty=0  then null else FinPkgQty end   ,FinAmt    =case when FinAmt=0 then null else FinAmt end   
+,FSellReturnQty  =case when FSellReturnQty=0 then null else FSellReturnQty end  ,FSellReturnAmt  =case when FSellReturnAmt=0 then null else FSellReturnAmt end   
+,FSellReturnPkgQty =case when FSellReturnPkgQty=0 then null else FSellReturnPkgQty end ,FoutQty   =case when FoutQty=0 then null else FoutQty end   
+,FoutPkgQty   =case when FoutPkgQty=0  then null else FoutPkgQty end   ,FoutAmt   =case when FoutAmt=0 then null else FoutAmt end   
+,FSaleOutqty  =case when FSaleOutqty=0 then null else FSaleOutqty end   ,FSaleOutPkgQty  =case when FSaleOutPkgQty=0 then null else FSaleOutPkgQty end   
+,FSaleOutAmt  =case when FSaleOutAmt=0 then null else FSaleOutAmt end   ,FEdstorage   =case when FEdstorage=0 then null else FEdstorage end   
+,FEdStoragePkgQty =case when FEdStoragePkgQty=0 then null else FEdStoragePkgQty end ,FEdAmt    =case when FEdAmt=0 then null else FEdAmt end   
+,FAvgPrice   =case when FAvgPrice=0  then null else FAvgPrice end   ,FGrossProfit  =case when FGrossProfit=0 then null else FGrossProfit end   
+,FSaleOutPrice  =case when FSaleOutPrice=0 then null else FSaleOutPrice end   
+  
+select *From #Rpt  
+  
+  
+drop table #Rpt  
+drop table #tmpi   drop table #tmpo                                    
+drop table #itemi  drop table #itemo                                 
+drop table #bg     drop table #ed                  
+drop table #SS                                        
+                                    
+                                    
+                                    
+                                    
+                                     
+                                  
+                                
+                              
+                            
+                          
+                        
+                      
+                    
+ ------------------------------------------------------------------------------------                    
+                  
+                
+              

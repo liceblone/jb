@@ -1,0 +1,12 @@
+finv00002805
+
+9727.5
+
+
+select * from TFormalInvoiceM where code=:code
+
+
+select *From TFormalInvoiceDL where code=:code
+
+
+XSH

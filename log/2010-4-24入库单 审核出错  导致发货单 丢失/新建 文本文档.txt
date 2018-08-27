@@ -1,0 +1,47 @@
+CREATE PROCEDURE [dbo].[wh_in_chk1]                   
+                 @InId varchar(20),                  
+                 @HandManId varchar(20)                  
+AS                  
+--2006-7-28同行入库加税率                
+                
+ declare @InOut varchar(20),@IsChk bit,@IsClose bit,@ChkManId varchar(50),@BillId varchar(20),@ClientId varchar(20),@InTypeId varchar(20) ,@TaxRate money                 
+ set @BillId=21                  
+ select @InOut=InTypeId,@IsChk=IsChk,@IsClose=IsClose,@ChkManId=ChkManId,@ClientId=ClientId,@InTypeId=InTypeId from wh_in where Code=@InId and IsChk=0                  
+ if @@rowcount<>1                  
+   Raiserror('系统找不到该入库单,数据可能已被其它操作员删除或已审核,请[-刷新-]验证!',16,1)                  
+ else                  
+ begin                  
+    begin tran                  
+                      
+        
+        
+      select  @TaxRate=MoneyX from sys_parameters where Id=6  --2006-7-28 去掉   TaxRate=@TaxRate,            
+      update wh_in set IsChk=1,ChkManId=@HandManId,ChkTime=dbo.Fn_IsMonthClose (ChkTime)   where Code=@InId           
+        
+
+--      if exists(select ChkTime,billtime,* from         wh_in where ChkTime<billtime  )         --2010-2-24 之前版本  发货单会丢失
+        
+      if exists(select ChkTime,billtime,* from         wh_in where ChkTime<billtime and  Code=@InId )         
+      begin        
+           raiserror('审核时间有误！',16,1)                  
+           --return(0)            
+      end        
+        
+ if @InOut='I08' or    @InOut='I09'             
+      exec fn_UpdateCost 'wh_in',@InId            
+          
+ update wr_ware set IsUse=1 from wr_ware T1 join wh_inDl T2 on T1.id=t2.wareid   where InId=@InId           
+--开户雇用标志                  
+            
+    commit                  
+    if @@error=0                  
+       return(1)                  
+    rollback                  
+    raiserror('事务提交失败,操作无效!',16,1)                  
+    return(0)                  
+ end                  
+Return 1                
+          
+        
+    
+  

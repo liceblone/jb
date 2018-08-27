@@ -1,0 +1,10 @@
+
+2011-5-8 14:20:12	1.0.0.45	E:\销售系统\DataBase\UserData                45 web
+               
+2013-01-11 0:48:24	1.0.0.56	C:\ALL_ENV\面料销售系统\DataBase\UserData                
+2013-01-19 14:37:39	1.0.0.58	C:\ALL_ENV\面料销售系统\DataBase\UserData                
+2013-03-30 22:22:34	1.0.0.59	C:\ALL_ENV\面料销售系统\DataBase\UserData                
+2013-06-16 22:39:39	1.0.0.61	C:\ALL_ENV\面料销售系统\DataBase\UserData                
+2013-07-06 20:43:08	1.0.0.61	C:\Source\JBSource\瑞萨系统\DataBase\UserDataBase                
+2013-07-06 20:46:14	1.0.0.61	C:\Source\JBSource\瑞萨系统\DataBase\UserData                
+2013-07-06 20:51:23	1.0.0.61	C:\Source\JBSource\瑞萨系统\DataBase\UserData                

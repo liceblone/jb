@@ -1,0 +1,60 @@
+
+truncate table sl_invoicedl
+truncate table sl_invoice
+
+truncate table sl_returndl
+truncate table sl_return     delete sl_return     
+
+
+sp_helptext   FK_SL_RETUR_REFERENCE_SL_RETUR
+ sl_return
+
+truncate table ph_arrivedl
+truncate table ph_arrive
+
+truncate table ph_returndl
+delete ph_return
+
+truncate table wh_outdl
+delete wh_out
+
+truncate table wh_inDL
+delete wh_in
+
+
+truncate table fn_payment
+truncate table fn_receiver
+truncate table fn_shldin
+truncate table fn_shldout
+truncate table fn_clntransfer
+
+delete sl_retailDL
+delete sl_retail
+
+
+sp_helptext wr_ware 
+
+
+alter           view Wr_ware                              
+as                                 
+select                        
+A.Id ,A.MemeberId,A.ClassId,A.Model,                      
+A.PartNo,A.Brand,A.Pack,A.Origin,A.Unit,A.SafePos,                      
+A.MaxPos,A.Note,A.Stock,A.IsUse,A.IsTmp,                      
+A.Place,A.CreateDataTime,A.CreateManID,A.ReplaceWareID,                      
+A.BJjb_MinPos as MinPos,A.BJjb_Cost   as Cost ,                      
+A.BJjb_Price  as Price ,A.BJjb_PriceRate as PriceRate ,                      
+A.BJjb_SalePrice as SalePrice ,A.BJjb_IsCommon  as IsCommon  ,                
+A.IsPub       ,              
+A.createManName   ,        
+A.IsDel   ,  A.DelTime,A.DelManId,A.DelManPlace ,      
+A.IsChk   ,IsUpload  ,  
+A.BjUseSerialNo as UseSerialNo  
+From jbhzuserdata.dbo.T_AllWares A            
+                 join wr_class   B on A.ClassId=B.code                
+where ( isnull(B.IsPrivate,0) =0  or A.Place='jbksuserdata'         )            
+             
+      
+  
+    
+  

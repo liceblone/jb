@@ -1,0 +1,67 @@
+select *From wh_warehouse 
+
+select *From sys_DataBase
+
+select *From sys_tab
+
+
+
+create table TSalesGroup
+(
+FSalesGroupCode varchar(30),
+FSalesGroupName varchar(30),
+FNote  varchar(300 )
+)
+
+
+select * From TSalesGroup where isnull(FDEL,0)=0
+
+select *From TAscription
+
+
+
+alter table hr_employee add FSalesGroupCode varchar(30)
+
+
+
+
+drop table  TAscription
+go
+Create table TAscription
+(
+FAscriptionCode varchar(30),
+FAscriptionName varchar(100),
+FDEL   bit default 0 ,
+FNote varchar(300)
+)
+go
+truncate  table TAscription
+go
+insert into TAscription
+(FAscriptionCode,FAscriptionName )
+select '01','所有'
+union all 
+select '0101','公司客户'
+union all
+select '0101','业务的客户'
+
+go
+
+select *From TAscription
+
+go
+
+
+
+
+
+Create table TAscriptionToRole
+(
+FAscriptionCode varchar(30),
+FRoleCode varchar(30),
+FNote varchar(300)
+
+)
+--FAscriptionCode
+
+Pr_CusPurchaseOrderRemainQty

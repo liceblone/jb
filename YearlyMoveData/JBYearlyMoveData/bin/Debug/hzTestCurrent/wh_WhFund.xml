@@ -1,0 +1,30 @@
+<?xml version="1.0" standalone="yes"?>
+<DocumentElement>
+  <table>
+    <WhId>003</WhId>
+    <tfund>452055.110285</tfund>
+  </table>
+  <table>
+    <WhId>005</WhId>
+    <tfund>-2933286.056742</tfund>
+  </table>
+  <table>
+    <WhId>008</WhId>
+    <tfund>370136.312051</tfund>
+  </table>
+  <table>
+    <WhId>009</WhId>
+    <tfund>67402.840000</tfund>
+  </table>
+  <table>
+    <WhId>01</WhId>
+    <tfund>5490338.335744</tfund>
+  </table>
+  <table>
+    <WhId>02</WhId>
+    <tfund>8852806.771184</tfund>
+  </table>
+  <table>
+    <tfund>12299453.312522</tfund>
+  </table>
+</DocumentElement>

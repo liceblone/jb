@@ -1,0 +1,93 @@
+-- 打印
+
+select * From T506 where f01=178 --link man   
+update T506 set f16=5028 where f01=178   --3094
+
+select * From T506 where f01=101 -- Tel
+update T506 set f16=5029 where f01=101 --3095
+
+select * From T506 where f01=100 -- linkfax
+update T506 set f16=5030 where f01=100   --3093
+
+
+
+drop  proc GetLkpClient_InvoiceOnly  
+go
+
+CREATE   proc GetLkpClient_InvoiceOnly  
+--     GetLkpClient_InvoiceOnly '0078'
+--查询数据用这个程序GetLkpClient_IsUse  09.07.12  
+--打单客户GetLkpClient_Bill   不含潜在客户  classid<>05 and isuse=1  
+                 @LoginId varchar(50)                    
+                    
+AS                    
+          --'0021'   
+--declare  @LoginId varchar(50)               
+--set @LoginId ='0007'            
+            
+declare @IsAdmin bit,@EmpId varchar(20),@i int                    
+set @IsAdmin=0                    
+
+
+create table #tmp
+(
+Code varchar(100),		Name varchar(100),		NickName varchar(100),		ClassId varchar(100),		FatherId varchar(100),
+RegionId varchar(100),	TaxId varchar(100),		LawMan varchar(100),		Bank varchar(100),			BankId varchar(100),
+LinkMan varchar(100),	Tel varchar(100),		Fax varchar(100),			Addr varchar(100),			Zip varchar(100),
+Mobile varchar(100),	BeepPager varchar(100),	Url varchar(100),			Email varchar(100),			Note varchar(100),
+Demand varchar(100),	Products varchar(100),	IsPub varchar(100),			Balance money,				AddEmpId varchar(100),
+F_ID varchar(100),		IsUse bit,				CreditLine money,			mon_cls_entry money,		KeyWords varchar(100),
+Cls_Entry_Months varchar(100),					GatheringEmp varchar(100),	OldNickName varchar(100),	Issuspect varchar(100),
+SuspectNote varchar(100),						debt money,					useSLOrdToDeliver varchar(100),
+FAscriptionCode varchar(100),					GatheringEmpName varchar(200)
+)
+
+ 
+
+-- sp_help  crm_client 
+
+select @IsAdmin=IsAdmin,@EmpId=EmpId from sys_user where LoginId=@LoginId                    
+  if isnull(@IsAdmin,0)=0                    
+  begin                 
+   /*   */       
+     insert into  #tmp  
+
+     select A.*, '' as GatheringEmpName            
+      from crm_client A  --left join  hr_employee B  on A.GatheringEmp=b.code                  
+      where (IsPub=1 or                  
+      A.code    in (select ClientId from   crm_clientemp where empid=@EmpId) or                
+      A.code    in (select clientid from sl_empclient where empid=@EmpId) or                  
+      A.ClassID in (select ClassCode From  Crm_ActorClientClass where Actorid in  (select GroupID from  sys_groupuser  where UserID=@EmpId)   )                    
+        )and classid <>'05'      and isUse=1    
+      order by A.code                            
+  end                  
+  else                    
+     insert into  #tmp  
+     select A.*  ,B.name as GatheringEmpName  
+     from crm_client   A             
+             left  join hr_employee  B on A.GatheringEmp=b.code  where A.isUse=1  order by A.code             
+   
+--select LinkMan , Tel ,code  From crm_client
+
+update #tmp 
+set LinkMan ='***', Tel ='***',Fax='***' 
+where
+ClassID in (select ClassCode From  Crm_ActorClientClass where Actorid in 
+             (select GroupID from  sys_groupuser  where UserID=@EmpId and groupid in (select code from sys_group where ForDeliverOnly =1 ) )
+           )
+
+select *From #tmp
+
+drop Table #tmp
+
+
+--sp_help  crm_client
+
+
+
+go
+
+update sys_group set ForDeliverOnly =1 where code=48
+ 
+
+

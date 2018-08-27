@@ -1,0 +1,106 @@
+<?xml version="1.0" standalone="yes"?>
+<DocumentElement>
+  <table>
+    <Code>000</Code>
+    <Name>现金帐户</Name>
+    <Fund>13864887.9934</Fund>
+    <UnChkFund>10957040.9934</UnChkFund>
+    <unConfirmFund>13864887.9934</unConfirmFund>
+  </table>
+  <table>
+    <Code>00001</Code>
+    <Name>  文化290号</Name>
+    <Fund>170230.5503</Fund>
+    <UnChkFund>6882.5503</UnChkFund>
+    <unConfirmFund>170230.5503</unConfirmFund>
+  </table>
+  <table>
+    <Code>00002</Code>
+    <Name>  信用卡</Name>
+    <Fund>13447213.7631</Fund>
+    <UnChkFund>10533853.7631</UnChkFund>
+    <unConfirmFund>13447213.7631</unConfirmFund>
+  </table>
+  <table>
+    <Code>00003</Code>
+    <Name>  手头款</Name>
+    <Fund>254673.1800</Fund>
+    <UnChkFund>424920.1800</UnChkFund>
+    <unConfirmFund>254673.1800</unConfirmFund>
+  </table>
+  <table>
+    <Code>00004</Code>
+    <Name>  时代063号</Name>
+    <Fund>0.0000</Fund>
+    <UnChkFund>0.0000</UnChkFund>
+    <unConfirmFund>0.0000</unConfirmFund>
+  </table>
+  <table>
+    <Code>00005</Code>
+    <Name>  费用开支</Name>
+    <Fund>-7229.5000</Fund>
+    <UnChkFund>-8615.5000</UnChkFund>
+    <unConfirmFund>-7229.5000</unConfirmFund>
+  </table>
+  <table>
+    <Code>001</Code>
+    <Name>银行帐户</Name>
+    <Fund>2939468.3600</Fund>
+    <UnChkFund>3119468.3600</UnChkFund>
+    <unConfirmFund>2939468.3600</unConfirmFund>
+  </table>
+  <table>
+    <Code>00101</Code>
+    <Name>  建行1号</Name>
+    <Fund>875144.2100</Fund>
+    <UnChkFund>875144.2100</UnChkFund>
+    <unConfirmFund>875144.2100</unConfirmFund>
+  </table>
+  <table>
+    <Code>00102</Code>
+    <Name>  建行2号</Name>
+    <Fund>0.1000</Fund>
+    <UnChkFund>0.1000</UnChkFund>
+    <unConfirmFund>0.1000</unConfirmFund>
+  </table>
+  <table>
+    <Code>00103</Code>
+    <Name>  建行3号</Name>
+    <Fund>0.0000</Fund>
+    <UnChkFund>0.0000</UnChkFund>
+    <unConfirmFund>0.0000</unConfirmFund>
+  </table>
+  <table>
+    <Code>00104</Code>
+    <Name>  建行4号</Name>
+    <Fund>2064324.0500</Fund>
+    <UnChkFund>2244324.0500</UnChkFund>
+    <unConfirmFund>2064324.0500</unConfirmFund>
+  </table>
+  <table>
+    <Code>00105</Code>
+    <Name>  建行5号</Name>
+    <Fund>0.0000</Fund>
+    <UnChkFund>0.0000</UnChkFund>
+    <unConfirmFund>0.0000</unConfirmFund>
+  </table>
+  <table>
+    <Code>002</Code>
+    <Name>票据帐户</Name>
+    <Fund>7514777.4500</Fund>
+    <UnChkFund>6834777.4500</UnChkFund>
+    <unConfirmFund>7464777.4500</unConfirmFund>
+  </table>
+  <table>
+    <Code>00201</Code>
+    <Name>  承兑汇票帐户</Name>
+    <Fund>7514777.4500</Fund>
+    <UnChkFund>6834777.4500</UnChkFund>
+    <unConfirmFund>7464777.4500</unConfirmFund>
+  </table>
+  <table>
+    <Fund>24319133.8034</Fund>
+    <UnChkFund>20911286.8034</UnChkFund>
+    <unConfirmFund>24269133.8034</unConfirmFund>
+  </table>
+</DocumentElement>

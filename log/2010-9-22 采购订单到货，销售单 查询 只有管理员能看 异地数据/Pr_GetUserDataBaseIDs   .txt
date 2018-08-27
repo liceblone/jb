@@ -1,0 +1,12 @@
+-- sempid ,sLocalUserDB  
+create   proc Pr_GetUserDataBaseIDs  
+@empid varchar(30),  
+@CurrentUserDB varchar(30)  
+as  
+  
+if exists(select * from sys_user where empid=@empid and IsAdmin=1)  
+ select * from jingbeisysPub.dbo.sys_filiale order by Code  
+else  
+ select * from jingbeisysPub.dbo.sys_filiale  where tabid in (select code from jingbeisysPub.dbo.sys_tab where db=@CurrentUserDB)  
+  
+  

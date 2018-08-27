@@ -1,0 +1,46 @@
+/*****************************************************************************
+ *	Copyright(c) 2010,  RealTeK Technology Inc. All Right Reserved.
+ *  
+ *	Realtek RTL8192C PCI-E 802.11B/G/N 300M Wireless NIC Release Note. 
+ *	
+ *	Description:	
+ *					N.VVVV.DDDD.YYYY
+ *					N		-	NDIS number
+ *					VVVV	-	Version	1001	-->
+ *					DDDD	-	Data	10/19	-->
+ *					YYYY	-	Year	2007	-->	
+ * 
+ *****************************************************************************/
+
+
+############################################################################
+	Version:		
+	1000.0.0224.2010
+	
+	Reason:			
+	1. Formal Release
+	
+	
+############################################################################
+	Version:		
+	1001.0.0224.2010
+	
+	Reason:			
+	1. Fix 92CU uplink issue
+	
+	
+############################################################################
+	Version:		
+	1002.0.0311.2010
+	
+	Reason:			
+	1. Add VWifi feature
+	2. Fix Adhoc unstable
+	3. Improve throughput
+############################################################################
+	Version:		
+	1003.0.0326.2010
+	
+	Reason:			
+	1. Fix vwifi beacon issue.
+	2. Add WHQL related feature.

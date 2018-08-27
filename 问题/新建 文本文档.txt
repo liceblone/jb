@@ -1,0 +1,37 @@
+那个制单日期能不有改一下
+
+
+CREATE TABLE [wr_Class] (
+	[code] [varchar] (50) COLLATE Chinese_PRC_CI_AS NOT NULL ,--分类代号
+	[Name] [varchar] (50) COLLATE Chinese_PRC_CI_AS NOT NULL ,--分类名称
+	[parentcode] [varchar] (50) COLLATE Chinese_PRC_CI_AS NOT NULL--父节点代号 
+) ON [PRIMARY]
+GO
+
+
+
+
+select *  ,(select top 1 f_citycode from T_City  where w.f_citycode  like f_citycode +'%'
+ and f_citycode <>w.f_citycode 
+)from T_City w
+
+
+
+
+
+
+CREATE TABLE [wr_Ware] (
+	[id] [int] IDENTITY (1, 1) NOT NULL ,
+	[classid] [varchar] (50) COLLATE Chinese_PRC_CI_AS NULL , --分类代号
+	[model] [varchar] (50) COLLATE Chinese_PRC_CI_AS NULL ,--型号
+	[PartNo] [varchar] (200) COLLATE Chinese_PRC_CI_AS NULL ,--规格
+	[Brand] [varchar] (50) COLLATE Chinese_PRC_CI_AS NULL ,--品牌
+	[pack] [varchar] (50) COLLATE Chinese_PRC_CI_AS NULL ,--封装
+	[Origin] [varchar] (50) COLLATE Chinese_PRC_CI_AS NULL ,--产地
+	[Unit] [varchar] (20) COLLATE Chinese_PRC_CI_AS NULL,--单位
+	[WareStat] [varchar] (20) COLLATE Chinese_PRC_CI_AS NULL,  --库存状态： 现货、订货
+	[Qty] [int]  NULL   --库存数量，预留字段
+) ON [PRIMARY]
+GO
+
+Alter table wr_ware add wareID int Null  --增加源表ID字段

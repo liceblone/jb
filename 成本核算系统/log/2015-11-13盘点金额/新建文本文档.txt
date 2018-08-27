@@ -1,0 +1,10 @@
+
+select FMonth, FinvCode, FmainQty = SUM(FMainQty)  , famt = SUM(Famt)  from
+(
+select dbo.Fn_GetFirstDayofMonth( m.FChkTime) as FMonth,dl.FinvCode, dl.FMainQty, dl.FMainQty* dl.Fprice as FAmt 
+from TWhin m join TWhinDL dl on m.FWhinCode = dl.FWhinCode where m.FinOutTypeCode ='I99' and dl.FMainQty<>0 and dl.Fprice <>0
+union all
+select  dbo.Fn_GetFirstDayofMonth( m.FChkTime) as FMonth, dl.FinvCode, -dl.FOutQty ,-dl.FOutQty* dl.Fprice as FAmt  
+from TWhOutM m join TWhOutDL dl on m.FWhOutCode =dl.FWhOutCode where m.FinOutTypeCode ='X99' and dl.FOutQty<>0 and dl.Fprice <>0
+) as tmp
+ group by FMonth,FinvCode

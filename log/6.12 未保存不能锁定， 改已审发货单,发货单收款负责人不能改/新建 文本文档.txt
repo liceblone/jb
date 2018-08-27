@@ -1,0 +1,4 @@
+
+alter table T602 add f36 varchar(20)
+alter table T602 add f37 varchar(20)
+alter table T602 add f38 varchar(20)

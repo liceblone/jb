@@ -1,0 +1,61 @@
+object DateFrm: TDateFrm
+  Left = 233
+  Top = 201
+  BorderStyle = bsToolWindow
+  Caption = #26085#21382
+  ClientHeight = 160
+  ClientWidth = 431
+  Color = clBtnFace
+  Font.Charset = DEFAULT_CHARSET
+  Font.Color = clWindowText
+  Font.Height = -13
+  Font.Name = #23435#20307
+  Font.Style = []
+  OldCreateOrder = False
+  Position = poMainFormCenter
+  PixelsPerInch = 96
+  TextHeight = 13
+  object Button1: TButton
+    Left = 344
+    Top = 8
+    Width = 75
+    Height = 22
+    Caption = #30830#23450
+    Default = True
+    ModalResult = 1
+    TabOrder = 0
+  end
+  object Button2: TButton
+    Left = 344
+    Top = 40
+    Width = 75
+    Height = 22
+    Cancel = True
+    Caption = #21462#28040
+    ModalResult = 2
+    TabOrder = 1
+  end
+  object Panel1: TPanel
+    Left = 0
+    Top = 0
+    Width = 337
+    Height = 160
+    Align = alLeft
+    Caption = 'Panel1'
+    TabOrder = 2
+    object MonthCalendar1: TMonthCalendar
+      Left = 4
+      Top = 3
+      Width = 329
+      Height = 153
+      AutoSize = True
+      CalColors.BackColor = clWhite
+      CalColors.TextColor = 16711808
+      CalColors.TitleBackColor = 16750848
+      Date = 37337.730209409730000000
+      ImeName = #19975#33021#20116#31508'EXE'#22806#25346#29256
+      TabOrder = 0
+      WeekNumbers = True
+    end
+  end
+end

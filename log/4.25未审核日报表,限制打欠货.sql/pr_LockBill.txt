@@ -1,0 +1,21 @@
+
+alter proc pr_LockBill  
+@BillCode varchar(20),  
+@Billtype  int  
+as  
+if @Billtype=0
+begin
+update sl_invoice  set islock=case when isnull(islock,0)=0 then 1 else 0 end where code =@BillCode  
+  
+end
+
+  
+if @Billtype=1
+begin
+update wh_out  set islock=case when isnull(islock,0)=0 then 1 else 0 end where code =@BillCode  
+  
+end
+   
+   
+  
+  
