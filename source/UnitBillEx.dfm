@@ -1,6 +1,6 @@
 object FrmBillEx: TFrmBillEx
-  Left = 511
-  Top = 239
+  Left = 369
+  Top = 130
   Width = 1215
   Height = 647
   Caption = 'FrmBillEx'
@@ -759,5 +759,13 @@ object FrmBillEx: TFrmBillEx
     Images = dmFrm.ImageList1
     Left = 320
     Top = 224
+  end
+  object frReport1: TfrReport
+    InitialZoom = pzDefault
+    PreviewButtons = [pbZoom, pbLoad, pbSave, pbPrint, pbFind, pbHelp, pbExit]
+    RebuildPrinter = False
+    Left = 398
+    Top = 273
+    ReportForm = {19000000}
   end
 end

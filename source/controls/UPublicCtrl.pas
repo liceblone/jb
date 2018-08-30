@@ -923,10 +923,8 @@ begin
     end;
 
       if self.FImage.Picture.Graphic= nil then
-       fhlknl1.WriteLog('Graphic nil ') ;
+       fhlknl1.WriteLog('Graphic nil ')  ;
 
-    if (self.FImage.Picture <> nil ) and ( self.FImage.Picture.Graphic.Empty ) then
-       fhlknl1.WriteLog('Graphic empty') ;
 
 end;
 

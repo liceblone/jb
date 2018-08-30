@@ -7,7 +7,7 @@ uses
   Dialogs, Menus, ComCtrls, ActnList, DB, ADODB, ToolWin, Grids, DBGrids,FhlKnl, StrUtils,
    UnitLookUpImport, datamodule,  StdCtrls, ExtCtrls,UnitGrid,UnitModelFrm,DBCtrls  ,UPublic
   , UnitSearchBarCode,UnitCommonInterface ,UnitPublicFunction   , UnitChyGrid  ,quickrpt
-  ,XPMenu;
+  ,XPMenu, FR_Class;
 
 type
   TFrmBillEx = class(TFrmModel,IParentSearch)
@@ -117,6 +117,7 @@ type
     ActPlateClientBarCodePrintWholeBill: TAction;
     ActPrintEveryPackageLabel: TAction;
     ActPlateClientBarCodePreviewWholeBillV2: TAction;
+    frReport1: TfrReport;
     procedure OpenCloseAfter(IsOpened:Boolean);
     procedure SetCtrlStyle(fEnabled:Boolean);
     procedure SetRitBtn;
@@ -212,6 +213,7 @@ type
     procedure ActPlateClientBarCodePrintWholeBillExecute(Sender: TObject);
     procedure ActPrintEveryPackageLabelExecute(Sender: TObject);
     procedure ActPlateClientBarCodePreviewWholeBillV2Execute( Sender: TObject);
+    procedure AddPage(report: TfrReport; fileName: string);
   private
     { Private declarations }
     F_ParamData:TDataset;
@@ -247,7 +249,7 @@ type
     procedure RefreshLookUpDataset;
     procedure DBGrid1DrawColumnCellFntClr(Sender: TObject; const Rect: TRect; DataCol: Integer; Column: TColumn; State: TGridDrawState);
     procedure CheckAllowToSave(actionName:string);
-    procedure GetBarcodeFolder ;
+    procedure GetBarcodeFolder (bDeleteImages:Boolean);
     { Public declarations }
   end;
 
@@ -818,7 +820,7 @@ begin
       else
           EditPostAfter(True);
 
-      GetBarcodeFolder;
+      
   finally
      Screen.Cursor:=crDefault;
   end;
@@ -2737,7 +2739,8 @@ begin
           end;
       end;
       dmfrm.ADOConnection1.CommitTrans ;
-
+      GetBarcodeFolder(true);
+      
       if not   self.AftSaveBillExecute  then
       begin
            abort;
@@ -3286,52 +3289,89 @@ begin
     Screen.Cursor:=crDefault;
   end;
 end;
+
+procedure TFrmBillEx.AddPage(report: TfrReport; fileName: string);
+var picview,t1,t0:TfrPictureView;
+var newpage:TfrPage;
+begin
+  t0:=TfrPictureView(report.Pages[0].FindObject('Picture1'));
+  
+  report.Pages.Add;
+
+  newpage:= report.Pages[report.Pages.Count -1]  ;
+  newpage.pgWidth:=report.Pages[0].pgWidth;
+  newpage.pgHeight:=report.Pages[0].pgHeight;
+  newpage.pgSize := report.Pages[0].pgSize;
+
+  picview:= TfrPictureView.Create;
+  picview.Assign(t0);
+  picview.ParentPage :=newpage;
+
+  newpage.Objects.Add( picview );
+
+  t1:=TfrPictureView(newpage.FindObject('Picture1'));
+  if t1<>nil then
+  t1.Picture.loadfromfile(fileName);
+end;
+
 procedure TFrmBillEx.ActPlateClientBarCodePreviewWholeBillV2Execute(Sender: TObject);
 var frm:TQrClientBarCodePrint;
 var sql, barcodeFileName:string;
 var frmTest : Tform;
 var image:TImage;
 var i:integer;
+var filelist:Tstringlist ;
+var folder:string;
 begin
-  //image  := TImage.Create(nil);
+    //image  := TImage.Create(nil);
 
+    folder := './barcodeImages/'+self.fBillex.BillCode+'/' ;
+    GetBarcodeFolder(false);
+    ActSaveWoOwner.Execute;
+    frm:=TQrClientBarCodePrint.Create(nil);
+    try
+      frm.GetPageCfg();
 
-  ActSaveWoOwner.Execute;
-  frm:=TQrClientBarCodePrint.Create(nil);
-  try
-    frm.GetPageCfg();
+      sql:= 'exec Pr_ClientBarCodeLabelPrint  '+quotedstr(fBillex.BillCode)  ;
+      fhlknl1.Kl_GetUserQuery(sql);
 
-    sql:= 'exec Pr_ClientBarCodeLabelPrint  '+quotedstr(fBillex.BillCode)  ;
-    fhlknl1.Kl_GetUserQuery(sql);
-
-    //frm.SetBillRep(  fhlknl1.User_Query );
-    self.PgBarSave.Max := fhlknl1.User_Query.RecordCount ;
-    self.PgBarSave.Visible := True;
-    fhlknl1.User_Query.First;
-    for i:=1 to  fhlknl1.User_Query.RecordCount do
-    begin
-      barcodeFileName := './barcodeImages/'+fhlknl1.User_Query.fieldbyname('FBarCode0').AsString + '.jpg';
-      if not fileexists( barcodeFileName ) then
+      //frm.SetBillRep(  fhlknl1.User_Query );
+      self.PgBarSave.Max := fhlknl1.User_Query.RecordCount ;
+      self.PgBarSave.Visible := True;
+      fhlknl1.User_Query.First;
+      for i:=1 to  fhlknl1.User_Query.RecordCount do
       begin
-        image:=frm.ExportReport(  fhlknl1.User_Query );
-        ImageConverter.BmpToJpeg( image, barcodeFileName);
-        image.Free ;
+        barcodeFileName :=folder+fhlknl1.User_Query.fieldbyname('FBarCode0').AsString + '.jpg';
+        if not fileexists( barcodeFileName ) then
+        begin
+          image:=frm.ExportReport(  fhlknl1.User_Query );
+          ImageConverter.BmpToJpeg( image, barcodeFileName);
+          image.Free ;
+        end;
+        application.ProcessMessages ;
+        self. PgBarSave.Position := i ;
+        fhlknl1.User_Query.Next  ;
       end;
-      application.ProcessMessages ;
-      self. PgBarSave.Position := i ;
-      fhlknl1.User_Query.Next  ;
+      //frm.InitialImageLoader(  fhlknl1.User_Query, fBillex.BillCode );
+      //frm.Preview;
+
+      // print
+      frReport1.LoadFromFile('barcode.frf');
+      filelist := getFileTree( folder,'*.jpg');
+      for i:= 0 to filelist.Count -1  do
+      begin
+          AddPage( self.frReport1,folder+filelist [i] );
+      end;
+      frReport1.Pages.Delete(0);
+      frReport1.PrepareReport;
+      frReport1.ShowReport;
+    finally
+      self.PgBarSave.Visible := False;
+      FreeAndNil(frm);
+      Screen.Cursor:=crDefault;
     end;
-    frm.InitialImageLoader(  fhlknl1.User_Query );
-    frm.Preview;
-
-
-  finally
-    self.PgBarSave.Visible := False;
-    FreeAndNil(frm);
-    Screen.Cursor:=crDefault;
-  end;
 end;
-procedure TFrmBillEx.GetBarcodeFolder;
+procedure TFrmBillEx.GetBarcodeFolder(bDeleteImages:Boolean);
 var folder:string;
 begin
     folder :='barcodeImages';
@@ -3339,10 +3379,12 @@ begin
     if not DirectoryExists(folder) then
         createdir(folder);
 
-    folder:= 'barcodeImages\'+self.fBillex.BillCode  ;
-    if self.fBillex.ID ='23' then  
+    folder:= 'barcodeImages\'+self.fBillex.BillCode +'\' ;
+    if self.fBillex.ID ='22' then  
           if not DirectoryExists(folder) then
               createdir( folder);
+    if bDeleteImages then
+      DeleteBakFile(folder,'*.jpg', -1);
 end;
 
 end.

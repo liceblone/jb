@@ -23,7 +23,7 @@ type
      CacheBarCodeImage:boolean;
   public
      procedure SetBillRep( fdataset:TCustomADODataSet );
-     procedure InitialImageLoader( fdataset:TCustomADODataSet );
+     procedure InitialImageLoader( fdataset:TCustomADODataSet ; billcode:string );
      function ExportReport( fdataset:TCustomADODataSet ):TImage;
 
      procedure GetPageCfg;
@@ -201,7 +201,7 @@ begin
 
               ibottomEdge :=  preTop + prePos.Y;
 
-              ileft   :=colGap*(i) + prePos.X   -50;
+              ileft   :=colGap*(i) + prePos.X   -40;
               prePos := CreateTextOnImage( ileft , preTop, 'ClientOrderNo', fdataset, result, i) ;
 
            end;
@@ -318,13 +318,13 @@ begin
   result:= point;
 end;
 
-procedure TQrClientBarCodePrint.InitialImageLoader( fdataset: TCustomADODataSet );
+procedure TQrClientBarCodePrint.InitialImageLoader( fdataset: TCustomADODataSet; billcode:string );
 var dbImage,imageLoader : TQRImageLoader;
 var barcodeFileName : string;
 begin
    if fdataset.Active then
    begin
-     barcodeFileName := './barcodeImages/';//+ fdataset.fieldbyname('FBarCode0').AsString + '.jpg';
+     barcodeFileName := './barcodeImages/'+billcode;//+ fdataset.fieldbyname('FBarCode0').AsString + '.jpg';
      imageLoader:= TQRImageLoader.Create(self.DetailBand1);
      imageLoader.Parent:=DetailBand1;
      imageLoader.Stretch := False;
