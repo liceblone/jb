@@ -4,7 +4,7 @@ interface
 
 uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
-  Dialogs, ComCtrls, StdCtrls, FR_Class, FR_View, UPublic ,UnitPublicFunction;
+  Dialogs, ComCtrls, StdCtrls, FR_Class, FR_View, UPublic ,UnitPublicFunction ;
 
 type
   TfrmBarcodePrintingProgress = class(TForm)
@@ -17,8 +17,12 @@ type
     UpDown1: TUpDown;
     frReport1: TfrReport;
     Label1: TLabel;
+    Label4: TLabel;
+    CBPrinters: TComboBox;
     procedure btnPreviewClick(Sender: TObject);
     procedure btnPrintClick(Sender: TObject);
+    procedure FormCreate(Sender: TObject);
+    procedure CBPrintersClick(Sender: TObject);
 
   private
     FImageDir: string;
@@ -37,7 +41,8 @@ var
   frmBarcodePrintingProgress: TfrmBarcodePrintingProgress;
 
 implementation
-
+  uses Printers,FR_Prntr ;
+  
 {$R *.dfm}
 
 
@@ -106,7 +111,7 @@ begin
       frReport1.Pages.Delete(0);
       frReport1.PrepareReport;
       frReport1.PrintPreparedReport('', 1, true, TfrPrintPages(0));
-        //  frReport1.PrintPreparedReportDlg;
+      //  frReport1.PrintPreparedReportDlg;
     end;
 end;
 
@@ -117,6 +122,18 @@ begin
   filelist := getFileTree( self.ImageDir,'*.jpg');
   self.lblBarcode.Caption := '总共条码数：  '+inttostr( filelist.Count  )+'     ';
   self.lblBarcode.Visible :=true;
+end;
+
+procedure TfrmBarcodePrintingProgress.FormCreate(Sender: TObject);
+begin
+  CBPrinters.Items.Assign(Printer.Printers);
+  CBPrinters.ItemIndex := Printer.PrinterIndex;
+  // OldIndex := Printer.PrinterIndex;
+end;
+
+procedure TfrmBarcodePrintingProgress.CBPrintersClick(Sender: TObject);
+begin
+  Prn.PrinterIndex := self.CBPrinters.ItemIndex;
 end;
 
 end.
