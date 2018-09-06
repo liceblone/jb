@@ -153,6 +153,7 @@ type
     { Private declarations }
     FParameterDataSet:Tdataset;
     FBillCode :string;
+    F_IDFieldName:string;
     FDLID :string;
     FBillDLF_ID :string;
     fBillex:TBillDictEx;
@@ -161,7 +162,7 @@ type
   public
     { Public declarations }
     Procedure InitFrm(frmid :string );
-    procedure Initial( pBillCode:string; pDataSet:Tdataset;F_IDFieldName :string);overload;
+    procedure Initial( pBillCode:string; pDataSet:Tdataset;pF_IDFieldName :string);overload;
     procedure Initial( pDataSet: Tdataset);overload;
 
     procedure printBarCode(pbarCode:String);
@@ -210,10 +211,10 @@ end;
 
 procedure TFrmPrintBarCode.Initial( pDataSet: Tdataset);
 begin
-Initial(self.FBillCode , self.FParameterDataSet, 'moveF_ID');
+Initial(self.FBillCode , pDataSet, F_IDFieldName);
 end;
 
-procedure TFrmPrintBarCode.Initial( pBillCode:string;  pDataSet: Tdataset ; F_IDFieldName: string);
+procedure TFrmPrintBarCode.Initial( pBillCode:string;  pDataSet: Tdataset ; pF_IDFieldName: string);
   var
   i, top:integer;
   GrpBox:TBarCodeGroupbox;
@@ -223,22 +224,25 @@ begin
 
     FDLID    := pdataset.fieldbyname('dlid').AsString;
     wareid   := pdataset.fieldbyname('wareid').AsString;
+    F_IDFieldName := pF_IDFieldName;
     //PhOrdFID
     if pdataset.FindField(F_IDFieldName)<>nil then
-        FBillDLF_ID := pdataset.fieldbyname(F_IDFieldName).AsString; 
+        FBillDLF_ID := pdataset.fieldbyname(F_IDFieldName).AsString;
+        //pF_IDFieldName
 
 
     FParameterDataset:=pDataset;
-
+      {
     FBillCode := pBillCode;
     dataset.Close;
     DataSet.CommandText:='select *from tbarcodeIO where  FBillDLF_ID ='+quotedstr(FBillDLF_ID)+' order by  FPackageBarcode, FBarCode desc';
     dataset.Open;
 
     dataset.First;
-
+         }
     self.Height:=ScrollTop.Height+top+200;
 
+    CloseBill;
     OpenBill(FBillDLF_ID);
       
 end;
