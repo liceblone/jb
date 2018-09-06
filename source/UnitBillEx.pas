@@ -7,7 +7,7 @@ uses
   Dialogs, Menus, ComCtrls, ActnList, DB, ADODB, ToolWin, Grids, DBGrids,FhlKnl, StrUtils,
    UnitLookUpImport, datamodule,  StdCtrls, ExtCtrls,UnitGrid,UnitModelFrm,DBCtrls  ,UPublic
   , UnitSearchBarCode,UnitCommonInterface ,UnitPublicFunction   , UnitChyGrid  ,quickrpt
-  ,XPMenu, FR_Class;
+  ,XPMenu, FR_Class ,UnitBarcodePrintingProgress;
 
 type
   TFrmBillEx = class(TFrmModel,IParentSearch)
@@ -117,7 +117,6 @@ type
     ActPlateClientBarCodePrintWholeBill: TAction;
     ActPrintEveryPackageLabel: TAction;
     ActPlateClientBarCodePreviewWholeBillV2: TAction;
-    frReport1: TfrReport;
     procedure OpenCloseAfter(IsOpened:Boolean);
     procedure SetCtrlStyle(fEnabled:Boolean);
     procedure SetRitBtn;
@@ -213,7 +212,7 @@ type
     procedure ActPlateClientBarCodePrintWholeBillExecute(Sender: TObject);
     procedure ActPrintEveryPackageLabelExecute(Sender: TObject);
     procedure ActPlateClientBarCodePreviewWholeBillV2Execute( Sender: TObject);
-    procedure AddPage(report: TfrReport; fileName: string);
+
   private
     { Private declarations }
     F_ParamData:TDataset;
@@ -3289,7 +3288,7 @@ begin
     Screen.Cursor:=crDefault;
   end;
 end;
-
+ {
 procedure TFrmBillEx.AddPage(report: TfrReport; fileName: string);
 var picview,t1,t0:TfrPictureView;
 var newpage:TfrPage;
@@ -3312,12 +3311,12 @@ begin
   t1:=TfrPictureView(newpage.FindObject('Picture1'));
   if t1<>nil then
   t1.Picture.loadfromfile(fileName);
-end;
+end;      }
 
 procedure TFrmBillEx.ActPlateClientBarCodePreviewWholeBillV2Execute(Sender: TObject);
 var frm:TQrClientBarCodePrint;
 var sql, barcodeFileName:string;
-var frmTest : Tform;
+var frmPrintingProgress : TfrmBarcodePrintingProgress;
 var image:TImage;
 var i:integer;
 var filelist:Tstringlist ;
@@ -3355,19 +3354,13 @@ begin
       //frm.InitialImageLoader(  fhlknl1.User_Query, fBillex.BillCode );
       //frm.Preview;
 
-      // print
-      frReport1.LoadFromFile('barcode.frf');
-      filelist := getFileTree( folder,'*.jpg');
-      for i:= 0 to filelist.Count -1  do
-      begin
-          AddPage( self.frReport1,folder+filelist [i] );
-      end;
-      frReport1.Pages.Delete(0);
-      frReport1.PrepareReport;
-      frReport1.ShowReport;
+      frmPrintingProgress := TfrmBarcodePrintingProgress.Create(nil);
+      frmPrintingProgress.ImageDir := folder;
+      frmPrintingProgress.ShowModal;
     finally
       self.PgBarSave.Visible := False;
       FreeAndNil(frm);
+      FreeAndNil(frmPrintingProgress);
       Screen.Cursor:=crDefault;
     end;
 end;

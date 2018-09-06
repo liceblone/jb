@@ -97,8 +97,9 @@ uses
   UnitPickSLOrderDL in 'source\UnitPickSLOrderDL.pas' {FrmPickSLOrderDL},
   UnitDeliveryReport in 'source\UnitDeliveryReport.pas' {FrmDeliveryReport},
   UnitPrintLabel in 'source\UnitPrintLabel.pas' {QrLabelPrinting: TQuickRep},
-  UnitClientBarcodePrint in 'source\UnitClientBarcodePrint.pas' {QrClientBarCodePrint: TQuickRep}
-  , UnitFastReport in 'source\fastreport\UnitFastReport.pas' {frmFastReport};
+  UnitClientBarcodePrint in 'source\UnitClientBarcodePrint.pas' {QrClientBarCodePrint: TQuickRep},
+  UnitFastReport in 'source\fastreport\UnitFastReport.pas' {frmFastReport},
+  UnitBarcodePrintingProgress in 'source\UnitBarcodePrintingProgress.pas' {frmBarcodePrintingProgress};
 
 //UnitUserQrRptEx in 'source\UnitUserQrRptEx.pas' {FrmUserQrRptEx};
 
