@@ -903,6 +903,7 @@ begin
       Barcode1.Ratio := self.Ratio;
       Barcode1.Height := self.Height-Barcode1.Top;
       Barcode1.Text:=  DataSet.fieldbyname(self.FDataField).AsString;
+      Barcode1.ShowText :=   bcoCode ;
 
       if self.CacheBarcodeImage then
       begin

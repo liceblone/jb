@@ -99,7 +99,9 @@ uses
   UnitPrintLabel in 'source\UnitPrintLabel.pas' {QrLabelPrinting: TQuickRep},
   UnitClientBarcodePrint in 'source\UnitClientBarcodePrint.pas' {QrClientBarCodePrint: TQuickRep},
   UnitFastReport in 'source\fastreport\UnitFastReport.pas' {frmFastReport},
-  UnitBarcodePrintingProgress in 'source\UnitBarcodePrintingProgress.pas' {frmBarcodePrintingProgress};
+  UnitBarcodePrintingProgress in 'source\UnitBarcodePrintingProgress.pas' {frmBarcodePrintingProgress},
+  UnitHouShengLabel in 'source\UnitHouShengLabel.pas' {frmHouShengLabel},
+  UnitHoushengLabel2 in 'source\UnitHoushengLabel2.pas' {QrptHoushengLabel: TQuickRep};
 
 //UnitUserQrRptEx in 'source\UnitUserQrRptEx.pas' {FrmUserQrRptEx};
 
@@ -114,6 +116,7 @@ begin
   Application.ShowMainForm:=false;
   SplashFrm.ShowHint('正在创建数据模块,请稍候...');
   Application.CreateForm(TdmFrm, dmFrm);
+  Application.CreateForm(TQrptHoushengLabel, QrptHoushengLabel);
   SplashFrm.ShowHint('正在创建主程序,请稍候...');
   Application.CreateForm(TmainFrm, mainFrm);
   SplashFrm.ShowHint('正在创建个人桌面,请稍候...');

@@ -1,6 +1,6 @@
 object FrmModel: TFrmModel
-  Left = 199
-  Top = 33
+  Left = 201
+  Top = 36
   Width = 454
   Height = 253
   Caption = 'FrmModel'

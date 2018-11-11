@@ -121,7 +121,7 @@ object FrmUpdateProperty: TFrmUpdateProperty
         Top = 72
         Width = 185
         Height = 21
-        ItemHeight = 13
+        ItemHeight = 0
         TabOrder = 3
         OnClick = cmbclickClick
       end
@@ -130,7 +130,7 @@ object FrmUpdateProperty: TFrmUpdateProperty
         Top = 112
         Width = 185
         Height = 21
-        ItemHeight = 13
+        ItemHeight = 0
         TabOrder = 4
         OnClick = cmbdbclickClick
       end
@@ -139,7 +139,7 @@ object FrmUpdateProperty: TFrmUpdateProperty
         Top = 152
         Width = 185
         Height = 21
-        ItemHeight = 13
+        ItemHeight = 0
         TabOrder = 5
         OnClick = cmbexitClick
       end

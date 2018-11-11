@@ -1,6 +1,6 @@
 object EditorFrm: TEditorFrm
-  Left = 607
-  Top = 96
+  Left = 609
+  Top = 102
   BorderStyle = bsDialog
   Caption = 'EditorFrm'
   ClientHeight = 286
@@ -15,6 +15,7 @@ object EditorFrm: TEditorFrm
   OldCreateOrder = False
   Position = poScreenCenter
   OnClose = FormClose
+  OnCreate = FormCreate
   OnKeyDown = FormKeyDown
   PixelsPerInch = 96
   TextHeight = 13
@@ -284,5 +285,28 @@ object EditorFrm: TEditorFrm
       ImageIndex = 13
       OnExecute = ActPrintDeliveryBillExecute
     end
+    object ActHouShengLabel: TAction
+      Caption = #21402#22768#26631#31614#25171#21360
+      ImageIndex = 13
+      OnExecute = ActHouShengLabelExecute
+    end
+    object ActShowBackgroundPic: TAction
+      Caption = #26174#31034#25171#21360#32972#26223
+      ImageIndex = 26
+      OnExecute = ActShowBackgroundPicExecute
+    end
+    object ActHouShengLableQrpt: TAction
+      Caption = 'ActHouShengLableQrpt'
+      ImageIndex = 13
+      OnExecute = ActHouShengLableQrptExecute
+    end
+  end
+  object frReport1: TfrReport
+    InitialZoom = pzDefault
+    PreviewButtons = [pbZoom, pbLoad, pbSave, pbPrint, pbFind, pbHelp, pbExit]
+    RebuildPrinter = False
+    Left = 70
+    Top = 137
+    ReportForm = {19000000}
   end
 end

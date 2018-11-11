@@ -3,9 +3,9 @@ unit Editor;
 interface
 
 uses
-  Windows, Messages, SysUtils, Classes, Graphics, Controls, Forms, Dialogs,
+  Windows, Messages, SysUtils, Classes, Graphics, Controls, Forms, Dialogs,   StrUtils ,
   StdCtrls, ComCtrls, ToolWin, ADODB, Db, DbCtrls, CheckLst, ImgList,UnitCreateComponent, variants,
-  Mask, ActnList, FhlKnl,UnitModelFrm, ExtCtrls, Grids, DBGrids;
+  Mask, ActnList, FhlKnl,UnitModelFrm, ExtCtrls, Grids, DBGrids, FR_Class, FR_View, UnitHoushengLabel2;
 
 
 type
@@ -50,6 +50,10 @@ type
     PnlItem: TPanel;
     ActDeliveryCfg: TAction;
     ActPrintDeliveryBill: TAction;
+    ActHouShengLabel: TAction;
+    ActShowBackgroundPic: TAction;
+    frReport1: TfrReport;
+    ActHouShengLableQrpt: TAction;
     //procedure InitFrm(EditorId:String;fOpenParams:Variant;fDataSet:TDataSet;ParamGrid:Tdbgrid=nil);
     procedure InitFrm(EditorId:String;fOpenParams:Variant;fDataSet:TDataSet;PparentGrid:Tdbgrid=nil;POpenFlds:String='');overload;
 
@@ -77,11 +81,19 @@ type
     procedure ActDeliveryCfgExecute(Sender: TObject);
     procedure ActPrintDeliveryBillExecute(Sender: TObject);
     procedure UpdateSysFields;
-     
+    procedure FormCreate(Sender: TObject);
+    procedure ActShowBackgroundPicExecute(Sender: TObject);
+    procedure ActHouShengLabelExecute(Sender: TObject);
+    procedure DrawBarCode(left,top,Ratio,barcodeHeight:integer; value:string; img:TImage);
+    procedure AddPage(report: TfrReport; fileName: string);
+    procedure ActHouShengLableQrptExecute(Sender: TObject);
+  private
+    ImgBackground:TImage;   
   public
        F_ParamGrid:TDBGrid;
        F_ParamFlds :string;
        fDict:TEditorDict;
+       pageTopMargin, pageLeftMargin:integer;
   end;
 
 var
@@ -90,7 +102,7 @@ var
 implementation
 
 {$R *.DFM}
-uses datamodule, RepCard, UnitDeliveryReport;
+uses datamodule, RepCard, UnitDeliveryReport, barcode;
 
 //procedure TEditorFrm.InitFrm(EditorId:string;fOpenParams:Variant;fDataSet:TDataSet;ParamGrid:Tdbgrid=nil);
 procedure TEditorFrm.InitFrm(EditorId:String;fOpenParams:Variant;fDataSet:TDataSet;PparentGrid:Tdbgrid=nil;POpenFlds:String='') ;
@@ -148,6 +160,7 @@ begin
                  Action:=caNone;
               end;
     end;
+    freeandnil( ImgBackground  );
 end;
 
 procedure TEditorFrm.SetEditState(CanEdit:Boolean);
@@ -487,6 +500,251 @@ begin
    if  DataSource1.DataSet.FindField  ('FlstEditTime') <>nil then
        DataSource1.DataSet.FieldByName ('FlstEditTime').Value :=now;
 
+end;
+
+procedure TEditorFrm.FormCreate(Sender: TObject);
+begin
+
+ImgBackground:=TImage.Create(nil);
+end;
+
+procedure TEditorFrm.ActShowBackgroundPicExecute(Sender: TObject);
+begin
+ ImgBackground.Picture.LoadFromFile('PrintingBackgroud\HoushengLabelBackground.bmp');
+ ImgBackground.Parent :=  PageControl1.Pages[0];
+ ImgBackground.Top :=0 ;
+ ImgBackground.Left :=0;
+ ImgBackground.Width := ImgBackground.Parent.Width ;
+ ImgBackground.Height := ImgBackground.Parent.Height ; 
+end;
+
+procedure TEditorFrm.ActHouShengLabelExecute(Sender: TObject);
+var img:Timage; control:TControl; font:Tfont;
+i:integer;     Barcode1 : TAsBarcode; imgBarCode:Timage;
+ctrlFBottomBarCode , ctrlFPesistorPartNo :TControl;
+TopLeft1FontName, TopLeft2FontName, ContentFontName, sql, PicFileName:string;
+TopLeft1FontSize, TopLeft2FontSize, ContentFontSize, fontstyleBold , barcodeHeight  :integer;
+TopLeft1Bold, TopLeft2Bold ,contentBold:boolean;
+begin
+  try
+    ActShowBackgroundPicExecute(self);
+
+    sql:='select  isnull(FParamValue,''ºÚÌå'') from TParamsAndValues where FParamCode like ''%020204%'' and FParamDescription=''TopLeft1FontName'' ';
+    fhlknl1.Kl_GetUserQuery(sql);
+    TopLeft1FontName:=fhlknl1.User_Query.fields[0].AsString ;
+
+    sql:='select  isnull(FParamValue,''ºÚÌå'') from TParamsAndValues where FParamCode like ''%020204%'' and FParamDescription=''TopLeft2FontName'' ';
+    fhlknl1.Kl_GetUserQuery(sql);
+    TopLeft2FontName:=fhlknl1.User_Query.fields[0].AsString ;
+
+    sql:='select  isnull(FParamValue,''ºÚÌå'') from TParamsAndValues where FParamCode like ''%020204%'' and FParamDescription=''ContentFontName'' ';
+    fhlknl1.Kl_GetUserQuery(sql);
+    ContentFontName:=fhlknl1.User_Query.fields[0].AsString ;
+
+    sql:='select  isnull(FParamValue,8) from TParamsAndValues where  FParamCode like ''%020204%'' and FParamDescription=''TopLeft1Bold'' ';
+    fhlknl1.Kl_GetUserQuery(sql);
+    TopLeft1Bold:=fhlknl1.User_Query.fields[0].AsInteger =1 ;
+   
+    sql:='select  isnull(FParamValue,8) from TParamsAndValues where  FParamCode like ''%020204%'' and FParamDescription=''TopLeft2Bold'' ';
+    fhlknl1.Kl_GetUserQuery(sql);
+    TopLeft2Bold:=fhlknl1.User_Query.fields[0].AsInteger =1 ;
+
+    sql:='select  isnull(FParamValue,8) from TParamsAndValues where  FParamCode like ''%020204%'' and FParamDescription=''ContentBold'' ';
+    fhlknl1.Kl_GetUserQuery(sql);
+    contentBold:=fhlknl1.User_Query.fields[0].AsInteger =1 ;
+
+    sql:='select  isnull(FParamValue,8) from TParamsAndValues where  FParamCode like ''%020204%'' and FParamDescription=''TopLeft1FontSize'' ';
+    fhlknl1.Kl_GetUserQuery(sql);
+    TopLeft1FontSize:=fhlknl1.User_Query.fields[0].AsInteger ;
+
+    sql:='select  isnull(FParamValue,8) from TParamsAndValues where  FParamCode like ''%020204%'' and FParamDescription=''TopLeft2FontSize'' ';
+    fhlknl1.Kl_GetUserQuery(sql);
+    TopLeft2FontSize:=fhlknl1.User_Query.fields[0].AsInteger ;
+
+    sql:='select  isnull(FParamValue,8) from TParamsAndValues where  FParamCode like ''%020204%'' and FParamDescription=''ContentFontSize'' ';
+    fhlknl1.Kl_GetUserQuery(sql);
+    ContentFontSize:=fhlknl1.User_Query.fields[0].AsInteger ;
+
+    sql:='select  isnull(FParamValue,8) from TParamsAndValues where  FParamCode like ''%020204%'' and FParamDescription=''barcodeHeight'' ';
+    fhlknl1.Kl_GetUserQuery(sql);
+    barcodeHeight:=fhlknl1.User_Query.fields[0].AsInteger ;
+
+    sql:='select  isnull(FParamValue,8) from TParamsAndValues where  FParamCode like ''%020204%'' and FParamDescription=''pageTopMargin'' ';
+    fhlknl1.Kl_GetUserQuery(sql);
+    pageTopMargin:=fhlknl1.User_Query.fields[0].AsInteger ;
+
+    sql:='select  isnull(FParamValue,8) from TParamsAndValues where  FParamCode like ''%020204%'' and FParamDescription=''pageleftMargin'' ';
+    fhlknl1.Kl_GetUserQuery(sql);
+    pageleftMargin:=fhlknl1.User_Query.fields[0].AsInteger ;
+
+
+
+
+    font:= Tfont.Create;
+    Barcode1 := TAsBarcode.Create(nil);
+    font.Name :=ContentFontName;
+
+    img:=Timage.Create(nil);
+
+    img.Width :=  220 ;
+    img.Height  :=  160 ;
+
+    img.Canvas.Draw(  pageLeftMargin,  pageTopMargin, self.ImgBackground.Picture.Graphic  );
+    img.Canvas.Font.Assign(font);
+
+    for i:=0 to PageControl1.Pages[0].Controlcount -1 do
+    begin
+      control :=  PageControl1.Pages[0].Controls[i] ;
+      if  control is TfhldbEdit then
+      begin
+          if ( control as TfhldbEdit).Field.FieldName ='FPesistorPartNo' then
+            ctrlFPesistorPartNo :=  PageControl1.Pages[0].Controls[i] ;
+          if ( control as TfhldbEdit).Field.FieldName ='FBottomBarCode' then
+            ctrlFBottomBarCode :=  PageControl1.Pages[0].Controls[i] ;
+      end;
+    end;
+
+    for i:=0 to PageControl1.Pages[0].Controlcount -1 do
+    begin
+      control :=  PageControl1.Pages[0].Controls[i] ;    if  control is TfhldbEdit then
+      if  control is TfhldbEdit then
+      begin
+        if ( control as TfhldbEdit).Field.FieldName ='FPesistorPartNo' then
+           DrawBarCode ( ctrlFBottomBarCode.Left-2 +pageLeftMargin, ctrlFPesistorPartNo.Top +pageTopMargin + 15 , 2, barcodeHeight, DataSource1.DataSet.fieldbyname('FPesistorPartNo').AsString, img);
+        if ( control as TfhldbEdit).Field.FieldName ='FBottomBarCode' then
+           DrawBarCode ( ctrlFBottomBarCode.Left-2 +pageLeftMargin, ctrlFBottomBarCode.Top +pageTopMargin + 15 , 3, barcodeHeight, DataSource1.DataSet.fieldbyname('FBottomBarCode').AsString, img);
+      end;
+    end;
+
+     for i:=0 to PageControl1.Pages[0].Controlcount -1 do
+    begin
+      control :=  PageControl1.Pages[0].Controls[i] ;
+      img.Canvas.Font.Size :=ContentFontSize;
+      
+
+      if  control is TfhldbEdit then
+      begin
+        if (control as TfhldbEdit ).Field.FieldName = 'FLeftTop1'  then
+        begin
+            if TopLeft1Bold  then
+              img.Canvas.font.Style :=font.Style + [fsBold]
+            else
+              img.Canvas.font.Style :=font.Style - [fsBold];
+
+          img.Canvas.Font.Size :=TopLeft1FontSize;
+        end
+        else
+        if (control as TfhldbEdit ).Field.FieldName = 'FLeftTop2'  then
+        begin
+           if TopLeft2Bold  then
+              img.Canvas.font.Style :=font.Style + [fsBold]
+            else
+              img.Canvas.font.Style :=font.Style - [fsBold];
+
+          img.Canvas.Font.Size :=TopLeft2FontSize;
+        end
+        else
+            if contentBold  then
+              img.Canvas.font.Style :=font.Style + [fsBold]
+            else
+              img.Canvas.font.Style :=font.Style - [fsBold];
+
+        img.Canvas.TextOut( control.left+ pageLeftMargin, control.top+pageTopMargin, (control as TfhldbEdit).Text );
+      end;
+       if  control is Tlabel then
+      begin
+        if contentBold  then
+          img.Canvas.font.Style :=font.Style + [fsBold]
+        else
+          img.Canvas.font.Style :=font.Style - [fsBold];
+
+        img.Canvas.TextOut( control.left+pageLeftMargin, control.top+pageTopMargin, (control as Tlabel).Caption  );
+      end;
+    end;
+    PicFileName:=  'barcodeImages\'+DataSource1.DataSet.fieldbyname('F_ID').AsString +'.bmp' ;
+    img.Picture.SaveToFile( PicFileName );
+
+    frReport1.LoadFromFile('barcode.frf');
+
+    AddPage( self.frReport1, PicFileName );
+    frReport1.Pages.Delete(0);
+  
+    //frReport1.Pages[0].Width :=10;
+    //frReport1.Pages[0].Height :=5;
+
+    //frReport1.PreviewButtons := [pbZoom, pbLoad, pbSave, pbPrint, pbHelp, pbExit] ;
+    frReport1.PrepareReport;
+    frReport1.ShowReport;
+  finally
+    freeandnil(img);
+    freeandnil(font);
+    freeandnil(Barcode1);
+  end;
+end;
+procedure TEditorFrm.AddPage(report: TfrReport; fileName: string);
+var picview,t1,t0:TfrPictureView;
+var newpage:TfrPage;
+begin
+  t0:=TfrPictureView(report.Pages[0].FindObject('Picture1'));
+  
+  report.Pages.Add;
+
+  newpage:= report.Pages[report.Pages.Count -1]  ;
+  newpage.pgWidth:=report.Pages[0].pgWidth;
+  newpage.pgHeight:=report.Pages[0].pgHeight;
+  newpage.pgSize := report.Pages[0].pgSize;
+
+  picview:= TfrPictureView.Create;
+  picview.Assign(t0);
+  picview.ParentPage :=newpage;
+
+  newpage.Objects.Add( picview );
+
+  t1:=TfrPictureView(newpage.FindObject('Picture1'));
+   //pageTopMargin, pageLeftMargin:integer;
+  
+  if t1<>nil then
+  begin
+    t1.Picture.loadfromfile(fileName);
+   // t1.Selected := true;
+  end;
+end;
+procedure TEditorFrm.DrawBarCode(left,top,Ratio, barcodeHeight:integer; value:string; img:TImage);
+var Barcode1 :TAsBarcode ;
+var imgBarCode:Timage;
+begin
+  try
+    Barcode1 := TAsBarcode.create(nil) ;
+    imgBarCode:= Timage.Create(nil);
+    imgBarCode.Height := barcodeHeight ;
+    imgBarCode.Width  := img.Width -50 ;
+
+    Barcode1.ShowText :=TBarcodeOption(2) ;
+    Barcode1.Left := 1 ;
+    Barcode1.Typ :=  TBarcodeType(5);
+    Barcode1.Modul := 1;
+    Barcode1.Ratio := Ratio;
+    Barcode1.Height := imgBarCode.Height ;
+    Barcode1.Text:= value ;
+    Barcode1.DrawBarcode(imgBarCode.Canvas  );
+    img.Canvas.Draw(  Left , top , imgBarCode.Picture.Graphic  );
+
+  finally
+    freeandnil(imgBarCode);
+    freeandnil(Barcode1);
+  end;
+end;
+
+procedure TEditorFrm.ActHouShengLableQrptExecute(Sender: TObject);
+var frm:TQrptHoushengLabel;
+begin
+  try
+   frm:= TQrptHoushengLabel.Create(nil);
+   frm.Prepare;
+   frm.PreviewModal ;
+  finally
+   frm.Free ;
+  end;
 end;
 
 end.

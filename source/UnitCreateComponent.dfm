@@ -23,7 +23,7 @@ object frmCreateComponent: TfrmCreateComponent
     Top = 29
     Width = 834
     Height = 536
-    ActivePage = ts1
+    ActivePage = ts2
     Align = alClient
     TabOrder = 0
     object ts1: TTabSheet

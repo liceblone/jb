@@ -75,9 +75,12 @@ begin
         Tlabel( Acontrol ).Caption := lbl1.Caption ;//  edtCaption.Text ;
         Tlabel( Acontrol ).Font :=lbl1.Font ;
         Tlabel( Acontrol ).Color :=  lbl1.Color ;
-
     end;
-
+    
+   if Acontrol is TEdit_mtn then
+   begin 
+        TEdit_mtn( Acontrol ).Font.Assign (lbl1.Font );
+   end;
 end;
 
 procedure TFrmUpdateProperty.edtCaptionChange(Sender: TObject);
