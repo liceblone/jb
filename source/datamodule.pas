@@ -223,6 +223,11 @@ type
     ActBeforPost: TAction;
     ActGetResistence: TAction;
     ActSetQtyitems: TAction;
+    MPopupGridCoLRPT: TPopupMenu;
+    MenuItem7: TMenuItem;
+    MenuItem8: TMenuItem;
+    MenuItem9: TMenuItem;
+    MenuItem10: TMenuItem;
     //--------------dataset-----------------------
     function  ConnectServer(ConnStr:wideString):Boolean;
     procedure GetQuery1(fSql:wideString;fReturn:Boolean=True;Editing:boolean=false);
@@ -1903,7 +1908,7 @@ end;
 
 procedure TdmFrm.actCalcExecute(Sender: TObject);
 var Fields,formula:Tstringlist;
-var ResultField,Calc,fieldValue:string;
+var ResultField,Calc,fieldValue, stringResult:string;
 var I,J:integer;
 var  vScript: Variant;
 var Presult:double;
@@ -1960,12 +1965,21 @@ begin
                        if   FieldValue='' then FieldValue:='0';
                       Calc:= stringreplace(trim(Calc),trim(Fields[j]),trim(FieldValue ),[rfIgnoreCase ]);
                   end;
-                  Presult   := vScript.Eval(Calc);
-
+                  
                   if  not(  Tadodataset(sender).State in [dsinsert,dsedit] ) then
-                    if Tadodataset(sender).FieldByName(ResultField).FieldKind  <> fkCalculated then
-                       Tadodataset(sender).Edit ;
-                  Tadodataset(sender).FieldByName(ResultField).AsCurrency := Presult;
+                        if Tadodataset(sender).FieldByName(ResultField).FieldKind  <> fkCalculated then
+                           Tadodataset(sender).Edit ;
+
+                  if Tadodataset(sender).FieldByName(ResultField) is TNumericField then
+                  begin
+                      Presult   := vScript.Eval(Calc);
+                      Tadodataset(sender).FieldByName(ResultField).Value  := Presult;
+                  end
+                  else
+                  begin 
+                      Tadodataset(sender).FieldByName(ResultField).Value  := Calc;
+                  end;
+
 
                  fhlknl1.FreeQuery.Next ;
         end;

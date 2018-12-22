@@ -117,6 +117,9 @@ type
     ActPlateClientBarCodePrintWholeBill: TAction;
     ActPrintEveryPackageLabel: TAction;
     ActPlateClientBarCodePreviewWholeBillV2: TAction;
+    ActCreateDeliveryLabel: TAction;
+    ActDeliveryLabelPrint: TAction;
+    ActMulFormatPrint: TAction;
     procedure OpenCloseAfter(IsOpened:Boolean);
     procedure SetCtrlStyle(fEnabled:Boolean);
     procedure SetRitBtn;
@@ -212,6 +215,9 @@ type
     procedure ActPlateClientBarCodePrintWholeBillExecute(Sender: TObject);
     procedure ActPrintEveryPackageLabelExecute(Sender: TObject);
     procedure ActPlateClientBarCodePreviewWholeBillV2Execute( Sender: TObject);
+    procedure ActCreateDeliveryLabelExecute(Sender: TObject);
+    procedure ActDeliveryLabelPrintExecute(Sender: TObject);
+    procedure ActMulFormatPrintExecute(Sender: TObject);
 
   private
     { Private declarations }
@@ -249,6 +255,7 @@ type
     procedure DBGrid1DrawColumnCellFntClr(Sender: TObject; const Rect: TRect; DataCol: Integer; Column: TColumn; State: TGridDrawState);
     procedure CheckAllowToSave(actionName:string);
     procedure GetBarcodeFolder (bDeleteImages:Boolean);
+ 
     { Public declarations }
   end;
 
@@ -262,7 +269,8 @@ var
 
 implementation
         uses   Editor,   UnitCreateComponent,UPublicFunction,UnitFrmAnalyserEx  ,UnitMDLookupImport  ,UnitPrintLabel
-         ,RepBarCode, UnitPrintBarCode,TabGrid, repbill,UnitPickWareshouse, UnitPickSLOrderDL, UnitClientBarcodePrint;
+         ,RepBarCode, UnitPrintBarCode,TabGrid, repbill,UnitPickWareshouse, UnitPickSLOrderDL, UnitClientBarcodePrint
+         ,UnitDeliveryLabel ,UnitMulPrintModule;
 {$R *.dfm}
 
 procedure TFrmBillEx.InitFrm(frmid: string);
@@ -457,7 +465,8 @@ begin
   ActChkSL_Invoice.Enabled :=CheckAction1.Enabled;
   ActSLInvoiceCheck.Enabled :=CheckAction1.Enabled ;
 
-  ActPrintBarCode.Enabled :=not  SaveAction1.Enabled   ; 
+  ActPrintBarCode.Enabled :=not  SaveAction1.Enabled   ;
+  ActCreateDeliveryLabel.Enabled :=not  SaveAction1.Enabled   ;
   ActPrintBarCodeWhMove.Enabled  :=not  SaveAction1.Enabled   ;
   ActPrintBarCodePhOrd .Enabled  :=not  SaveAction1.Enabled   ;
   ActPrintLabelCfg.Enabled       := mtDataSet1.RecordCount >0  ;
@@ -470,6 +479,8 @@ begin
   ActPlateLabelPreview .Enabled     := ActPrintLabelCfg.Enabled   ;
   ActOutItemPrintLabel.Enabled   := ActPrintLabelCfg.Enabled   ;
   ActPrintEveryPackageLabel.Enabled   := ActPrintLabelCfg.Enabled   ;
+  ActDeliveryLabelPrint.Enabled   := ActPrintLabelCfg.Enabled   ;
+  ActMulFormatPrint.Enabled   := ActPrintLabelCfg.Enabled   ;
   ActCreateWhmove.Enabled        :=not  SaveAction1.Enabled and IsChecked   ;
 
 
@@ -837,7 +848,8 @@ begin
      ActChkSL_Invoice.Enabled := CheckAction1.Enabled;
      ActSLInvoiceCheck.Enabled :=CheckAction1.Enabled ;
 
-     ActPrintBarCode.Enabled       :=not  SaveAction1.Enabled and not CheckAction1.Enabled ;
+     ActPrintBarCode.Enabled        :=not  SaveAction1.Enabled and not CheckAction1.Enabled ;
+     ActCreateDeliveryLabel.Enabled :=not  SaveAction1.Enabled and not CheckAction1.Enabled ;
      ActPrintBarCodeWhMove.Enabled :=not  SaveAction1.Enabled and not CheckAction1.Enabled ;
      ActPrintBarCodePhOrd.Enabled :=not  SaveAction1.Enabled and not CheckAction1.Enabled ;
      ActPrintLabelCfg.Enabled      :=mtDataSet1.RecordCount >0  ;
@@ -850,6 +862,8 @@ begin
      ActPlateLabelPreview .Enabled         := ActPrintLabelCfg.Enabled   ;
      ActOutItemPrintLabel.Enabled          := ActPrintLabelCfg.Enabled   ;
      ActPrintEveryPackageLabel.Enabled     := ActPrintLabelCfg.Enabled   ;
+     ActDeliveryLabelPrint .Enabled         := ActPrintLabelCfg.Enabled   ;
+     ActMulFormatPrint.Enabled   := ActPrintLabelCfg.Enabled   ;
      ActCreateWhmove.Enabled               := not  SaveAction1.Enabled  and not CheckAction1.Enabled ;
     end;
     OpenAction1.Enabled:=IsEnabled;
@@ -1574,22 +1588,28 @@ end;
 
 procedure TFrmBillEx.PrintAction1Execute(Sender: TObject);
 var printID:string;
-  //  FrmMulModulePrint: TFrmMulModulePrint;
+var
+  bk:TBookmark;
 begin
-  {
-  inherited;
-  try
-    printID:=self.fBillex.ID;
-    FrmMulModulePrint:= TFrmMulModulePrint.Create (nil);
-    FrmMulModulePrint.FrmIni(printID  ,self.mtDataSet1   ,inttostr(mtDataSet1.Tag ), self.fBillex.TopBoxId ,     fBillex.BtmBoxID ,DBGridDL  );
-    FrmMulModulePrint.MaxPrintModule :=20;
-    FrmMulModulePrint.ShowModal ;
-  finally
-    FrmMulModulePrint.Free ;
-  end;
-  }
-end;
+  FhlUser.CheckToolButtonRight( inttostr(fBillex.ActID) ,(sender as Taction).Name );
+  Screen.Cursor:=crSqlWait;
+  bk:=dlDataSet1.GetBookmark;
+  dlDataSet1.DisableControls;
 
+  //hide field
+  RepBillFrm:=TRepBillFrm.Create(Application);
+  try
+    RepBillFrm.SetBillRep( self.fBillex .TopBoxId,fBillex.BtmBoxId,mtDataSet1, self.DBGridDL);
+    RepBillFrm.PreviewModal;//Preview;
+  finally
+    FreeAndNil(RepBillFrm);
+    dlDataSet1.EnableControls;
+    Screen.Cursor:=crDefault;
+  end;
+  dlDataSet1.GotoBookmark(bk);
+    //restore field
+    
+end;
 procedure TFrmBillEx.ActSaveExecDLProcExecute(Sender: TObject);
 var
   fbk:TBookmark;
@@ -3379,6 +3399,74 @@ begin
     if bDeleteImages then
       DeleteBakFile(folder,'*.jpg', -1);
 end;
+
+procedure TFrmBillEx.ActCreateDeliveryLabelExecute(Sender: TObject);
+var sql ,code : string;
+var FrmBillEx: TFrmBillEx ;
+begin
+    code:=  mtDataSet1.fieldbyname('code').AsString ;
+    sql:= 'exec Pr_GetDeliveryLabel '+quotedstr( mtDataSet1.fieldbyname('code').AsString ) ;
+    fhlknl1.Kl_GetUserQuery(sql, false);
+    try
+      FrmBillEx:=TFrmBillEx.Create(nil);
+      FrmBillEx.SetParamDataset(dlDataSet1  );
+      FrmBillEx.FWindowsFID :=  '' ;
+      FrmBillEx.InitFrm('24');
+      if Code<>'' then
+      begin
+          FrmBillEx.OpenBill( code  );
+      end;
+      FrmBillEx.FormStyle :=fsnormal;
+      FrmBillEx.Hide;
+      FrmBillEx.Position :=poDesktopCenter;
+      FrmBillEx.ScrollBtm.Visible :=true;
+
+      FrmBillEx.ShowModal ;
+    finally
+      FrmBillEx.Free ;
+    end;
+end;
+
+procedure TFrmBillEx.ActDeliveryLabelPrintExecute(Sender: TObject);
+var dataset: TCustomADODataSet;
+var frm: TDeliveryLabelPrint  ;
+var sql:string;
+begin
+  frm:=TDeliveryLabelPrint.Create(nil);
+  //frm.GetPageCfg();
+
+  try
+    if not  dlDataSet1.IsEmpty    then
+    begin
+      sql:= 'select * from TDeliveryLabel where Moveid =  '+quotedstr( mtDataSet1.fieldbyname('code').AsString ) +' order by pcsIndex';
+      fhlknl1.Kl_GetUserQuery(sql, true);
+
+      frm.SetBillRep( fhlknl1.User_Query  );
+      frm.PreviewModal ;
+    end;
+
+  finally
+    Screen.Cursor:=crDefault;
+  end;
+end; 
+
+procedure TFrmBillEx.ActMulFormatPrintExecute(Sender: TObject);
+ var
+    printID:string;
+    FrmMulModulePrint: TFrmMulModulePrint;
+begin
+  inherited;
+  try
+    printID:=self.fBillex.ID;
+    FrmMulModulePrint:= TFrmMulModulePrint.Create (nil);
+    FrmMulModulePrint.FrmIni(printID  ,self.mtDataSet1   ,inttostr(mtDataSet1.Tag ), self.fBillex.TopBoxId ,     fBillex.BtmBoxID ,DBGridDL  );
+    FrmMulModulePrint.MaxPrintModule :=20;
+    FrmMulModulePrint.ShowModal ;
+  finally
+    FrmMulModulePrint.Free ;
+  end;
+end;
+
 
 end.
 

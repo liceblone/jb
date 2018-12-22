@@ -8,9 +8,6 @@ uses
 type TcontrolEx=class(Tcontrol)  ;
 type
   TFrmUpdateProperty = class(TForm)
-    pg: TPageControl;
-    tabLabel: TTabSheet;
-    Tabedit: TTabSheet;
     lbl1: TLabel;
     btnUpdate: TButton;
     edtCaption: TEdit;
@@ -36,6 +33,8 @@ type
     rg1: TRadioGroup;
     a1: TMenuItem;
     chkreadonly: TCheckBox;
+    GrpLabel: TGroupBox;
+    GrpCTRL: TGroupBox;
     procedure btnUpdateClick(Sender: TObject);
     procedure edtCaptionChange(Sender: TObject);
     procedure edtUpdateActionClick(Sender: TObject);
@@ -183,9 +182,9 @@ begin
 
 
 if self.Acontrol is tlabel then
-  pg.TabIndex :=0
+ GrpLabel.Visible :=true
 else
-    pg.TabIndex :=1;
+   GrpCTRL.Visible  :=true;
 
 
 

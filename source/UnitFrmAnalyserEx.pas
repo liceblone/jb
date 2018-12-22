@@ -49,6 +49,7 @@ type
     ActExportCSV: TAction;
     ActNextDataset: TAction;
     ActOldVersionPrint: TAction;
+    ActDelete: TAction;
 
     procedure OpnDlDsBtn1Click(Sender: TObject);
     procedure printAction0Execute(Sender: TObject);
@@ -83,6 +84,7 @@ type
     procedure ActExportCSVExecute(Sender: TObject);
     procedure ActNextDatasetExecute(Sender: TObject);
     procedure ActOldVersionPrintExecute(Sender: TObject);
+    procedure ActDeleteExecute(Sender: TObject);
   private
     fDict:TAnalyserDictEX;
     fInputBarCode:boolean;
@@ -1010,6 +1012,16 @@ begin
 if self.DBGdCurrent.DataSource.DataSet.Active  then
  FhlKnl1.Rp_DbGrid(intTostr(DBGdCurrent.Tag),DBGdCurrent,self.fDict.Caption );
 
+end;
+
+procedure TAnalyseEx.ActDeleteExecute(Sender: TObject);
+begin
+ if self.DBGdCurrent.DataSource.DataSet.Active  then
+begin
+  if Not Assigned(DBGdCurrent.DataSource.DataSet.BeforeDelete) and (MessageDlg(fsDbDelete,mtConfirmation,[mbYes,mbNo],0)<>mrYes) then
+     Abort;
+  DBGdCurrent.DataSource.DataSet.Delete;
+end;
 end;
 
 end.

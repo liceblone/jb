@@ -1,6 +1,6 @@
 object FrmBillEx: TFrmBillEx
-  Left = 0
-  Top = 34
+  Left = 383
+  Top = 197
   Width = 1215
   Height = 647
   Caption = 'FrmBillEx'
@@ -752,6 +752,21 @@ object FrmBillEx: TFrmBillEx
       Caption = #23458#25143#26465#30721#25972#21333#39044#35272
       ImageIndex = 13
       OnExecute = ActPlateClientBarCodePreviewWholeBillV2Execute
+    end
+    object ActCreateDeliveryLabel: TAction
+      Caption = #29983#25104#24555#36882#26631#31614
+      ImageIndex = 7
+      OnExecute = ActCreateDeliveryLabelExecute
+    end
+    object ActDeliveryLabelPrint: TAction
+      Caption = #25171#21360#24555#36958#27161#31805
+      ImageIndex = 13
+      OnExecute = ActDeliveryLabelPrintExecute
+    end
+    object ActMulFormatPrint: TAction
+      Caption = #25171#21360
+      ImageIndex = 13
+      OnExecute = ActMulFormatPrintExecute
     end
   end
   object MainMenu1: TMainMenu

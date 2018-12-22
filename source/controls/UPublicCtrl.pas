@@ -12,6 +12,54 @@ interface
   procedure GetMacAddrFromIP(const IP: String;var Mac: String);
 
 
+  
+type Tedit_Mtn= class(TEdit)
+  private
+    FDown:boolean;
+    FOldX : TPoint;
+    FOldY : TPoint;
+    FRectList: array[1..8] of TRect;
+    FPosList: array[1..8] of Integer;
+    FisUserMode: Boolean;
+
+    procedure MouseDown(Button: TMouseButton; Shift: TShiftState;X, Y: Integer); override;
+    procedure MouseMove(Shift: TShiftState; X, Y: Integer); override;
+    procedure WmNcHitTest(var Msg: TWmNcHitTest); message wm_NcHitTest;
+    procedure WmSize(var Msg: TWmSize); message wm_Size;
+    procedure SetisUserMode(const Value: Boolean);
+
+  public
+    FCollector:Tstrings;
+    BoxId:string;        //记录boxid，删除控键时用到  2006-5-8
+    FieldID        :integer;
+    DLDataSourceType :Integer;    // 0 as maindataset  , 1 as dlgrid  dl
+    constructor Create(AOwner: TComponent); override;
+    property isUserMode:Boolean read FisUserMode write SetisUserMode default False;
+end;
+
+type Tlabel_Mtn= class(Tlabel)
+  private
+    FECaption: string;
+    FDown:boolean;
+    FOldX : TPoint;
+    FOldY : TPoint;
+    FRectList: array[1..8] of TRect;
+    FPosList: array[1..8] of Integer;
+    FisUserMode: Boolean;
+    procedure MouseDown(Button: TMouseButton; Shift: TShiftState;  X, Y: Integer); override;
+    procedure MouseMove(Shift: TShiftState; X, Y: Integer); override;
+    procedure WmNcHitTest(var Msg: TWmNcHitTest); message wm_NcHitTest;
+    procedure WmSize(var Msg: TWmSize); message wm_Size;
+    procedure SetisUserMode(const Value: Boolean);
+  public
+    FCollector:Tstrings;
+    BoxId:string;        //记录boxid，删除控键时用到  2006-5-8
+    
+    constructor Create(AOwner: TComponent); override;
+    Procedure SetCollector(value:Tstrings);
+    property  isUserMode:Boolean read FisUserMode write SetisUserMode default False;
+    property  ECaption :string read FECaption write FECaption;
+end;
 
 type TGrpQueryRecord=class(Tscrollbox)
     private
@@ -443,6 +491,93 @@ begin
     self.Click(self.lkpCombobox );
 end;
 
+{ Tedit_Mtn }
+
+constructor Tedit_Mtn.Create(AOwner: TComponent);
+begin
+    inherited;
+    self.ShowHint :=true;
+    FieldID:=-1;
+    self.BoxId :='-1';
+end;
+
+procedure Tedit_Mtn.MouseDown(Button: TMouseButton; Shift: TShiftState; X,Y: Integer);
+begin
+    if self<>nil then
+    begin
+      inherited;
+      FOldX := Point(X,Y);
+    end;
+end;
+
+procedure Tedit_Mtn.MouseMove(Shift: TShiftState; X, Y: Integer);
+var NewPoint : TPoint;
+    tempPoint: TPoint;    
+begin
+  inherited;
+  if Shift=[ssleft] then
+  begin
+    tempPoint.X :=   Left + X-  FOldX.x;
+    tempPoint.Y:=Top + Y- FOldX.Y;
+    NewPoint:= tempPoint;
+    
+    with Self do
+      SetBounds(NewPoint.x, NewPoint.Y , Width, Height);
+  end;      
+end;
+
+ 
+
+procedure Tedit_Mtn.SetisUserMode(const Value: Boolean);
+begin
+  FisUserMode := Value;
+end;
+
+procedure Tedit_Mtn.WmNcHitTest(var Msg: TWmNcHitTest);
+var
+  Pt: TPoint;
+  I: Integer;
+begin
+
+  FPosList[1] := htTopLeft;         //这里为什么要这么初始化？？？不然不能改控件大小
+  FPosList[2] := htTop;
+  FPosList[3] := htTopRight;
+  FPosList[4] := htRight;
+  FPosList[5] := htBottomRight;
+  FPosList[6] := htBottom;
+  FPosList[7] := htBottomLeft;
+  FPosList[8] := htLeft;
+
+
+  Pt := Point(Msg.XPos, Msg.YPos);
+  Pt := ScreenToClient(Pt);
+  Msg.Result := 0;
+
+  for I := 1 to 8 do
+    if PtInRect(FRectList[I], Pt) then
+      Msg.Result := FPosList[I];
+  if Msg.Result = 0 then
+    inherited;
+end;
+
+procedure Tedit_Mtn.WmSize(var Msg: TWmSize);
+var
+  R: TRect;
+begin
+
+
+  FRectList[1] := Rect(0, 0, 5, 5);
+  FRectList[2] := Rect(Width div 2 - 3, 0, Width div 2 + 2, 5);
+  FRectList[3] := Rect(Width - 5, 0, Width, 5);
+  FRectList[4] := Rect(Width - 5, height div 2 - 3, Width, Height div 2 + 2);
+  FRectList[5] := Rect(Width - 5, Height - 5, Width, Height);
+  FRectList[6] := Rect(Width div 2 - 3, Height - 5, Width div 2 + 2, Height);
+  FRectList[7] := Rect(0, Height - 5, 5, Height);
+  FRectList[8] := Rect(0, Height div 2 - 3, 5, Height div 2 + 2);
+
+//====================================================================
+
+end;
 { TGrpQueryRecord }
 
 procedure TGrpQueryRecord.BtnClick(sender: TObject);
@@ -1061,6 +1196,9 @@ begin
   height:=fheight;
   FImage.Width:=self.Width;
   Fimage.Height:=self.Height;
+
+  Barcode1.Width:=self.Width ;
+  Barcode1.Height:=self.Height ;
 end;
 
 procedure TQRDBBarCodeImage.setBarCodeType(const Value: integer);
@@ -1374,6 +1512,101 @@ procedure TQRImageLoader.UnPrepare;
 begin
   FField := nil;
   inherited Unprepare;
+
+end;
+
+{ Tlabel_Mtn }
+
+constructor Tlabel_Mtn.Create(AOwner: TComponent);
+begin
+    inherited;
+
+    self.Visible :=true;
+    self.Hint :='0'         ;
+    self.Font.Name :='宋体';
+    self.Font.Size:=10;
+end;
+
+procedure Tlabel_Mtn.MouseDown(Button: TMouseButton; Shift: TShiftState; X,
+  Y: Integer);
+begin
+  inherited;
+  if (self<>nil)and (Button=  mbLeft  ) then
+  begin
+    FOldX := Point(X,Y);
+  end;
+end;
+
+procedure Tlabel_Mtn.MouseMove(Shift: TShiftState; X, Y: Integer);
+var NewPoint : TPoint;
+tempPoint: TPoint;  
+begin
+  inherited;
+  if Shift=[ssleft] then
+  begin
+    tempPoint.X :=   Left + X-  FOldX.x;
+    tempPoint.Y:=Top + Y- FOldX.Y;
+    NewPoint:= tempPoint;
+
+    with Self do
+       SetBounds(NewPoint.x, NewPoint.Y , Width, Height);
+
+  end;
+
+end;
+
+
+procedure Tlabel_Mtn.SetCollector(value: Tstrings);
+begin
+self.FCollector :=  value;
+end;
+
+procedure Tlabel_Mtn.SetisUserMode(const Value: Boolean);
+begin
+  FisUserMode := Value;
+end;
+
+procedure Tlabel_Mtn.WmNcHitTest(var Msg: TWmNcHitTest);
+var
+  Pt: TPoint;
+  I: Integer;
+begin
+
+  FPosList[1] := htTopLeft;         //这里为什么要这么初始化？？？不然不能改控件大小
+  FPosList[2] := htTop;
+  FPosList[3] := htTopRight;
+  FPosList[4] := htRight;
+  FPosList[5] := htBottomRight;
+  FPosList[6] := htBottom;
+  FPosList[7] := htBottomLeft;
+  FPosList[8] := htLeft;
+
+
+  Pt := Point(Msg.XPos, Msg.YPos);
+  Pt := ScreenToClient(Pt);
+  Msg.Result := 0;
+
+  for I := 1 to 8 do
+    if PtInRect(FRectList[I], Pt) then
+      Msg.Result := FPosList[I];
+  if Msg.Result = 0 then
+    inherited;
+end;
+
+procedure Tlabel_Mtn.WmSize(var Msg: TWmSize);
+var
+  R: TRect;
+begin             
+  FRectList[1] := Rect(0, 0, 5, 5);
+  FRectList[2] := Rect(Width div 2 - 3, 0, Width div 2 + 2, 5);
+  FRectList[3] := Rect(Width - 5, 0, Width, 5);
+  FRectList[4] := Rect(Width - 5, height div 2 - 3, Width, Height div 2 + 2);
+  FRectList[5] := Rect(Width - 5, Height - 5, Width, Height);
+  FRectList[6] := Rect(Width div 2 - 3, Height - 5, Width div 2 + 2, Height);
+  FRectList[7] := Rect(0, Height - 5, 5, Height);
+  FRectList[8] := Rect(0, Height div 2 - 3, 5, Height div 2 + 2);
+
+//====================================================================
 
 end;
 

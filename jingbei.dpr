@@ -101,7 +101,17 @@ uses
   UnitFastReport in 'source\fastreport\UnitFastReport.pas' {frmFastReport},
   UnitBarcodePrintingProgress in 'source\UnitBarcodePrintingProgress.pas' {frmBarcodePrintingProgress},
   UnitHouShengLabel in 'source\UnitHouShengLabel.pas' {frmHouShengLabel},
-  UnitHoushengLabel2 in 'source\UnitHoushengLabel2.pas' {QrptHoushengLabel: TQuickRep};
+  UnitHoushengLabel2 in 'source\UnitHoushengLabel2.pas' {QrptHoushengLabel: TQuickRep},
+  UnitDeliveryLabel in 'source\UnitDeliveryLabel.pas' {DeliveryLabelPrint: TQuickRep},
+  UnitMulPrintModule in 'source\UnitMulPrintModule.pas',
+  UnitUserDefineRpt in 'source\UnitUserDefineRpt.pas',
+  UnitUpdateQLabel in 'source\UnitUpdateQLabel.pas',
+  UnitEditorReport in 'source\core\model\UnitEditorReport.pas',
+  UnitUserQrRptEx in 'source\privatesource\UnitUserQrRptEx.pas',
+  Myprv in 'source\privatesource\Myprv.pas',
+  UnitChyFrReportView in 'source\privatesource\UnitChyFrReportView.pas',
+  DelphiZXingQRCode in 'source\privatesource\DelphiZXingQRCode.pas',
+  UnitBarcodeTemplate in 'source\UnitBarcodeTemplate.pas' {FrmBarCodeTemplate};
 
 //UnitUserQrRptEx in 'source\UnitUserQrRptEx.pas' {FrmUserQrRptEx};
 
@@ -115,8 +125,7 @@ begin
   SplashFrm.Update;
   Application.ShowMainForm:=false;
   SplashFrm.ShowHint('正在创建数据模块,请稍候...');
-  Application.CreateForm(TdmFrm, dmFrm);
-  Application.CreateForm(TQrptHoushengLabel, QrptHoushengLabel);
+  Application.CreateForm(TdmFrm, dmFrm); 
   SplashFrm.ShowHint('正在创建主程序,请稍候...');
   Application.CreateForm(TmainFrm, mainFrm);
   SplashFrm.ShowHint('正在创建个人桌面,请稍候...');

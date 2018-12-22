@@ -234,6 +234,7 @@ var
   NameList:Tstrings;
   FrmChgPwd:TFrmChgPwd;
   list:Tstringlist;
+  PIssys,PIsAdmin:boolean;
 begin
     DeleteBakFile('.\barcodeImages\','*.jpg', 7);
 
@@ -246,6 +247,7 @@ begin
                 begin
                     fEId:=dmFrm.FreeStoredProc1.Parameters.ParamValues['@EmpId'];
                     FLockTime:=dmFrm.FreeStoredProc1.Parameters.ParamValues['@LockTime'];
+                    PIssys:=dmFrm.FreeStoredProc1.Parameters.ParamValues['@Issys'];
                     fLTime:=FormatDateTime('yyyy"-"mm"-"dd" "hh":"nn":"ss"."zzz',dmFrm.FreeStoredProc1.Parameters.ParamValues['@LoginTime']);
 
                     FhlUser.Logout('注消,并以'+userEdit1.Text+'重新登陆');
@@ -271,7 +273,9 @@ begin
                               Zip:=FieldByName('Zip').asString;
                               Tel:=FieldByName('Tel').asString;
                               Fax:=FieldByName('Fax').asString;
+                               sys:=PIssys;
                           {
+
                               SmtpHost:=FieldByName('SmtpHost').asString;
                               SmtpPort:=FieldByName('SmtpPort').asInteger;
                               SmtpUser:=FieldByName('SmtpUser').asString;

@@ -331,5 +331,10 @@ object AnalyseEx: TAnalyseEx
       ImageIndex = 13
       OnExecute = ActOldVersionPrintExecute
     end
+    object ActDelete: TAction
+      Caption = #21024#38500
+      ImageIndex = 2
+      OnExecute = ActDeleteExecute
+    end
   end
 end

@@ -667,7 +667,10 @@ begin
   strtmp:=Column.Title.Caption;
   fieldname:= Column.FieldName;
   if (Column.Field.FieldKind  =  fkLookup ) then
-   fieldname:= Column.Field.LookupKeyFields  ;
+    if  Tadodataset( DataSource.DataSet).FindField (  Column.Field.LookupKeyFields )<>nil then
+        fieldname:= Column.Field.LookupKeyFields
+    else
+        fieldname:= Column.Field.KeyFields   ;
 
   if (Column.Field.FieldKind  =  fkCalculated ) then
     if  Tadodataset( self.DataSource.DataSet).FindField (leftstr( fieldname,length(fieldName)-3))<>nil then

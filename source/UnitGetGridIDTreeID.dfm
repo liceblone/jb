@@ -236,7 +236,7 @@ object frmGetGridID: TfrmGetGridID
       object lbl8: TLabel
         Left = 16
         Top = 184
-        Width = 305
+        Width = 214
         Height = 13
         Caption = 'F03,cmdText   '#21442#25968#35821#21477#21518#35201#21152' where 1<>! '
         FocusControl = dbedt8
@@ -316,9 +316,9 @@ object frmGetGridID: TfrmGetGridID
       object lbl18: TLabel
         Left = 472
         Top = 104
-        Width = 87
+        Width = 111
         Height = 13
-        Caption = 'F14,OnCalcFieldId'
+        Caption = 'F14,OnCalcFieldId  13  '
         FocusControl = dbedt18
       end
       object lbl19: TLabel
@@ -372,7 +372,7 @@ object frmGetGridID: TfrmGetGridID
         Left = 16
         Top = 200
         Width = 41
-        Height = 129
+        Height = 21
         DataField = 'F03'
         DataSource = ds1
         TabOrder = 2

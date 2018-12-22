@@ -2489,4 +2489,29 @@ object dmFrm: TdmFrm
       Caption = 'loadBmpPic'
     end
   end
+  object MPopupGridCoLRPT: TPopupMenu
+    Images = ImageList1
+    OnPopup = DbGridPopupMenu1Popup
+    Left = 432
+    Top = 128
+    object MenuItem7: TMenuItem
+      Caption = '-'
+    end
+    object MenuItem8: TMenuItem
+      Caption = #25490#24207'...'
+      ImageIndex = 15
+      OnClick = dgPupSortClick
+    end
+    object MenuItem9: TMenuItem
+      Caption = #21015#23646#24615'...'
+      Hint = #33258#23450#20041#21508#21015#25152#26377#30340#26174#31034#23646#24615'...'
+      ImageIndex = 28
+      OnClick = dgPupPropClick
+    end
+    object MenuItem10: TMenuItem
+      Caption = #21015#21487#35270#24615'...'
+      Hint = #33258#23450#20041#21508#21015#26159#21542#26174#31034'...'
+      OnClick = dgPupVisClick
+    end
+  end
 end

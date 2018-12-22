@@ -160,12 +160,7 @@ begin
   Fnt.Assign(grpLayout.Font);
   //fDictDataSet.First;
 
-  fDictDataSet:=Tadoquery.Create (nil);
-  fDictDataSet.Connection :=FhlKnl1.Connection;
-  sql:='select r.*,f.F02,f.f09 as FText from T506 r left outer join T102 f on r.F16=f.F01 where r.F18=1 and r.F02='+ quotedstr( reportID ) +'  order by r.f13' ;
-  fDictDataSet.SQL.Clear ;
-  fDictDataSet.SQL.Add(sql);
-  fDictDataSet.Open ;
+  fDictDataSet:=fhlknl1.GetReportLayoutDBSet( reportID );
 
   //select r.*,f.F02 as F99 from T506 r left outer join T102 f on r.F16=f.F01 where r.F02=:BoxId and r.F18=1 order by r.f13
 

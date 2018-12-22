@@ -796,6 +796,7 @@ type
     //--------------Config/Init-------------
     function  Cf_SetDataSet(ADataSet:TDataSet;ADataSetId:ShortString;ActnLst:TActionList):wideString;
     function  Cf_SetDbGrid(GridId:string;dbGrid:TDbGrid;BDifReadOnlyClr:boolean=false):string;
+    function  Cf_SetDbGrid_PRT(GridId:string;dbGrid:TDbGrid ):string;
     function  SetColFormat(ADbGrid:TDbGrid)  :boolean;
 
     procedure Cf_SetBox(ABoxId:string;ADataSource:TDataSource;AParent:TWinControl;ActnLst:TActionList);
@@ -930,7 +931,11 @@ type
     procedure Vl_SetCtrlStyle(bkColor:TColor;fFather:TwinControl;fCanEdit:Boolean);
     //-----------------Report-----------------------
     procedure Rp_SetRepGrid(fDBGrid:TDBGrid;fDetailBand,fColumnHeaderBand:TQrBand;fHasVerticalLine:Boolean=True);
-    procedure Rp_SetRepCtrl(fDictDataSet,fDataSet:TDataSet;fParent:TQrBand;ABeginTop:integer=80);
+
+    procedure Rp_SetRepCtrl(fDictDataSet,fDataSet:TDataSet;fParent:TQrBand;ABeginTop:integer=80;DLGrid:TDbGrid=nil);
+    procedure Rp_SetRepCtrlWithSumRow(fDictDataSet,fDataSet:TDataSet;fParent:TQrBand;ABeginTop:integer=10;DLGrid:TDbGrid=nil);
+
+
     procedure Rp_SetRepLabel(fDictDataSet:TDataSet;fParent:TQrBand);
     procedure Rp_RepSet(APrinterId:string);
     procedure Rp_DbGrid(APrinterId:string;ADbGrid:TDbGrid;RptTitle:string='');
@@ -984,10 +989,10 @@ type
     function WriteTxt(strWrite,  FileName:string):boolean;
     function WriteLog(strWrite :string):boolean;
 
+    function GetReportLayoutDBSet( PrintID:string ): Tadoquery;
   published
     property FreeQuery:TAdoQuery read FFre_Query write FFre_Query;
     property User_Query:TAdoQuery read FUser_Query write FUser_Query;
-
     property Connection:TAdoConnection read FAdoConnection write FAdoConnection;
     property UserConnection:Tadoconnection read FAdoUserConnection ;
   end;
@@ -1032,7 +1037,8 @@ const
 procedure Register;
 
 implementation
-uses sort,colShower,colProp,Filter,RepSet,RepGrid,RepCard,memo,date,DirSelector,datamodule,UnitUpdateProerty,Upublic ,UPublicCtrl ,UnitExpressPrint;
+uses sort,colShower,colProp,Filter,RepSet,RepGrid,RepCard,memo,date,DirSelector,datamodule,UnitUpdateProerty,Upublic
+,UPublicCtrl ,UnitExpressPrint,UnitGrid;
 
 procedure Register;
 begin
@@ -4590,7 +4596,7 @@ begin
   end;
 end;
 
-procedure TFhlKnl.Rp_SetRepCtrl(fDictDataSet,fDataSet:TDataSet;fParent:TQrBand;ABeginTop:integer=80);
+procedure TFhlKnl.Rp_SetRepCtrl(fDictDataSet,fDataSet:TDataSet;fParent:TQrBand;ABeginTop:integer=80;DLGrid:TDbGrid=nil);
  var l,t,w:Integer;Fnt:TFont;
 begin
   t:=0;
@@ -5811,4 +5817,104 @@ begin
    WriteTxt(strWrite , fileName)
 end;
 
+function TFhlKnl.GetReportLayoutDBSet(PrintID: string): Tadoquery;
+var fDictDataSet: Tadoquery;
+var sql:string;
+begin
+  fDictDataSet:=Tadoquery.Create (nil);
+  fDictDataSet.Connection :=FhlKnl1.Connection;
+  sql:='select r.*,f.F02 as F99 from T506 r left outer join T102 f on r.F16=f.F01 where r.F18=1 and r.F02='+ quotedstr( PrintID ) +'  order by r.f13' ;
+  fDictDataSet.SQL.Clear ;
+  fDictDataSet.SQL.Add(sql);
+  fDictDataSet.Open ;
+  result:= fDictDataSet;
+end;
+
+function TFhlKnl.Cf_SetDbGrid_PRT(GridId: string; dbGrid: TDbGrid): string;
+var Col:TChyColumn;
+var  Fcfg_dbgridCoLRpt:TADODataSet ;
+var cmd:string;
+begin
+  try
+    Fcfg_dbgridCoLRpt:=TADODataSet.Create(self);
+    with Fcfg_dbgridCoLRpt do
+    begin
+      CommandTimeOut:=600;
+      LockType:=ltReadOnly;
+      CommandType:=cmdText;
+      cmd:='    SELECT  c.f01 as colid,c.F07 & c.F08 AS F07, c.F06 AS colreadonly, c.F02, c.F03, c.F04, c.F05, c.F09, ';
+      cmd:=cmd+'      c.F10, c.F11, c.F12, c.F13, c.F14, c.F15, c.F16, c.F17, c.F18, c.F19, c.F20, c.F21, c.F22, ';
+      cmd:=cmd+'     c.F23,       c.F27,    c.F28,   isnull(c.F29,0) as F29,   f.F02 AS fldname  ,f.f07 as displayValues ';
+      cmd:=cmd+'   FROM '+self.UserConnection.DefaultDatabase +'.dbo.T516 c LEFT OUTER JOIN  ';
+      cmd:=cmd+'   dbo.T102 f ON f.F01 = c.F03  ';
+      cmd:=cmd+'   where  c.F02  ='+quotedstr(GridId)+' order by c.f23 ';
+      CommandText:=cmd ;
+      Connection:=FADOConnection;
+    end;
+
+
+    result:='-1';
+   if dbGrid.Columns.Count >0 then
+    dbGrid.Columns.Clear;
+    if GridId='-1' then exit;
+
+    Fcfg_dbgridCoLRpt.Open;
+    with Fcfg_dbgridCoLRpt do
+    begin
+      while not Eof do
+      begin
+        Col:=TChyColumn.Create(dbGrid.Columns);
+        if  Fcfg_dbgridCoLRpt.findfield ('colid')<>nil then
+        Col.colid := Fcfg_dbgridCoLRpt.fieldbyname('colid').AsString ;
+        q_NewDbGridCol(Fcfg_dbgridCoLRpt,TColumn(Col),false);
+        next;
+      end;
+      Close;
+    end;
+  finally
+    Fcfg_dbgridCoLRpt.free ;
+  end;
+end;
+
+
+procedure TFhlKnl.Rp_SetRepCtrlWithSumRow(fDictDataSet, fDataSet: TDataSet;
+  fParent: TQrBand; ABeginTop: integer; DLGrid: TDbGrid);
+ var l,t,w, i :Integer;Fnt:TFont;
+ var lbl:TQRLabel ;
+ var Txt: TQRDBtext ;
+ const ConstGap:Integer=1   ;
+
+begin
+  Rp_SetRepCtrl(fDictDataSet,fDataSet,fParent,ABeginTop,DLGrid);
+
+  l:=0;
+  t:=4;
+  if DLGrid<>nil then
+  if TModelDbGrid(DLGrid).NeedSumRow then
+  begin
+     for i:=0 to DLGrid.Columns.Count -1 do
+     begin
+        if  DLGrid.Columns[i].Visible then
+        begin
+          lbl:=TQRLabel.Create(fParent) ;
+          //Txt:=TQRDBtext.Create(fParent) ;
+          with lbl do
+          begin
+           Parent:=fParent; Left:=l; top:=t;
+           Caption :=TChyColumn(DLGrid.Columns[i]).GroupValue  ;
+           // Font.Assign(Fnt);
+            Frame.DrawLeft:=True;
+            AutoSize :=False;
+            AutoStretch :=false;
+            Alignment:= DLGrid.Columns[i].Alignment  ;//Vl_GetAlignment(fDictDataSet.FieldByName('F03').asInteger);
+            width:=DLGrid.Columns[i].Width ;
+            Frame.Width :=1;
+
+            l :=left +DLGrid.Columns[i].Width +ConstGap ;
+          end;
+        end;
+     end;
+  end;
+
+end;
 end.
