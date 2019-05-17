@@ -66,6 +66,7 @@ type
     procedure ActBarCodeSearchExecute(Sender: TObject);
     function  GetAllParameters: Variant ;
     procedure OpnDlDsBtn1Click(Sender: TObject);
+    procedure FormCreate(Sender: TObject);
   private
     { Private declarations }
   public
@@ -576,6 +577,11 @@ end;
 procedure TFrmPickUniversal.OpnDlDsBtn1Click(Sender: TObject);
 begin
   self.FormActivate(self);
+end;
+
+procedure TFrmPickUniversal.FormCreate(Sender: TObject);
+begin
+DateEnd.Date := today;
 end;
 
 end.

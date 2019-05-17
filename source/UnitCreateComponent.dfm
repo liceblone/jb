@@ -58,7 +58,7 @@ object frmCreateComponent: TfrmCreateComponent
       end
       object lbl46: TLabel
         Left = 8
-        Top = 408
+        Top = 384
         Width = 83
         Height = 13
         Caption = 'MTDATASETID  '
@@ -1401,7 +1401,7 @@ object frmCreateComponent: TfrmCreateComponent
       end
       object edtMtDataSetID: TEdit
         Left = 8
-        Top = 424
+        Top = 400
         Width = 81
         Height = 21
         ImeName = #20013#25991' ('#31616#20307') - '#24494#36719#25340#38899
@@ -1463,7 +1463,7 @@ object frmCreateComponent: TfrmCreateComponent
         TabOrder = 14
       end
       object btnQAddField: TButton
-        Left = 104
+        Left = 128
         Top = 408
         Width = 75
         Height = 25

@@ -901,6 +901,7 @@ type
     procedure Ds_CopyValues(SourceDataSet,DestDataSet:TDataSet;SourceFields,DestFields:Variant;IsAppend:Boolean=True;IsPost:Boolean=True);overload;
     procedure Ds_CopyValues(SourceGrid:TdbGrid;SourceDataSet,DestDataSet:TDataSet;SourceFields,DestFields:Variant;IsAppend:Boolean=True;IsPost:Boolean=True);overload;//¼ÇÂ¼¶àÑ¡ 2006-7-20
     procedure Ds_CopyValues(AllDataSet:boolean;SourceDataSet,DestDataSet:TDataSet;SourceFields,DestFields:Variant;IsAppend:Boolean=True;IsPost:Boolean=True);overload;
+    procedure Ds_CopyCommarValues(SourceGrid:TdbGrid;SourceDataSet,DestDataSet:TDataSet;SourceFields,DestFields:Variant; IsPost:Boolean=True); 
 
 
     procedure Ds_CopyDataSet(SourceDataSet,DestDataSet:TAdoDataSet);
@@ -4188,6 +4189,53 @@ end
 else
        Ds_CopyValues(SourceDataSet,DestDataSet,SourceFields,DestFields,false,IsPost)   ;
 
+end;
+
+procedure TFhlKnl.Ds_CopyCommarValues(SourceGrid:TdbGrid;SourceDataSet,DestDataSet:TDataSet;SourceFields,DestFields:Variant; IsPost:Boolean=True);
+ var i,Row :integer;
+ var tempvalues:TstringList;
+   TempBookmark: TBookMark;
+begin
+if  dgmultiselect in  SourceGrid.Options then
+begin
+      if VarIsStr(SourceFields) then
+        SourceFields:=Vr_CommaStrToVarArray(SourceFields);
+      if VarIsStr(DestFields) then
+        DestFields:=Vr_CommaStrToVarArray(DestFields);
+      if VarIsNull(SourceFields) or VarIsNull(DestFields) then
+        Exit;
+
+      try
+
+      tempvalues := Tstringlist.Create;
+
+      with SourceGrid.SelectedRows do
+      if Count <> 0 then
+      begin
+        TempBookmark:= SourceGrid.Datasource.Dataset.GetBookmark;
+        DestDataSet.edit  ;
+
+        for Row:= 0 to Count - 1 do
+        begin
+          if IndexOf(Items[Row]) > -1 then
+          begin
+                SourceGrid.Datasource.Dataset.Bookmark:= Items[Row];
+                tempvalues.Append (SourceDataSet.FieldByName(SourceFields[0]).Value );
+          end;
+        end;
+      end;
+      DestDataSet.FieldByName(DestFields[0]).Value := tempvalues.CommaText ;
+
+      if IsPost then
+        DestDataSet.Post;
+
+       SourceGrid.Datasource.Dataset.GotoBookmark(TempBookmark);
+       SourceGrid.Datasource.Dataset.FreeBookmark(TempBookmark);
+       finally
+          tempvalues.Free;
+       end;
+end;
+
 
 end;
 
@@ -4424,9 +4472,8 @@ procedure  TFhlKnl.Ds_AssignDefaultVals(ADataSet:TDataSet;ACommaVals:wideString;
 var
   s:TStringList;
   i:integer;
-
 begin
-      s:=TStringList.Create;
+    s:=TStringList.Create;
     try
       if ADataSet.Active then
       begin
@@ -5296,6 +5343,7 @@ begin
 
 end;
 
+
 procedure TFhlKnl.Ds_CopyValues(AllDataSet: boolean; SourceDataSet,
   DestDataSet: TDataSet; SourceFields, DestFields: Variant; IsAppend,
   IsPost: Boolean);
@@ -5917,4 +5965,5 @@ begin
   end;
 
 end;
+
 end.

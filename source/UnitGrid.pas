@@ -340,7 +340,7 @@ end;
 
 procedure TModelDbGrid.SetPopupMenu(PPopupMenu: TPopupMenu);
 begin
-  self.PopupMenu :=   PPopupMenu;
+   self.PopupMenu :=   PPopupMenu;
 
    if   self.FLoginInfo.Sys then                         //±£¡Ù
    begin
@@ -364,21 +364,16 @@ end;
 
 procedure TModelDbGrid.SetToolID(PtoolID: string);
 begin
-self.FtoolID :=  PtoolID;
-
-
+  self.FtoolID :=  PtoolID;        
 end;
 
 
 
 procedure TModelDbGrid.ToolMenuClick(sender: Tobject);
 var dbgrid:TdbGrid;
-
 var CrtCom:TfrmCreateComponent    ;
 begin
-//
-   dbgrid:=Tdbgrid(self.PopupMenu.PopupComponent);
-
+  dbgrid:=Tdbgrid(self.PopupMenu.PopupComponent);
 
   if FLoginInfo.Sys  then  begin
         CrtCom:=TfrmCreateComponent.Create(self);
@@ -394,10 +389,10 @@ begin
         CrtCom.DlGridId :=inttostr(dbgrid.Tag );
 
        try
-    CrtCom.Show;
-finally
+          CrtCom.Show;
+      finally
 
-end;
+      end;
   end;
 
 

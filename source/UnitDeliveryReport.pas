@@ -203,8 +203,8 @@ begin
           Font.Assign(Fnt);
           KeyValue := fDictDataSet.FieldByName('F01').AsInteger ;
           FieldID   := fDictDataSet.FieldByName('f16').Value ;
-          //text:=fDictDataSet.FieldByName('f99').asString;
-          text:=fDictDataSet.FieldByName('fText').asString;
+          text:=fDictDataSet.FieldByName('f99').asString;
+          //text:=fDictDataSet.FieldByName('fText').asString;
         end;
 
    end;

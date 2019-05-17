@@ -1027,17 +1027,11 @@ begin
 
       self.FFhlUser.MergeGridUserMenuAndSysCongfigMenu(FGridPopupMenu,PPopupMenu,fdict.GridUserMenuIDs ,self.FActionList );
       self.FGrid.SetPopupMenu ( FGridPopupMenu);
-    
-
-
 
 end;
 
 procedure ModelTreeGridsheet.ToolMenuClick(sender: Tobject);
-
-
 begin
-
 //          showmessage(tdbgrid(Tmeunitem(sender).PopupComponent ).className );
  self.FGrid.ToolMenuClick(sender);
 end;
@@ -1606,13 +1600,9 @@ begin
 end;
 procedure TGrpQueryRecord.FldComboBoxChange(Sender: TObject);
  var ft:TFieldType;i:Integer;fld:TField;s:string;
- 
-
 begin
- for i:=ValGroupBox.ControlCount-1 downto 0 do
-     ValGroupBox.Controls[i].free;
-
-
+    for i:=ValGroupBox.ControlCount-1 downto 0 do
+      ValGroupBox.Controls[i].free;
 
     for i:=0 to  fDBGrid.Columns.Count -1  do
     begin
@@ -1625,7 +1615,7 @@ begin
 
 
     if not assigned(fld) then showmessage('字段查找不误，请联系管理员');
- if fld.FieldKind=fkLookup then begin
+      if fld.FieldKind=fkLookup then begin
        with TFhlComboBox.Create(ValGroupBox) do begin
            Parent:=ValGroupBox;
 
@@ -1639,9 +1629,6 @@ begin
                    Next;
                  end;
             end;
-
-
-
        end;
          with self.OptCombobox  do begin
               Items.Clear;

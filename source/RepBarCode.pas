@@ -94,6 +94,16 @@ begin
                dbText.Top:=topMargin;
                dbText.Left:=VLeft+ 100;//round(dbimage.Height/2)- round(dbText.Width/2);
 
+               dbText:= TQRDBText.Create(self.DetailBand1);
+               
+               dbText.Font.Size:=self.BarCodePrintConfig.BarCodeConfig.FontSize;
+               dbText.AutoSize:=true;
+               dbText.Parent:=self.DetailBand1;
+               dbText.DataSet :=fdataset;
+               dbText.DataField:='FDateCode';//+inttostr(i+1);
+               dbText.Top:=topMargin;
+               dbText.Left:=VLeft+ 160;//round(dbimage.Height/2)- round(dbText.Width/2);
+
 
                dbText:= TQRDBText.Create(self.DetailBand1);
                dbText.Font.Size:=self.BarCodePrintConfig.BarCodeConfig.FontSize;

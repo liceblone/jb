@@ -530,7 +530,7 @@ type
     function GetCtrlTypeIndex(sender:Tobject):string;
     procedure CreateControlObj(contralClass:TcontrolClass;parent:Twincontrol);
     procedure SavePorpertyToDataBase(sender:Tlabel);  overload;
-    procedure SavePorpertyToDataBase(sender :Tedit_Mtn) ;overload;
+    procedure SavePorpertyToDataBase(sender :TEdit) ;overload;
     procedure SavePorpertyToDataBase(sender :TDbRadioGroup);overload;
     procedure getfieldTolist(desList:Tstrings;sql:string;connectionstring:string);   overload;
     procedure getfieldTolist(desList:Tstrings;sql:string;connection:TADOConnection);   overload;
@@ -698,11 +698,11 @@ else
 try dmFrm.ADOConnection1.BeginTrans   ;
     for i:=0 to grpbox.controlcount-1 do
     begin
-           if (grpbox.controls[i] is  Tedit_Mtn ) then
+           if (grpbox.controls[i] is  TEdit ) then
            begin
-              Lst.CommaText :=   (grpbox.controls[i] as Tedit_Mtn).Hint;
+              Lst.CommaText :=   (grpbox.controls[i] as TEdit).Hint;
               if  isinteger( Lst[0] )then  //if  the hint is fieldID  then continue else break. fieldID is integer
-              SavePorpertyToDataBase(grpbox.controls[i] as Tedit_Mtn)
+              SavePorpertyToDataBase(grpbox.controls[i] as TEdit)
               else
               break
            end;
@@ -882,7 +882,7 @@ end;
 
 
 
-procedure TfrmCreateComponent.SavePorpertyToDataBase(sender: Tedit_Mtn);   //SavePorpertyToDataBase
+procedure TfrmCreateComponent.SavePorpertyToDataBase(sender: TEdit);   //SavePorpertyToDataBase
 var qry:Tadoquery;
 var sql,BOXID:string;
 
@@ -984,18 +984,15 @@ end;
 end;
 procedure TfrmCreateComponent.btn1Click(Sender: TObject);
 begin
-   //connectionstring :='Provider=SQLOLEDB.1;Persist Security Info=False;User ID=sa;Initial Catalog=wzjb03a;Data Source=localhost;Use Procedure for Prepare=1;Auto Translate=True;Packet Size=4096;Workstation ID=XTS1;Use Encryption for Data=False;Tag with column collation when possible=False';
-
    if   assigned(mtDataSet1) and  ( mtDataSet1.CommandText<>'') then
    begin
-   
-      edtMtDataSetID.Text := inttostr(mtDataSet1.tag );// SELF.mtDataSetId      ;
-      mtDataSetId:=      edtMtDataSetID.Text;
-      if self.mtDataSet1.CommandType = cmdText then
-      getfieldTolist(lstParaFields.Items, mtDataSet1.CommandText, mtDataSet1.Connection );
-      edt1.Text :=  mtDataSet1.CommandText ;
-      EdtProc_Parameter.text:=fAnalyserDict.mtOpenParamFlds;
-      
+        edtMtDataSetID.Text := inttostr(mtDataSet1.tag )   ;
+        mtDataSetId:=      edtMtDataSetID.Text;
+        if self.mtDataSet1.CommandType = cmdText then
+        getfieldTolist(lstParaFields.Items, mtDataSet1.CommandText, mtDataSet1.Connection );
+        edt1.Text :=  mtDataSet1.CommandText ;
+        EdtProc_Parameter.text:=fAnalyserDict.mtOpenParamFlds;
+
    end
    else
    begin
@@ -1003,8 +1000,6 @@ begin
       edt1.Text :=mtDataSet1.CommandText;
       MessageBox(0, ' mtDataSet1 Ϊnil', '', MB_OK + MB_ICONQUESTION);
    end;
-
-
 end;
 
 procedure TfrmCreateComponent.getfieldTolist(desList:Tstrings;sql:string;connectionstring:string);

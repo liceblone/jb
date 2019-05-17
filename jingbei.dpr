@@ -111,7 +111,10 @@ uses
   Myprv in 'source\privatesource\Myprv.pas',
   UnitChyFrReportView in 'source\privatesource\UnitChyFrReportView.pas',
   DelphiZXingQRCode in 'source\privatesource\DelphiZXingQRCode.pas',
-  UnitBarcodeTemplate in 'source\UnitBarcodeTemplate.pas' {FrmBarCodeTemplate};
+  UnitBarcodeTemplate in 'source\UnitBarcodeTemplate.pas' {FrmBarCodeTemplate},
+  UnitFrmWrArchive in 'source\UnitFrmWrArchive.pas' {FrmWrArchive: TFrame};
+
+//UnitFrmWrArchive in 'source\UnitFrmWrArchive.pas' {FrmWrArchive};
 
 //UnitUserQrRptEx in 'source\UnitUserQrRptEx.pas' {FrmUserQrRptEx};
 
@@ -125,7 +128,7 @@ begin
   SplashFrm.Update;
   Application.ShowMainForm:=false;
   SplashFrm.ShowHint('正在创建数据模块,请稍候...');
-  Application.CreateForm(TdmFrm, dmFrm); 
+  Application.CreateForm(TdmFrm, dmFrm);
   SplashFrm.ShowHint('正在创建主程序,请稍候...');
   Application.CreateForm(TmainFrm, mainFrm);
   SplashFrm.ShowHint('正在创建个人桌面,请稍候...');

@@ -336,5 +336,10 @@ object AnalyseEx: TAnalyseEx
       ImageIndex = 2
       OnExecute = ActDeleteExecute
     end
+    object ActWrArchive: TAction
+      Caption = 'ActWrArchive'
+      ImageIndex = 1
+      OnExecute = ActWrArchiveExecute
+    end
   end
 end

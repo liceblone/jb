@@ -302,14 +302,21 @@ begin
 end;
 
 procedure TLookupFrm.FormClose(Sender: TObject; var Action: TCloseAction);
+var isGridOwner:boolean;
 begin
+  isGridOwner := self.Owner is tdbgrid;
+
   if ModalResult=mrOk then
   begin
     if fDict.MyFld<>nil then
     begin
       if Not CheckBox1.Checked then
-         //FhlKnl1.Ds_CopyValues(DataSource1.DataSet,fDict.MyFld.DataSet,fDict.LkpChgFldNames,fDict.ChgFldNames,False,False)
-         FhlKnl1.Ds_CopyValues(self.dbGrid1,  DataSource1.DataSet,fDict.MyFld.DataSet,fDict.LkpChgFldNames,fDict.ChgFldNames,true,False) //多选
+      begin
+         if  ( isGridOwner ) then
+             FhlKnl1.Ds_CopyValues(self.dbGrid1,  DataSource1.DataSet,fDict.MyFld.DataSet,fDict.LkpChgFldNames,fDict.ChgFldNames,true,false) //多选
+         else
+             FhlKnl1.Ds_CopyCommarValues(self.dbGrid1,  DataSource1.DataSet,fDict.MyFld.DataSet,fDict.LkpChgFldNames,fDict.ChgFldNames, false) //
+      end
       else
          FhlKnl1.Ds_AssignNulls(fDict.MyFld.DataSet,fDict.ChgFldNames,False);
 

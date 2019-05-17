@@ -5,7 +5,7 @@ interface
 uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
   Dialogs, DB, ActnList, ADODB, Buttons, StdCtrls, ExtCtrls, Grids , Excel2000,ComObj,ActiveX, ComCtrls,
-  DBGrids, FhlKnl,ToolWin, jpeg,UnitGrid,UnitModelFrm, XPMenu,UPublicFunction,
+  DBGrids, FhlKnl,ToolWin, jpeg,UnitGrid,UnitModelFrm, XPMenu,UPublicFunction, unitFrmWrArchive ,
   DBCtrls,UnitBarCodePanel;
 
 type
@@ -50,6 +50,7 @@ type
     ActNextDataset: TAction;
     ActOldVersionPrint: TAction;
     ActDelete: TAction;
+    ActWrArchive: TAction;
 
     procedure OpnDlDsBtn1Click(Sender: TObject);
     procedure printAction0Execute(Sender: TObject);
@@ -85,9 +86,12 @@ type
     procedure ActNextDatasetExecute(Sender: TObject);
     procedure ActOldVersionPrintExecute(Sender: TObject);
     procedure ActDeleteExecute(Sender: TObject);
+    procedure ActWrArchiveExecute(Sender: TObject);
   private
     fDict:TAnalyserDictEX;
+    FrmWrArchive : TFrmWrArchive ;
     fInputBarCode:boolean;
+
     { Private declarations }
   public
     DBGdCurrent: TModelDbGrid;
@@ -106,7 +110,7 @@ var
 
 implementation
 
-uses datamodule,UnitCreateComponent,UnitBillEx,Editor,bill;
+uses datamodule,UnitCreateComponent,UnitBillEx,Editor,bill   ;
 
 {$R *.dfm}
 procedure TAnalyseEx.InitFrm(AFrmId:String;AmtParams:Variant);
@@ -233,7 +237,6 @@ procedure TAnalyseEx.OpnDlDsBtn1Click(Sender: TObject);
 var fParams:variant;
 var  abortstr,WarningStr:string;
 begin
-
     with mtAdoDataSet1 do
     begin
         if (State=dsInsert) or (State=dsEdit) then  //update parameter getvalue
@@ -729,8 +732,6 @@ begin
   try
       try
         LstParameterFLDs:=Tstringlist.Create ;
-
-
  
         if uppercase(fBillType)=uppercase('Analyser') then
         begin
@@ -1022,6 +1023,33 @@ begin
      Abort;
   DBGdCurrent.DataSource.DataSet.Delete;
 end;
+end;
+
+procedure TAnalyseEx.ActWrArchiveExecute(Sender: TObject);
+begin
+    if FrmWrArchive = nil then
+    begin
+        FrmWrArchive := TFrmWrArchive.Create(self);
+        FrmWrArchive.InitFrm (null);
+        FrmWrArchive.SetDataSet(self.DBGdCurrent.DataSource.DataSet);
+        FrmWrArchive.Parent  :=PgGrids;
+        FrmWrArchive.Align:=alleft;
+        FrmWrArchive.Width:=300;
+        DBGdCurrent.DataSource.DataSet.AfterScroll(DBGdCurrent.DataSource.DataSet) ;
+
+    end
+    else
+    begin
+        if FrmWrArchive.Visible then
+          FrmWrArchive.Visible :=Not FrmWrArchive.Visible
+        else
+        begin
+          FrmWrArchive.Show;
+
+        end
+    end;
+ // fInputBarCode:= Ttoolbutton( ActBatCodeList.ActionComponent).Down;
+    { }
 end;
 
 end.
