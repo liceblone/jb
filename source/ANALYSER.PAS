@@ -141,6 +141,7 @@ type
     ActXlkInvoice: TAction;
     ActSortAnalyser: TAction;
     ActExport120: TAction;
+    ActReloadGridFormat: TAction;
     procedure InitFrm(AFrmId:String;AmtParams:Variant);
     procedure FormClose(Sender: TObject; var Action: TCloseAction);
     procedure dlAdoDataSet1AfterClose(DataSet: TDataSet);
@@ -265,6 +266,7 @@ type
     procedure ActXlkInvoiceExecute(Sender: TObject);
     procedure ActSortAnalyserExecute(Sender: TObject);
     procedure ActExport120Execute(Sender: TObject);
+    procedure ActReloadGridFormatExecute(Sender: TObject);
 
   private
     fFinderFrm,fdsFinderFrm:TForm;
@@ -2228,6 +2230,11 @@ begin
     PopDbgrid:=self.DBGrid1   ;
     QExportExcel(PopDbgrid,TForm(PopDbgrid.Parent).Caption+formatdatetime('yyyymmdd',now), true,strtoint(RepeatCnt));
   end;
+end;
+
+procedure TanalyserFrm.ActReloadGridFormatExecute(Sender: TObject);
+begin
+  fhlknl1.RenewColumnsFormatCache( fdict.DbGridId, true );
 end;
 
 end.

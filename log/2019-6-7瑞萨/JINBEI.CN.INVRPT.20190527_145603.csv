@@ -1,0 +1,6 @@
+Disti Code (Disti #),File Number,Date Sent,Report Produced,Inventory Date,Currency,Distributor Name,Distributor Branch,Part Number,Product Description,Inventory Qty on Hand,UOM,Purchase Price,CPN,Warehouse Name,Warehouse Street1,Warehouse Street2,Warehouse City,Warehouse State,Warehouse Postal Code,Warehouse Country
+113307,201905271,05/27/2019,05/27/2019,05/26/2019,USD,JINBEI,CN,XLH335025.000000I,,1000,EA,0.123,ADVANET,Zhejiang Jingbei Electronics Technology Co Ltd,4C100 Wenhua shangcheng,639 Dengyun lu,Hangzhou City,Zhejiang,310000,CN
+113307,201905272,05/27/2019,05/27/2019,05/26/2019,USD,JINBEI,CN,QS3VH126QG,,970,EA,0.124,ADVANET,Zhejiang Jingbei Electronics Technology Co Ltd,4C100 Wenhua shangcheng,639 Dengyun lu,Hangzhou City,Zhejiang,310000,CN
+113307,201905273,05/27/2019,05/27/2019,05/26/2019,USD,JINBEI,CN,74FCT38075DCGI,,835,EA,0.125,ADVANET,Zhejiang Jingbei Electronics Technology Co Ltd,4C100 Wenhua shangcheng,639 Dengyun lu,Hangzhou City,Zhejiang,310000,CN
+,,,,,,,,,,,,,,,,,,,,
+Hard Code,Running #. YYYYMMDD + running #,MM/DD/YYYY,MM/DD/YYYY,MM/DD/YYYY,Hard Code,Hard Code,Hard Code,,optional,cannot have comma,Hard Code,cannot have comma,cannot have comma,cannot have comma,cannot have comma,cannot have comma,cannot have comma,cannot have comma,,

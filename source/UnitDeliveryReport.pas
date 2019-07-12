@@ -75,7 +75,7 @@ var
 
 implementation
 
-uses datamodule, RepCard, UnitCreateComponent,UPublic;
+uses datamodule, RepCard, UnitCreateComponent,UPublic ,upublicctrl;
 
 {$R *.dfm}
 
@@ -201,7 +201,7 @@ begin
           width:=w;
 
           Font.Assign(Fnt);
-          KeyValue := fDictDataSet.FieldByName('F01').AsInteger ;
+          //KeyValue := fDictDataSet.FieldByName('F01').AsInteger ;
           FieldID   := fDictDataSet.FieldByName('f16').Value ;
           text:=fDictDataSet.FieldByName('f99').asString;
           //text:=fDictDataSet.FieldByName('fText').asString;
@@ -334,8 +334,8 @@ begin
         begin
               if (grpbox.controls[i] is  tedit_mtn  ) or (grpbox.controls[i] is  tlabel_mtn) then
               begin
-                  if (grpbox.controls[i] is  tedit_mtn )then
-                      MaxF01  := (grpbox.controls[i] as tedit_mtn  ).KeyValue ;
+                  //if (grpbox.controls[i] is  tedit_mtn )then
+                   //   MaxF01  := (grpbox.controls[i] as tedit_mtn  ).KeyValue ;
                   if (grpbox.controls[i] is  tlabel_mtn)then
                       MaxF01  := (grpbox.controls[i] as tlabel_mtn  ).KeyValue ;
 

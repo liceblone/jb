@@ -2201,6 +2201,8 @@ begin
   //hide field
   RepBillFrm:=TRepBillFrm.Create(Application);
   try
+    mtDataSet1.Close;
+    mtDataSet1.Open;
     RepBillFrm.SetBillRep(self.fBillex .TopBoxId,fBillex.BtmBoxId,mtDataSet1,self.DBGridDL);
     RepBillFrm.PreviewModal;//Preview;
   finally
@@ -2280,6 +2282,8 @@ begin
   //hide field
   RepBillFrm:=TRepBillFrm.Create(Application);
   try
+    mtDataSet1.Close;
+    mtDataSet1.Open;
     RepBillFrm.SetBillRep(fBillex.TopBoxId,'145',mtDataSet1, self.DBGridDL);
     RepBillFrm.PreviewModal;//Preview;
 

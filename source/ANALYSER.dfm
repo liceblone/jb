@@ -871,6 +871,11 @@ object analyserFrm: TanalyserFrm
       ImageIndex = 40
       OnExecute = ActExport120Execute
     end
+    object ActReloadGridFormat: TAction
+      Caption = #21152#36733#21015#35774#32622
+      ImageIndex = 26
+      OnExecute = ActReloadGridFormatExecute
+    end
   end
   object mtADODataSet1: TADODataSet
     Connection = dmFrm.ADOConnection1

@@ -1,0 +1,3 @@
+PO_Num,PO_Date,IDT_Part_Number,Cust_Part_Number,PO_Line_Item_Number,Order_Quantity,Unit_Price,Requested_Date,Cust_Name,Ship_To
+,,,,,,,,JINBEI,113306
+,MM/DD/YYYY,,,,,,MM/DD/YYYY,Hard Code,Hard Code

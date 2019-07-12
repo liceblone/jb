@@ -325,6 +325,15 @@ object FrmMulModulePrint: TFrmMulModulePrint
     TabOrder = 11
     OnClick = btnExitClick
   end
+  object btnLabelPrint: TButton
+    Left = 352
+    Top = 216
+    Width = 97
+    Height = 25
+    Caption = #26631#31614#25171#21360
+    TabOrder = 12
+    OnClick = btnLabelPrintClick
+  end
   object DatasetReport: TADODataSet
     Parameters = <>
     Left = 384

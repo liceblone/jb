@@ -1,6 +1,6 @@
 object FrmUpdateProperty: TFrmUpdateProperty
-  Left = 254
-  Top = 134
+  Left = 319
+  Top = 233
   Width = 811
   Height = 635
   Caption = 'FrmUpdateProperty'

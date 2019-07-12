@@ -43,6 +43,7 @@ type
     dbChkLabelTemplate: TDBCheckBox;
     btnExit: TButton;
     frReport1: TfrReport;
+    btnLabelPrint: TButton;
     procedure FormDblClick(Sender: TObject);
     procedure BtnPreviewClick(Sender: TObject);
     procedure btnprintClick(Sender: TObject);
@@ -58,6 +59,7 @@ type
     procedure BtnPreviorClick(Sender: TObject);
     procedure BtnNextClick(Sender: TObject);
     procedure btnExitClick(Sender: TObject);
+    procedure btnLabelPrintClick(Sender: TObject);
   private
     { Private declarations }
     FPrintId:string;
@@ -87,7 +89,7 @@ var
 
 implementation
      uses datamodule,fhlknl ,UnitUserDefineRpt ,UnitEditorReport,RepBill,Printers ,QRPrntr ,UnitUserQrRptEx,UPublicFunction
-     ,UnitGrid,UPublicCtrl, UnitChyFrReportView;
+     ,UnitGrid,UPublicCtrl, UnitChyFrReportView , UnitClientBarcodePrint ,UnitBarcodePrintingProgress ,UPublic;
 {$R *.dfm}
 
 { TFrmMulModulePrint }
@@ -657,6 +659,57 @@ begin
         FreeAndNil(GridPrt);
         FreeAndNil(RepBillFrm);
       end;
+end;
+
+procedure TFrmMulModulePrint.btnLabelPrintClick(Sender: TObject);
+
+var frm:TQrClientBarCodePrint;
+var sql, barcodeFileName:string;
+var frmPrintingProgress : TfrmBarcodePrintingProgress;
+var image:TImage;
+var i:integer;
+var filelist:Tstringlist ;
+var folder:string;
+ {}
+begin
+
+    folder := './barcodeImages/'+ self.FPrintId +'/' ;
+ //   GetBarcodeFolder(false);
+  //  ActSaveWoOwner.Execute;
+    frm:=TQrClientBarCodePrint.Create(nil);
+    try
+      frm.GetPageCfg();
+
+      //sql:= 'exec Pr_ClientBarCodeLabelPrint  '+quotedstr(fBillex.BillCode)  ;
+      //fhlknl1.Kl_GetUserQuery(sql);
+
+
+      fhlknl1.User_Query.First;
+      for i:=1 to  fhlknl1.User_Query.RecordCount do
+      begin
+        barcodeFileName :=folder+fhlknl1.User_Query.fieldbyname('FBarCode0').AsString + '.jpg';
+        if not fileexists( barcodeFileName ) then
+        begin
+          image:=frm.ExportReport(  fhlknl1.User_Query );
+          ImageConverter.BmpToJpeg( image, barcodeFileName);
+          image.Free ;
+        end;
+        application.ProcessMessages ;
+        fhlknl1.User_Query.Next  ;
+      end;
+      //frm.InitialImageLoader(  fhlknl1.User_Query, fBillex.BillCode );
+      //frm.Preview;
+
+      frmPrintingProgress := TfrmBarcodePrintingProgress.Create(nil);
+      frmPrintingProgress.ImageDir := folder;
+      frmPrintingProgress.ShowModal;
+    finally
+      //self.PgBarSave.Visible := False;
+      FreeAndNil(frm);
+      FreeAndNil(frmPrintingProgress);
+      Screen.Cursor:=crDefault;
+    end;
+   { }
 end;
 
 end.

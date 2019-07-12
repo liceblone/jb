@@ -5,7 +5,7 @@ interface
 uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
   Dialogs, StdCtrls, DB, ADODB, Grids, DBGrids, ExtCtrls,FhlKnl,
-  ComCtrls, Mask,UnitUpdateProerty,datamodule, Menus,UPublic,StrUtils,
+  ComCtrls, Mask,UnitUpdateProerty,datamodule, Menus,UPublic,StrUtils ,
   DBCtrls,UnitGetGridIDTreeID, ToolWin;
 
 
@@ -385,6 +385,9 @@ type
     GrpReportControls: TGroupBox;
     DBEdit3: TDBEdit;
     Label6: TLabel;
+    DBCheckBox3: TDBCheckBox;
+    BtnDecWidth: TButton;
+    BtnIncWidth: TButton;
 
     procedure btnCreateComponentClick(Sender: TObject);
 
@@ -526,6 +529,8 @@ type
     procedure Image1DragDrop(Sender, Source: TObject; X, Y: Integer);
     procedure btnSaveReportCfgClick(Sender: TObject);
     procedure btnReportControlsClick(Sender: TObject);
+    procedure BtnDecWidthClick(Sender: TObject);
+    procedure BtnIncWidthClick(Sender: TObject);
   private
     function GetCtrlTypeIndex(sender:Tobject):string;
     procedure CreateControlObj(contralClass:TcontrolClass;parent:Twincontrol);
@@ -583,7 +588,7 @@ var
    CurrentCol: Tcolumn;
 implementation
 
-
+             uses upublicctrl;
 
 {$R *.dfm}
 procedure TfrmCreateComponent.CreateControlObj(contralClass: TcontrolClass;parent:Twincontrol);
@@ -988,7 +993,7 @@ begin
    begin
         edtMtDataSetID.Text := inttostr(mtDataSet1.tag )   ;
         mtDataSetId:=      edtMtDataSetID.Text;
-        if self.mtDataSet1.CommandType = cmdText then
+        
         getfieldTolist(lstParaFields.Items, mtDataSet1.CommandText, mtDataSet1.Connection );
         edt1.Text :=  mtDataSet1.CommandText ;
         EdtProc_Parameter.text:=fAnalyserDict.mtOpenParamFlds;
@@ -1025,25 +1030,51 @@ end;
 
 procedure TfrmCreateComponent.getfieldTolist(desList: Tstrings;
   sql: string; connection: TADOConnection);
-var qry:Tadoquery;
+var qry:Tadodataset;
       i:integer;
 begin
-    qry := Tadoquery.Create(nil);
+    qry := Tadodataset.Create(nil);
     try
           qry.Connection:= connection;
-          qry.SQL.add(sql);
+          if pos('(',mtDataSet1.CommandText)>-1 then
+          begin
+           qry.Prepared :=true;
+           qry.Parameters.AddParameter ;
+           qry.Parameters[0].Value :='0';
+          end;
+
+
+
+          qry.CommandText :=sql; 
+          if uppercase( leftstr(trim(sql),6))<>uppercase('select') then
+          begin
+             qry.CommandType :=  cmdStoredProc;
+             qry.Parameters.Refresh ;
+          end;
+
+          for i:=0 to qry.Parameters.Count -1 do
+          begin
+              if  ((qry.Parameters[i].DataType  =ftDate )or  (qry.Parameters[i].DataType  =ftTime )or (qry.Parameters[i].DataType  = ftDateTime ))then
+                 qry.Parameters[i].Value :='2001-1-1'
+              else
+                 qry.Parameters[i].Value :='0' ;
+
+          end;
+
           qry.Open ;
           desList.Clear;
 
           for i:=0 to qry.FieldCount -1 do
           begin
               desList.Add(qry.Fields[i].FieldName )   ;
+
           end;
 
     finally
       qry.Free;
     end;
 end;
+
 procedure TfrmCreateComponent.btnDisplayExistsFieldsClick(Sender: TObject);
 var sql:string;
 qry:Tadoquery;
@@ -1663,7 +1694,7 @@ begin
        //   DataSet:=fDataSet;
         //  DataField:=fDictDataSet.FieldByName('F99').asString;
           Font.Assign(Fnt);
-          KeyValue := fDictDataSet.FieldByName('F01').AsInteger ;
+          //KeyValue := fDictDataSet.FieldByName('F01').AsInteger ;
           FieldID   := fDictDataSet.FieldByName('f16').Value ;
           text:=fDictDataSet.FieldByName('f99').asString;
         end;
@@ -3043,11 +3074,9 @@ begin
       fstpt.Y :=y;
       MButton2:= mbLeft;
       Shift2 :=[ssleft	];
-
-      if Button in [mbleft] then
       for i:=0 to self.grpGrpParent.ComponentCount -1 do
       begin
-      //chyMouseUp(Twincontrol(grpGrpParent.Components[i]),MButton2, Shift2,x,y);
+      chyMouseUp(Twincontrol(grpGrpParent.Components[i]),MButton2, Shift2,x,y);
       end;
     end;
 end;
@@ -3098,8 +3127,6 @@ begin
 
    mmButton2:= mbLeft;
    Shift2 :=[ ssshift ,ssleft	];
-   
-   if Button  in [mbleft]      then
    for i:=0 to self.grpGrpParent.ComponentCount -1 do
    begin
        if (
@@ -3111,6 +3138,8 @@ begin
         chyMouseDown(grpGrpParent.Components[i],mmButton2,  Shift2,0,0); { }
    end;
 end;
+
+
 
 procedure TfrmCreateComponent.chyMouseDown(Sender: TObject;
   Button: TMouseButton; Shift: TShiftState; X, Y: Integer);
@@ -3307,6 +3336,32 @@ begin
     LoadReportControl;
 end;
 
+
+
+procedure TfrmCreateComponent.BtnDecWidthClick(Sender: TObject);
+var i:integer;
+begin
+    if     self.FCollector.Count>1 then
+    begin
+          for i:=0 to self.FCollector.Count -1 do
+          begin
+             if  ((self.FCollector.Objects [i]) is Tedit     )   then
+             tcontrol( self.FCollector.Objects [i]).Width   :=   tcontrol( self.FCollector.Objects [i]).Width   -2;
+          end;
+    end    ;
+end;
+procedure TfrmCreateComponent.BtnIncWidthClick(Sender: TObject);
+var i:integer;
+begin
+    if     self.FCollector.Count>1 then
+    begin
+          for i:=0 to self.FCollector.Count -1 do
+          begin
+             if  ((self.FCollector.Objects [i]) is Tedit     )   then
+             tcontrol( self.FCollector.Objects [i]).Width   :=   tcontrol( self.FCollector.Objects [i]).Width   +2;
+          end;
+    end;
+end;
 
 
 end.

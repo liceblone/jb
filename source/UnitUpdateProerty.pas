@@ -64,7 +64,7 @@ var
   FrmUpdateProperty: TFrmUpdateProperty;
 
 implementation
-         uses upublic;
+         uses upublic ,upublicCtrl;
 {$R *.dfm}
 
 procedure TFrmUpdateProperty.btnUpdateClick(Sender: TObject);

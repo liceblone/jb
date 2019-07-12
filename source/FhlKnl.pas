@@ -214,6 +214,7 @@ type
     DefIdx:Integer;
     RefreshWhenPopup:boolean;
     ParamFields:string;
+    CommarValues :boolean;
    end;
 
 type TEditorDict = Record
@@ -797,8 +798,8 @@ type
     function  Cf_SetDataSet(ADataSet:TDataSet;ADataSetId:ShortString;ActnLst:TActionList):wideString;
     function  Cf_SetDbGrid(GridId:string;dbGrid:TDbGrid;BDifReadOnlyClr:boolean=false):string;
     function  Cf_SetDbGrid_PRT(GridId:string;dbGrid:TDbGrid ):string;
-    function  SetColFormat(ADbGrid:TDbGrid)  :boolean;
-
+    function  SetColFormat(ADbGrid:TDbGrid ) :boolean;
+    procedure RenewColumnsFormatCache( GridId :string ; deleteCacheFile:boolean );
     procedure Cf_SetBox(ABoxId:string;ADataSource:TDataSource;AParent:TWinControl;ActnLst:TActionList);
     procedure Cf_ListAllNode(myTreeCodeDataSet:TDataSet;TreeView:TTreeView;ImgIdx,SelIdx:Integer;CodeFld,NameFld:String;ShowCode:Boolean=True);
     procedure Cf_ListAllNodeForMain(myTreeCodeDataSet:TDataSet;TreeView:TTreeView;ImgIdx,SelIdx:Integer;CodeFld,NameFld:String;ShowCode:Boolean=True);
@@ -1724,14 +1725,34 @@ begin
   end;
   col.Alignment:=Vl_GetAlignment(dt.FieldByName('F13').asInteger);
 end;
+procedure TFhlKnl.RenewColumnsFormatCache( GridId :string ; deleteCacheFile:boolean );
+var GridColsFileName:string;
+begin
+    GridColsFileName:=CacheFileName('Fcfg_dbgridcol') ;
+
+    if deleteCacheFile then
+      deletefile(GridColsFileName);
+
+    if (logininfo.IsDev ) or not FileExists(GridColsFileName ) then
+    begin
+         Ds_OpenDataSet(Fcfg_dbgridcol,  GridId);
+         Fcfg_dbgridcol.Filtered :=False;
+         if not FileExists(GridColsFileName ) then
+            Fcfg_dbgridcol.SaveToFile(GridColsFileName,pfXML);
+    end
+    else
+        Fcfg_dbgridcol.LoadFromFile (GridColsFileName);
+
+end;
+
 function TFhlKnl.SetColFormat(ADbGrid: TDbGrid): boolean;
 var i:integer; 
 var StrSort,SortFldName,teststr:string;
-
 var fld:TNumericField ;
 begin
    if not ADbGrid.DataSource.DataSet.IsEmpty  then
    begin
+        {
         GridColsFileName:= CacheFileName('Fcfg_dbgridcol');
         if not Fcfg_dbgridcol.Active   then
         begin
@@ -1747,8 +1768,10 @@ begin
              Fcfg_dbgridcol.SaveToFile(GridColsFileName,pfXML);
             end;
         end;
+        }
 
-        Fcfg_dbgridcol.Filtered :=False;
+      RenewColumnsFormatCache( inttostr(ADbGrid.Tag ),false );
+      Fcfg_dbgridcol.Filtered :=False;
       Fcfg_dbgridcol.Filter :='F02='+inttostr(ADbGrid.Tag );
       Fcfg_dbgridcol.Filtered :=true;
 
@@ -1815,7 +1838,7 @@ begin
     end
     else
         Fcfg_dbgridcol.LoadFromFile (GridColsFileName);
-     
+
 
   Fcfg_dbgridcol.Filtered :=False;
   Fcfg_dbgridcol.Filter :='F02='+GridId;
@@ -2729,6 +2752,8 @@ begin
               ADict.RefreshWhenPopup :=FieldByName('RefreshWhenPopup').AsBoolean ;
            if FindField('ParamFields')  <>nil then
               ADict.ParamFields :=FieldByName('ParamFields').AsString ;
+           if FindField('CommarValues')  <>nil then
+              ADict.CommarValues :=FieldByName('CommarValues').asboolean  ;
 
     end;
     Result:=True;
@@ -5042,6 +5067,7 @@ begin
 
    if Sender is tlabel then
    begin
+        FrmUpdateProperty.GrpLabel.Visible :=true ;
         FrmUpdateProperty.edtCaption.Text :=  (Sender as tlabel).Caption ;
         (FrmUpdateProperty.Acontrol as Tlabel).Color :=(Sender as Tlabel).Color ;
         FrmUpdateProperty.lbl1.Font.Assign ((Sender as Tlabel).Font );
@@ -5049,6 +5075,7 @@ begin
 
    if Sender is Tedit_Mtn then
    begin
+        FrmUpdateProperty.GrpCTRL.Visible :=true ;
         actlst:=Tstringlist.Create ;
         actlst.CommaText :=Tedit_Mtn(sender).Hint ;
         FrmUpdateProperty.cmbclick.ItemIndex :=  strtoint(actlst[1]);
@@ -5965,5 +5992,6 @@ begin
   end;
 
 end;
+
 
 end.

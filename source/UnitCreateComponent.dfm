@@ -20,10 +20,10 @@ object frmCreateComponent: TfrmCreateComponent
   TextHeight = 13
   object pgc1: TPageControl
     Left = 0
-    Top = 29
+    Top = 41
     Width = 834
-    Height = 536
-    ActivePage = ts1
+    Height = 524
+    ActivePage = ts2
     Align = alClient
     TabOrder = 0
     object ts1: TTabSheet
@@ -109,7 +109,7 @@ object frmCreateComponent: TfrmCreateComponent
       end
       object grp1: TGroupBox
         Left = 0
-        Top = 451
+        Top = 439
         Width = 826
         Height = 57
         Align = alBottom
@@ -180,7 +180,7 @@ object frmCreateComponent: TfrmCreateComponent
         Top = 80
         Width = 634
         Height = 393
-        ActivePage = ts4
+        ActivePage = ts6
         TabOrder = 3
         object ts4: TTabSheet
           Caption = #23383#27573#20540#36755#20837#23383#27573
@@ -1133,6 +1133,18 @@ object frmCreateComponent: TfrmCreateComponent
             ImeName = #20013#25991' ('#31616#20307') - '#24494#36719#25340#38899
             TabOrder = 14
           end
+          object DBCheckBox3: TDBCheckBox
+            Left = 40
+            Top = 168
+            Width = 145
+            Height = 17
+            Caption = 'CommarValues'
+            DataField = 'CommarValues'
+            DataSource = dsST607
+            TabOrder = 15
+            ValueChecked = 'True'
+            ValueUnchecked = 'False'
+          end
         end
         object ts7: TTabSheet
           Caption = 'Tree lookup T610'
@@ -1512,7 +1524,7 @@ object frmCreateComponent: TfrmCreateComponent
       end
       object grp2: TGroupBox
         Left = 0
-        Top = 453
+        Top = 441
         Width = 826
         Height = 55
         Align = alBottom
@@ -1759,7 +1771,7 @@ object frmCreateComponent: TfrmCreateComponent
       ImageIndex = 2
       DesignSize = (
         826
-        508)
+        496)
       object lbl26: TLabel
         Left = 8
         Top = 8
@@ -1939,7 +1951,7 @@ object frmCreateComponent: TfrmCreateComponent
         Left = 112
         Top = 336
         Width = 353
-        Height = 153
+        Height = 141
         Anchors = [akLeft, akTop, akRight, akBottom]
         DataSource = dsGrid
         ImeName = #20013#25991' ('#31616#20307') - '#24494#36719#25340#38899
@@ -1952,7 +1964,7 @@ object frmCreateComponent: TfrmCreateComponent
       end
       object grp6: TGroupBox
         Left = 0
-        Top = 442
+        Top = 430
         Width = 826
         Height = 66
         Align = alBottom
@@ -2454,7 +2466,7 @@ object frmCreateComponent: TfrmCreateComponent
     Left = 0
     Top = 0
     Width = 834
-    Height = 29
+    Height = 41
     ButtonHeight = 21
     ButtonWidth = 75
     Caption = 'ToolBar1'
@@ -2500,52 +2512,70 @@ object frmCreateComponent: TfrmCreateComponent
       Top = 2
       Caption = 'TbHEspan'
       ImageIndex = 5
-      Wrap = True
       OnClick = TbHEspanClick
     end
     object TbMoveLeft: TToolButton
-      Left = 0
-      Top = 23
+      Left = 450
+      Top = 2
       Caption = 'TbMoveLeft'
       ImageIndex = 6
+      Wrap = True
       OnClick = TbMoveLeftClick
     end
     object TbMoveRight: TToolButton
-      Left = 75
+      Left = 0
       Top = 23
       Caption = 'TbMoveRight'
       ImageIndex = 7
       OnClick = TbMoveRightClick
     end
     object TbMoveUP: TToolButton
-      Left = 150
+      Left = 75
       Top = 23
       Caption = 'TbMoveUP'
       ImageIndex = 8
       OnClick = TbMoveUPClick
     end
     object TbMoveDown: TToolButton
-      Left = 225
+      Left = 150
       Top = 23
       Caption = 'TbMoveDown'
       ImageIndex = 9
       OnClick = TbMoveDownClick
     end
     object Label2: TLabel
-      Left = 300
+      Left = 225
       Top = 23
       Width = 48
       Height = 21
       Caption = #31227#21160#27493#38271
     end
     object edMoveSpan: TEdit
-      Left = 348
+      Left = 273
       Top = 23
       Width = 48
       Height = 21
       ImeName = #19975#33021#20116#31508'EXE'#22806#25346#29256
       TabOrder = 0
       Text = '3'
+    end
+    object BtnDecWidth: TButton
+      Left = 321
+      Top = 23
+      Width = 75
+      Height = 21
+      Caption = 'BtnDecWidth'
+      TabOrder = 1
+      OnClick = BtnDecWidthClick
+    end
+    object BtnIncWidth: TButton
+      Left = 396
+      Top = 23
+      Width = 75
+      Height = 21
+      Caption = 'BtnIncWidth'
+      TabOrder = 2
+      OnClick = BtnIncWidthClick
     end
   end
   object mm1: TMainMenu
