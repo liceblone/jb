@@ -5485,15 +5485,17 @@ begin
             for i:=1 to FFre_Query.RecordCount  do
             begin
                 Actid:=FFre_Query.FieldByName('F16').asinteger;
-
                 if not logininfo.isAdmin then
-                if (FFre_Query.FindField('rightID')<>nil) and (FFre_Query.FieldbyName('rightID').asstring<>'') then
+                if (FFre_Query.FindField('f13')<>nil) and (FFre_Query.FieldbyName('f13').asstring<>'') then
                 begin
                     rightSql:='select *   from sys_groupright  GpRit join sys_groupuser   GpUser on GpRit.groupid = GpUser.GroupId   ';
-                    rightSql:=rightSql+' where GpUser.UserId='+quotedstr(logininfo.EmpId)+' and  GpRit.rightid='+quotedstr(FFre_Query.FieldbyName('rightID').asstring) ;
+                    rightSql:=rightSql+' where GpUser.UserId='+quotedstr(logininfo.EmpId)+' and  GpRit.rightid='+quotedstr(FFre_Query.FieldbyName('f13').asstring) ;
                     self.Kl_GetUserQuery(rightsql);
                     if self.FUser_Query.RecordCount =0 then
+                    begin
+                       FFre_Query.Next ;
                        continue;
+                    end;
                 end;
 
                  with TToolButton.Create(fToolBar) do
