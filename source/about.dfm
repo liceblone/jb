@@ -12,6 +12,7 @@ object aboutFrm: TaboutFrm
   Font.Style = []
   OldCreateOrder = False
   Position = poMainFormCenter
+  OnCreate = FormCreate
   DesignSize = (
     599
     302)
@@ -23,6 +24,13 @@ object aboutFrm: TaboutFrm
     Width = 59
     Height = 13
     Caption = #29256#26412#35760#24405':'
+  end
+  object lblVersion: TLabel
+    Left = 120
+    Top = 16
+    Width = 70
+    Height = 13
+    Caption = 'lblVersion'
   end
   object Memo1: TMemo
     Left = 16

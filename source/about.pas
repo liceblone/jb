@@ -10,6 +10,8 @@ type
   TaboutFrm = class(TForm)
     Label1: TLabel;
     Memo1: TMemo;
+    lblVersion: TLabel;
+    procedure FormCreate(Sender: TObject);
   private
     { Private declarations }
   public
@@ -20,8 +22,13 @@ var
   aboutFrm: TaboutFrm;
 
 implementation
-uses datamodule;
+uses datamodule, unitpublicfunction;
 {$R *.dfm}
+procedure TaboutFrm.FormCreate(Sender: TObject);
+begin
+  self.lblVersion.Caption := JbGetversion;
+end;
+
 end.
 
 

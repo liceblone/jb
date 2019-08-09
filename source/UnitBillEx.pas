@@ -2903,7 +2903,7 @@ procedure TFrmBillEx.ActCreateSLinvoiceExecute(Sender: TObject);
 //808
 var
   frmid,keyValue:string;
-  Code ,sql :string;
+  Code, sql, wareid:string;
   FrmBillEx:TFrmBillEx ;
   i,j:integer;
 begin
@@ -2911,30 +2911,30 @@ begin
       FhlUser.CheckToolButtonRight( inttostr( fBillex.actid)  , (sender as Taction).Name );
 
       try
+          FrmBillEx:=TFrmBillEx.Create(nil);
+          FrmBillEx.SetParamDataset(dlDataSet1  );
+          FrmBillEx.InitFrm('14');
+          FrmBillEx.FormStyle :=fsnormal;
+          FrmBillEx.Position :=poDesktopCenter;
+          FrmBillEx.ScrollBtm.Visible :=true;
+
+          FrmBillEx.NewAction1.Execute;
+          FrmBillEx.mtDataSet1.FieldByName('Clientid').Value := self.mtDataSet1.FieldByName('Clientid').Value ;
+          FrmBillEx.mtDataSet1.FieldByName('ClientName').Value := self.mtDataSet1.FieldByName('ClientName').Value ;
+          FrmBillEx.mtDataSet1.FieldByName('Note').Value := self.mtDataSet1.FieldByName('Note').Value ;
+
+          FrmBillEx.dlDataSet1.DisableControls ;
 
           sql:=sql+' exec Pr_GetOrderDLForDelivery ' +quotedstr( self.fBillex.BillCode  ) ;
           fhlknl1.Kl_GetUserQuery  (sql  );
           if  not fhlknl1.User_Query.IsEmpty   then
           begin
-              FrmBillEx:=TFrmBillEx.Create(nil);
-              FrmBillEx.SetParamDataset(dlDataSet1  );
-              FrmBillEx.InitFrm('14');
-              FrmBillEx.FormStyle :=fsnormal;
-              FrmBillEx.Position :=poDesktopCenter;
-              FrmBillEx.ScrollBtm.Visible :=true;
-
-              FrmBillEx.NewAction1.Execute;
-              FrmBillEx.mtDataSet1.FieldByName('Clientid').Value := self.mtDataSet1.FieldByName('Clientid').Value ;
-              FrmBillEx.mtDataSet1.FieldByName('ClientName').Value := self.mtDataSet1.FieldByName('ClientName').Value ;      
-              FrmBillEx.mtDataSet1.FieldByName('Note').Value := self.mtDataSet1.FieldByName('Note').Value ;
-
-              FrmBillEx.dlDataSet1.DisableControls ;
- 
               fhlknl1.User_Query.First;
               for i:= 0 to  fhlknl1.User_Query.RecordCount -1 do
               begin  //WareId,PartNo,Brand,Qty,Origin,pack
                  FrmBillEx.dlDataSet1.Append ;
-                 FrmBillEx.dlDataSet1.FieldByName('wareid').Value := fhlknl1.User_Query.FieldByName('wareid').Value ;
+                 wareid :=  fhlknl1.User_Query.FieldByName('wareid').Value  ;
+                 FrmBillEx.dlDataSet1.FieldByName('wareid').Value := wareid ;
                  FrmBillEx.dlDataSet1.FieldByName('PartNo').Value := fhlknl1.User_Query.FieldByName('PartNo').Value ;
                  FrmBillEx.dlDataSet1.FieldByName('Brand').Value  := fhlknl1.User_Query.FieldByName('Brand').Value ;
                  FrmBillEx.dlDataSet1.FieldByName('Origin').Value := fhlknl1.User_Query.FieldByName('Origin').Value ;
@@ -2950,11 +2950,11 @@ begin
 
                  FrmBillEx.dlDataSet1.Post;
                  fhlknl1.User_Query.Next;
-              end;
-              FrmBillEx.Hide;
-              FrmBillEx.dlDataSet1.EnableControls  ;
-              FrmBillEx.ShowModal ;
-              RefreshAction1.Execute;
+          end;
+          FrmBillEx.Hide;
+          FrmBillEx.dlDataSet1.EnableControls  ;
+          FrmBillEx.ShowModal ;
+          RefreshAction1.Execute;
           end;
       finally
          fhlknl1.User_Query.Close;

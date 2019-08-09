@@ -5,7 +5,7 @@ interface
 uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
   Dialogs, StdCtrls, Grids, DBGrids, DB, ADODB, ExtCtrls, DBCtrls, Mask,
-  FR_Class;
+  FR_Class, ComCtrls;
 
 type
   TFrmMulModulePrint = class(TForm)
@@ -44,6 +44,7 @@ type
     btnExit: TButton;
     frReport1: TfrReport;
     btnLabelPrint: TButton;
+    ProgressBar1: TProgressBar;
     procedure FormDblClick(Sender: TObject);
     procedure BtnPreviewClick(Sender: TObject);
     procedure btnprintClick(Sender: TObject);
@@ -184,33 +185,38 @@ begin
 end;
 
 procedure TFrmMulModulePrint.btnprintClick(Sender: TObject);
-var RepBillFrm:TEditorReport;
-var i:integer;
+var RepBillFrm:TFrmUserQrRptEx;
+var i,j:integer;
+var modelID:string;
+var GridPrt   :TModelDbGrid;
 begin
-
-//   FhlUser.CheckRight(fDict.PrintRitId);
+  //   FhlUser.CheckRight(fDict.PrintRitId);
 
   if FTopBoxID<>'' then
   begin
-      RepBillFrm:=TEditorReport.Create(Application);
+      RepBillFrm:=TFrmUserQrRptEx.Create(Application);       //2010-3-25 直接打印不行
       try
-      FContentDataSet.First;
-        for i:=0 to FContentDataSet.RecordCount -1 do
-        begin
+          for j:= 0 to self.FContentDataSet.RecordCount -1 do
+          begin
+              modelID:=StrGridPrintModule.Cols[0].Strings[StrGridPrintModule.Row ];
 
-          //  RepBillFrm.SetBillRep(self.FTopBoxID ,self.FContentDataSet   , '');
-         //   RepBillFrm.Print;
+              GridPrt:=TModelDbGrid.Create (nil);
+              GridPrt.DataSource :=fgrid.DataSource;
+              FhlKnl1.Cf_SetDbGrid_PRT (modelID,GridPrt );
 
-             FhlUser.DoExecProc(FContentDataSet ,null);
-        FContentDataSet.Next ;
-        end;
+              RepBillFrm.SetBillRep(self.FTopBoxID,self.FPrintId ,self.FBtmBoxID,modelID,self.FContentDataSet ,GridPrt );     //fgrid
+              RepBillFrm.QuickRep1.Preview;
+
+              FhlUser.DoExecProc(FContentDataSet ,null);
+
+              FContentDataSet.Next;
+          end;
 
       finally
+        FreeAndNil(GridPrt);
         FreeAndNil(RepBillFrm);
-
-       end;
-
-   end;
+      end;
+  end;
 end;
 
 procedure TFrmMulModulePrint.btnPrintOneClick(Sender: TObject);
@@ -449,13 +455,16 @@ begin
     Fnt:=TFont.Create;
     Fnt.Assign(self.Font);
     FGrid.DataSource.DataSet.First;
-
-    for j:=0 to 199 do
+    self.ProgressBar1.Position :=0;
+    self.ProgressBar1.Max := self.FGrid.DataSource.DataSet.RecordCount;
+    for j:=0 to 50 do
     begin
-        if self.FGrid.DataSource.DataSet.Eof then   break; 
-        for i:=0+j to 199+j do
+        if self.FGrid.DataSource.DataSet.Eof then   break;
+        for i:=0 to 199 do
         begin
               if self.FGrid.DataSource.DataSet.Eof then   break;
+              self.ProgressBar1.Position := i+(j)*200 ;
+
               newpage:=CreatePage(frReport1 ,  strtoint( self.edtWidth.Text ) *10,  strtoint( self.edtHeight.Text )*10);
               newpage.Left  := strtoint( edtLeftMargin.text );    // newpage. := strtoint( self.edtRightMargin.Text );  //newpage.Bottom := strtoint( self.edtBtmMargin.Text );
               newpage.Top  := strtoint( self.edtTopMargin.Text );
@@ -527,15 +536,16 @@ begin
                   fieldView.dx:=w;
                   fieldView.dy:=h;
                   if (fieldView is TFrDigitalImageView) then
-                      (fieldView as TFrDigitalImageView).LoadPicture(); 
-                  newpage.Objects.Add( fieldView ); 
+                      (fieldView as TFrDigitalImageView).LoadPicture();
+                  newpage.Objects.Add( fieldView );
                   fDictDataSet.next;
                end;
-        self.FGrid.DataSource.DataSet.Next;
+          self.FGrid.DataSource.DataSet.Next;
         end;
-         
-      frReport1.PrepareReport;
-      frReport1.ShowReport;
+
+        frReport1.PrepareReport;
+        frReport1.ShowReport;
+        frReport1.Clear;
      end;
       {FhlKnl1.Rp_SetRepCtrl(FhlKnl1.FreeQuery, FGrid.DataSource.DataSet,    TQRBand(TopBand1),0,fdbGrid);
 
@@ -562,12 +572,12 @@ begin
          
       newpage.Objects.Add( mm );
 
-            
 
 
 
-  
-  
+
+
+
       qrCode:= TChyFrQRCodeView.Create ;
       with qrCode do
       begin

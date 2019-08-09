@@ -1,8 +1,8 @@
 object FrmMulModulePrint: TFrmMulModulePrint
-  Left = 396
-  Top = 181
-  Width = 464
-  Height = 440
+  Left = 393
+  Top = 139
+  Width = 467
+  Height = 462
   Caption = #36873#25321#25171#21360#27169#26495
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
@@ -14,15 +14,15 @@ object FrmMulModulePrint: TFrmMulModulePrint
   OnCreate = FormCreate
   OnDblClick = FormDblClick
   DesignSize = (
-    456
-    413)
+    459
+    435)
   PixelsPerInch = 96
   TextHeight = 13
   object StrGridPrintModule: TStringGrid
     Left = 18
     Top = 8
-    Width = 319
-    Height = 265
+    Width = 317
+    Height = 257
     Hint = #21452#20987#21487#25913#21464#24403#21069#20540
     Anchors = [akLeft, akTop, akRight, akBottom]
     ColCount = 2
@@ -40,7 +40,7 @@ object FrmMulModulePrint: TFrmMulModulePrint
       23)
   end
   object BtnPreview: TButton
-    Left = 351
+    Left = 346
     Top = 8
     Width = 96
     Height = 26
@@ -51,7 +51,7 @@ object FrmMulModulePrint: TFrmMulModulePrint
     OnClick = BtnPreviewClick
   end
   object Button2: TButton
-    Left = 351
+    Left = 346
     Top = 38
     Width = 96
     Height = 24
@@ -62,7 +62,7 @@ object FrmMulModulePrint: TFrmMulModulePrint
     TabOrder = 2
   end
   object btnprint: TButton
-    Left = 351
+    Left = 346
     Top = 155
     Width = 97
     Height = 26
@@ -73,7 +73,7 @@ object FrmMulModulePrint: TFrmMulModulePrint
     OnClick = btnprintClick
   end
   object btnPrintOne: TButton
-    Left = 351
+    Left = 346
     Top = 184
     Width = 97
     Height = 26
@@ -84,7 +84,7 @@ object FrmMulModulePrint: TFrmMulModulePrint
     OnClick = btnPrintOneClick
   end
   object BtnDelete: TButton
-    Left = 351
+    Left = 346
     Top = 65
     Width = 97
     Height = 26
@@ -94,7 +94,7 @@ object FrmMulModulePrint: TFrmMulModulePrint
     OnClick = BtnDeleteClick
   end
   object BtnPageSize: TButton
-    Left = 351
+    Left = 346
     Top = 125
     Width = 97
     Height = 26
@@ -105,16 +105,16 @@ object FrmMulModulePrint: TFrmMulModulePrint
   end
   object GroupBox1: TGroupBox
     Left = 16
-    Top = 280
-    Width = 321
-    Height = 129
+    Top = 274
+    Width = 324
+    Height = 143
     Anchors = [akLeft, akRight, akBottom]
     Caption = #25171#21360#35774#32622
     TabOrder = 7
     object plPageSize: TPanel
       Left = 2
-      Top = 16
-      Width = 317
+      Top = 30
+      Width = 320
       Height = 111
       Align = alBottom
       TabOrder = 0
@@ -282,7 +282,7 @@ object FrmMulModulePrint: TFrmMulModulePrint
     end
   end
   object BtnDefineRptModel: TButton
-    Left = 351
+    Left = 346
     Top = 95
     Width = 97
     Height = 26
@@ -292,7 +292,7 @@ object FrmMulModulePrint: TFrmMulModulePrint
     OnClick = BtnDefineRptModelClick
   end
   object BtnPrevior: TButton
-    Left = 351
+    Left = 346
     Top = 271
     Width = 96
     Height = 24
@@ -304,7 +304,7 @@ object FrmMulModulePrint: TFrmMulModulePrint
     OnClick = BtnPreviorClick
   end
   object BtnNext: TButton
-    Left = 351
+    Left = 346
     Top = 298
     Width = 96
     Height = 24
@@ -316,7 +316,7 @@ object FrmMulModulePrint: TFrmMulModulePrint
     OnClick = BtnNextClick
   end
   object btnExit: TButton
-    Left = 351
+    Left = 346
     Top = 336
     Width = 97
     Height = 26
@@ -326,13 +326,22 @@ object FrmMulModulePrint: TFrmMulModulePrint
     OnClick = btnExitClick
   end
   object btnLabelPrint: TButton
-    Left = 352
+    Left = 346
     Top = 216
     Width = 97
     Height = 25
+    Anchors = [akTop, akRight]
     Caption = #26631#31614#25171#21360
     TabOrder = 12
     OnClick = btnLabelPrintClick
+  end
+  object ProgressBar1: TProgressBar
+    Left = 0
+    Top = 419
+    Width = 459
+    Height = 16
+    Align = alBottom
+    TabOrder = 13
   end
   object DatasetReport: TADODataSet
     Parameters = <>

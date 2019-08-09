@@ -253,7 +253,7 @@ begin
          FhlKnl1.Ds_OpenDataSet(DBGdCurrent.DataSource.DataSet  ,fParams);
          FhlKnl1.SetColFormat(DBGdCurrent );
     end;
-
+  
     if assigned(  DBGdCurrent.DataSource.DataSet.FindField('fntclr')) then
        DBGdCurrent.OnDrawColumnCell:=DBGrid1DrawColumnCellFntClr   ;
 

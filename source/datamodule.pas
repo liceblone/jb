@@ -1357,6 +1357,8 @@ begin
          end
          else if AParamName=uppercase('sEmpty') then
             Result:=''
+         else if AParamName=uppercase('sVersion') then
+            Result:= JbGetversion
          else if AParamName=uppercase('sFirstDayofMonth') then
             Result:=formatdatetime('yyyy"-"mm"-"dd',firstDayofMonth) 
 
