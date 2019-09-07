@@ -768,6 +768,11 @@ object FrmBillEx: TFrmBillEx
       ImageIndex = 13
       OnExecute = ActMulFormatPrintExecute
     end
+    object ActExportExcel: TAction
+      Caption = #23548#20986
+      ImageIndex = 38
+      OnExecute = ActExportExcelExecute
+    end
   end
   object MainMenu1: TMainMenu
     AutoMerge = True

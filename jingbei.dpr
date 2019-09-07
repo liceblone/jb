@@ -112,7 +112,8 @@ uses
   UnitChyFrReportView in 'source\privatesource\UnitChyFrReportView.pas',
   DelphiZXingQRCode in 'source\privatesource\DelphiZXingQRCode.pas',
   UnitBarcodeTemplate in 'source\UnitBarcodeTemplate.pas' {FrmBarCodeTemplate},
-  UnitFrmWrArchive in 'source\UnitFrmWrArchive.pas' {FrmWrArchive: TFrame};
+  UnitFrmWrArchive in 'source\UnitFrmWrArchive.pas' {FrmWrArchive: TFrame},
+  Md5 in 'source\Md5.pas';
 
 //UnitFrmWrArchive in 'source\UnitFrmWrArchive.pas' {FrmWrArchive};
 

@@ -457,6 +457,12 @@ begin
     FGrid.DataSource.DataSet.First;
     self.ProgressBar1.Position :=0;
     self.ProgressBar1.Max := self.FGrid.DataSource.DataSet.RecordCount;
+
+    sql:=  'select r.*,f.F02 as F99 from '+dmfrm.ADOConnection1.DefaultDatabase
+           +'.dbo.T506 r left outer join T102 f on r.F16=f.F01 where r.F02='+ quotedstr(  fTopBoxId ) +' AND r.f20='
+           +quotedstr( modelID )+' and r.F22='+quotedstr( fprintid )+' and r.F18=1 order by r.f13' ;
+    FhlKnl1.Kl_GetQuery2(sql);
+
     for j:=0 to 50 do
     begin
         if self.FGrid.DataSource.DataSet.Eof then   break;
@@ -468,11 +474,6 @@ begin
               newpage:=CreatePage(frReport1 ,  strtoint( self.edtWidth.Text ) *10,  strtoint( self.edtHeight.Text )*10);
               newpage.Left  := strtoint( edtLeftMargin.text );    // newpage. := strtoint( self.edtRightMargin.Text );  //newpage.Bottom := strtoint( self.edtBtmMargin.Text );
               newpage.Top  := strtoint( self.edtTopMargin.Text );
-
-              sql:=  'select r.*,f.F02 as F99 from '+dmfrm.ADOConnection1.DefaultDatabase
-                   +'.dbo.T506 r left outer join T102 f on r.F16=f.F01 where r.F02='+ quotedstr(  fTopBoxId ) +' AND r.f20='
-                   +quotedstr( modelID )+' and r.F22='+quotedstr( fprintid )+' and r.F18=1 order by r.f13' ;
-              FhlKnl1.Kl_GetQuery2(sql);
 
               fDictDataSet := FhlKnl1.FreeQuery  ;
               fDictDataSet.First;

@@ -120,6 +120,7 @@ type
     ActCreateDeliveryLabel: TAction;
     ActDeliveryLabelPrint: TAction;
     ActMulFormatPrint: TAction;
+    ActExportExcel: TAction;
     procedure OpenCloseAfter(IsOpened:Boolean);
     procedure SetCtrlStyle(fEnabled:Boolean);
     procedure SetRitBtn;
@@ -218,6 +219,7 @@ type
     procedure ActCreateDeliveryLabelExecute(Sender: TObject);
     procedure ActDeliveryLabelPrintExecute(Sender: TObject);
     procedure ActMulFormatPrintExecute(Sender: TObject);
+    procedure ActExportExcelExecute(Sender: TObject);
 
   private
     { Private declarations }
@@ -481,6 +483,7 @@ begin
   ActPrintEveryPackageLabel.Enabled   := ActPrintLabelCfg.Enabled   ;
   ActDeliveryLabelPrint.Enabled   := ActPrintLabelCfg.Enabled   ;
   ActMulFormatPrint.Enabled   := ActPrintLabelCfg.Enabled   ;
+  ActExportExcel.Enabled   := ActPrintLabelCfg.Enabled   ;
   ActCreateWhmove.Enabled        :=not  SaveAction1.Enabled and IsChecked   ;
 
 
@@ -864,6 +867,7 @@ begin
      ActPrintEveryPackageLabel.Enabled     := ActPrintLabelCfg.Enabled   ;
      ActDeliveryLabelPrint .Enabled         := ActPrintLabelCfg.Enabled   ;
      ActMulFormatPrint.Enabled   := ActPrintLabelCfg.Enabled   ;
+     ActExportExcel.Enabled   := ActPrintLabelCfg.Enabled   ;
      ActCreateWhmove.Enabled               := not  SaveAction1.Enabled  and not CheckAction1.Enabled ;
     end;
     OpenAction1.Enabled:=IsEnabled;
@@ -2947,6 +2951,10 @@ begin
                     FrmBillEx.dlDataSet1.FieldByName('ClientOrderNo').Value    := fhlknl1.User_Query.FieldByName('ClientOrderNo').Value ;
                  if ( (fhlknl1.User_Query.FindField('FMinPackageQty')  <>nil) and (fhlknl1.User_Query.findfield('FMinPackageQty')<>nil) ) then
                     FrmBillEx.dlDataSet1.FieldByName('FMinPackageQty').Value    := fhlknl1.User_Query.FieldByName('FMinPackageQty').Value ;
+                 if ( (fhlknl1.User_Query.FindField('FPesistorPartNo')  <>nil) and (fhlknl1.User_Query.findfield('FPesistorPartNo')<>nil) ) then
+                    FrmBillEx.dlDataSet1.FieldByName('FPesistorPartNo').Value    := fhlknl1.User_Query.FieldByName('FPesistorPartNo').Value ;
+
+
 
                  FrmBillEx.dlDataSet1.Post;
                  fhlknl1.User_Query.Next;
@@ -3471,6 +3479,23 @@ begin
   end;
 end;
 
+
+procedure TFrmBillEx.ActExportExcelExecute(Sender: TObject);
+var
+  PopDbgrid:Tdbgrid;
+  RepeatCnt:string;
+  ClickedOK: Boolean;
+  NewString: string;
+
+begin
+  RepeatCnt := '1';
+  ClickedOK := InputQuery('设置列重复次数', '请输入列重复次数', RepeatCnt);
+  if ClickedOK then
+  begin
+    PopDbgrid:=self.DBGridDL  ;
+    QExportExcel(PopDbgrid,TForm(PopDbgrid.Parent).Caption+formatdatetime('yyyymmdd',now), true,strtoint(RepeatCnt));
+  end;
+end;
 
 end.
 

@@ -341,5 +341,27 @@ object AnalyseEx: TAnalyseEx
       ImageIndex = 1
       OnExecute = ActWrArchiveExecute
     end
+    object ActSendMsg: TAction
+      Caption = #21457#30701#20449
+      ImageIndex = 35
+      OnExecute = ActSendMsgExecute
+    end
+  end
+  object IdHTTP: TIdHTTP
+    MaxLineAction = maException
+    ReadTimeout = 0
+    AllowCookies = True
+    ProxyParams.BasicAuthentication = False
+    ProxyParams.ProxyPort = 0
+    Request.ContentLength = -1
+    Request.ContentRangeEnd = 0
+    Request.ContentRangeStart = 0
+    Request.ContentType = 'text/html'
+    Request.Accept = 'text/html, */*'
+    Request.BasicAuthentication = False
+    Request.UserAgent = 'Mozilla/3.0 (compatible; Indy Library)'
+    HTTPOptions = [hoForceEncodeParams]
+    Left = 400
+    Top = 72
   end
 end

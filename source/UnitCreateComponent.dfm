@@ -23,7 +23,7 @@ object frmCreateComponent: TfrmCreateComponent
     Top = 41
     Width = 834
     Height = 524
-    ActivePage = ts2
+    ActivePage = ts1
     Align = alClient
     TabOrder = 0
     object ts1: TTabSheet
@@ -180,7 +180,7 @@ object frmCreateComponent: TfrmCreateComponent
         Top = 80
         Width = 634
         Height = 393
-        ActivePage = ts6
+        ActivePage = ts4
         TabOrder = 3
         object ts4: TTabSheet
           Caption = #23383#27573#20540#36755#20837#23383#27573
@@ -330,6 +330,7 @@ object frmCreateComponent: TfrmCreateComponent
                 'sClientKey'
                 'sGUID'
                 'sFirstDayofMonth'
+                'sComputerName'
                 #21040#26399
                 #30007
                 #20840#37096
@@ -2651,7 +2652,7 @@ object frmCreateComponent: TfrmCreateComponent
     end
     object qryT202F08: TStringField
       FieldName = 'F08'
-      Size = 200
+      Size = 500
     end
     object qryT202F09: TStringField
       FieldName = 'F09'

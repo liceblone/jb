@@ -6,7 +6,8 @@ uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
   Dialogs, DB, ActnList, ADODB, Buttons, StdCtrls, ExtCtrls, Grids , Excel2000,ComObj,ActiveX, ComCtrls,
   DBGrids, FhlKnl,ToolWin, jpeg,UnitGrid,UnitModelFrm, XPMenu,UPublicFunction, unitFrmWrArchive ,
-  DBCtrls,UnitBarCodePanel;
+  DBCtrls,UnitBarCodePanel, IdBaseComponent, IdComponent, IdTCPConnection,
+  IdTCPClient, IdHTTP;
 
 type
   TAnalyseEx = class(TFrmModel)
@@ -51,6 +52,8 @@ type
     ActOldVersionPrint: TAction;
     ActDelete: TAction;
     ActWrArchive: TAction;
+    ActSendMsg: TAction;
+    IdHTTP: TIdHTTP;
 
     procedure OpnDlDsBtn1Click(Sender: TObject);
     procedure printAction0Execute(Sender: TObject);
@@ -87,6 +90,8 @@ type
     procedure ActOldVersionPrintExecute(Sender: TObject);
     procedure ActDeleteExecute(Sender: TObject);
     procedure ActWrArchiveExecute(Sender: TObject);
+    procedure ActSendMsgExecute(Sender: TObject);
+    function SendSms(sms, MobilePhoneNo:string):boolean;
   private
     fDict:TAnalyserDictEX;
     FrmWrArchive : TFrmWrArchive ;
@@ -110,7 +115,7 @@ var
 
 implementation
 
-uses datamodule,UnitCreateComponent,UnitBillEx,Editor,bill   ;
+uses datamodule,UnitCreateComponent,UnitBillEx,Editor,bill,md5   ;
 
 {$R *.dfm}
 procedure TAnalyseEx.InitFrm(AFrmId:String;AmtParams:Variant);
@@ -1050,6 +1055,65 @@ begin
     end;
  // fInputBarCode:= Ttoolbutton( ActBatCodeList.ActionComponent).Down;
     { }
+end;
+
+procedure TAnalyseEx.ActSendMsgExecute(Sender: TObject);
+var sms, MobilePhoneNo:string;
+var BookMark :TBookMark;
+begin
+  if  (DBGdCurrent.DataSource.DataSet.FindField('FSms')<>nil )  and
+       (DBGdCurrent.DataSource.DataSet.FindField('FMobilePhoneNo')<>nil) then
+  begin
+    sms := DBGdCurrent.DataSource.DataSet.FieldByName('FSms').AsString ;
+    MobilePhoneNo :=  DBGdCurrent.DataSource.DataSet.FieldByName('FMobilePhoneNo').AsString ;
+    if DBGdCurrent.DataSource.DataSet.FieldByName('ActualPaymentCAL').AsFloat >0 then
+    if ( sms <> '' ) and ( MobilePhoneNo <>'' ) then
+    begin
+      SendSms  ('【浙江晶贝电子】'+sms, MobilePhoneNo) ;
+      BookMark := DBGdCurrent.DataSource.DataSet.GetBookMark;
+      DBGdCurrent.DataSource.DataSet.Edit;
+      DBGdCurrent.DataSource.DataSet.FieldByName('FSmsSendTime').Value := now;// smalldatetime
+      DBGdCurrent.DataSource.DataSet.Post;
+      DBGdCurrent.DataSource.DataSet.Close;
+      DBGdCurrent.DataSource.DataSet.Open;
+      DBGdCurrent.DataSource.DataSet.GotoBookmark(BookMark);
+    end;
+  end;
+end;
+
+function TAnalyseEx.SendSms(sms, MobilePhoneNo: string): boolean;
+var
+  ParamLst: TStrings;
+  ReMsg: WideString;
+  userName, password :string;
+begin
+  userName:='liceblone@163.com';
+  Password :='www.jingbei.com123';
+
+  Screen.Cursor := crHourGlass;
+  ParamLst := TStringList.Create;
+  try
+    begin
+    ParamLst.Add('accName=' + Trim( userName ));
+    ParamLst.Add('accPwd=' + StrUpper(PChar(RivestStr( password ))));
+    ParamLst.Add('content=' + UTF8Encode(Trim( sms )));
+
+    ParamLst.Add('aimcodes=' + Trim( mobilePhoneNo ));
+    ParamLst.Add('dataType' + 'string');
+
+    ReMsg := UTF8Decode(IdHTTP.Post('http://www.lx198.com/sdk/send', ParamLst));
+
+    //mmoDisplay.Lines.Add('错误代码：' + ReMsg);
+
+    IdHTTP.Disconnect;
+    IdHTTP.Request.Clear;
+
+    end
+  finally
+
+    Screen.Cursor := crDefault;
+    ParamLst.Free;
+  end;
 end;
 
 end.

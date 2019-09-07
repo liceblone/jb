@@ -1312,7 +1312,8 @@ begin
          Result:=Null;
          AParamName:=uppercase(AParamName);
 
-         if (AParamName=uppercase('sNow' )) or (Copy(AParamName,1,6)=uppercase('sToday')) then
+         if (AParamName=uppercase('sNow' )) or (Copy(AParamName,1,6)=uppercase('sToday'))
+            or ( AParamName = uppercase('sFirstDayofMonth') ) then
          begin
             fhlknl1.Kl_GetQuery2('select getdate() as  Pnow, dbo.Fn_GetFirstDayofMonth(getdate()) as firstDayofMonth');
             Pnow:= fhlknl1.FreeQuery.fields[0].AsDateTime        ;
@@ -1357,6 +1358,9 @@ begin
          end
          else if AParamName=uppercase('sEmpty') then
             Result:=''
+         else if AParamName=uppercase('sComputerName') then
+            Result:= FhlKnl1.Os_GetComputerName
+
          else if AParamName=uppercase('sVersion') then
             Result:= JbGetversion
          else if AParamName=uppercase('sFirstDayofMonth') then
