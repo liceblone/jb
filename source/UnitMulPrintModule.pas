@@ -107,7 +107,7 @@ begin
     FBtmBoxID:=Btmboxid;
     FGrid:=Midgird;
     Result:=False;
-    TModelDbGrid(Midgird).ReflashSumValues;
+   // TModelDbGrid(Midgird).ReflashSumValues;
 
     for i:= self.StrGridPrintModule.RowCount -1 to 0 do
     begin
@@ -462,20 +462,26 @@ begin
            +'.dbo.T506 r left outer join T102 f on r.F16=f.F01 where r.F02='+ quotedstr(  fTopBoxId ) +' AND r.f20='
            +quotedstr( modelID )+' and r.F22='+quotedstr( fprintid )+' and r.F18=1 order by r.f13' ;
     FhlKnl1.Kl_GetQuery2(sql);
+    fDictDataSet := FhlKnl1.FreeQuery  ;
+    fDictDataSet.DisableControls ;
 
+
+    self.FGrid.DataSource.DataSet.DisableControls;
     for j:=0 to 50 do
     begin
         if self.FGrid.DataSource.DataSet.Eof then   break;
-        for i:=0 to 199 do
+        for i:=0 to 256 do
         begin
               if self.FGrid.DataSource.DataSet.Eof then   break;
               self.ProgressBar1.Position := i+(j)*200 ;
 
+
               newpage:=CreatePage(frReport1 ,  strtoint( self.edtWidth.Text ) *10,  strtoint( self.edtHeight.Text )*10);
+
               newpage.Left  := strtoint( edtLeftMargin.text );    // newpage. := strtoint( self.edtRightMargin.Text );  //newpage.Bottom := strtoint( self.edtBtmMargin.Text );
               newpage.Top  := strtoint( self.edtTopMargin.Text );
 
-              fDictDataSet := FhlKnl1.FreeQuery  ;
+
               fDictDataSet.First;
               While not fDictDataSet.Eof do
               begin
@@ -547,7 +553,9 @@ begin
         frReport1.PrepareReport;
         frReport1.ShowReport;
         frReport1.Clear;
+     
      end;
+     self.FGrid.DataSource.DataSet.EnableControls;
       {FhlKnl1.Rp_SetRepCtrl(FhlKnl1.FreeQuery, FGrid.DataSource.DataSet,    TQRBand(TopBand1),0,fdbGrid);
 
       chyBar:= TChyFrBarCodeView.Create;
@@ -598,14 +606,14 @@ begin
 
 end;
 function TFrmMulModulePrint.CreatePage(report: TfrReport ;width,height:integer): TfrPage;
-var newPage:TfrPage ;
+var newPage1:TfrPage ;
 begin
   report.Pages.Add;
-  newPage := report.Pages[report.Pages.Count -1] ;
-  newpage.pgWidth := width ;
-  newpage.pgHeight:= height;
-  newpage.pgSize  := 0;//report.Pages[ 0 ].pgSize ;
-  result:=  newPage;
+  newPage1 := report.Pages[report.Pages.Count -1] ;
+  newPage1.pgWidth := width ;
+  newPage1.pgHeight:= height;
+  newPage1.pgSize  := 0;//report.Pages[ 0 ].pgSize ;
+  result:=  newPage1;
 end;
 procedure TFrmMulModulePrint.PreviewMDTemplate;
 var RepBillFrm:TFrmUserQrRptEx;

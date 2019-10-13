@@ -16,24 +16,30 @@ type
     DataSource1: TDataSource;
     PnlLeft: TPanel;
     Label1: TLabel;
-    EdtBarCode: TEdit;
+    EdtHsBarCode: TEdit;
     BtnSearch: TButton;
     BtnImport: TButton;
-    procedure EdtBarCodeEnter(Sender: TObject);
+    EdtJbLabelBarCode: TEdit;
+    Label2: TLabel;
+    procedure EdtHsBarCodeEnter(Sender: TObject);
     procedure BtnSearchClick(Sender: TObject);
     procedure BarCodeGridDblClick(Sender: TObject);
     procedure BtnImportClick(Sender: TObject);
     procedure PnlLeftDblClick(Sender: TObject);
     function  GetBarCodeList:TStringlist;
-    procedure EdtBarCodeKeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);
+    procedure EdtHsBarCodeKeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);
     procedure BarCodeGridKeyUp(Sender: TObject; var Key: Word;  Shift: TShiftState);
-    procedure EdtBarCodeChange(Sender: TObject);
+    procedure EdtHsBarCodeChange(Sender: TObject);
     procedure FormCreate(Sender: TObject);
+    procedure EdtJbLabelBarCodeKeyDown(Sender: TObject; var Key: Word;
+      Shift: TShiftState);
     private
     FBillCode:Variant;
     FParentSearch:  IParentSearch;
+    FVerifyHSPartNo:integer;
     procedure Post;
-    
+
+
     { Private declarations }
   public
     { Public declarations}
@@ -54,7 +60,7 @@ implementation
  uses datamodule , UnitCreateComponent;
 {$R *.dfm}
 
-procedure TFrmSearchBarCode.EdtBarCodeEnter(Sender: TObject);
+procedure TFrmSearchBarCode.EdtHsBarCodeEnter(Sender: TObject);
 begin
 //
 end;
@@ -106,11 +112,11 @@ end;
 function  TFrmSearchBarCode.AddBarCode :boolean;
 var resultset:tdataset;
 begin
-    if (length( EdtBarCode.Text)<9) then
+    if (length( EdtHsBarCode.Text)<9) then
       abort;
 
-    EdtBarCode.Text :=trim(EdtBarCode.Text);
-    resultset:= GetBarCodeInfo( EdtBarCode.Text );
+    EdtHsBarCode.Text :=trim(EdtHsBarCode.Text);
+    resultset:= GetBarCodeInfo( EdtHsBarCode.Text );
 
    
 end;
@@ -166,7 +172,7 @@ begin
             result.Add(self.BarCodeDataSet.fieldbyname('FPackageBarCode').AsString);
           BarCodeDataSet.Next
       end;
-      result.Add(self.EdtBarCode.Text);
+      result.Add(self.EdtHsBarCode.Text);
    finally
    end;
 end;
@@ -190,7 +196,7 @@ self.BarCodeDataSet.Close;
 self.BarCodeDataSet.Open;
 end;
 
-procedure TFrmSearchBarCode.EdtBarCodeKeyDown(Sender: TObject;
+procedure TFrmSearchBarCode.EdtHsBarCodeKeyDown(Sender: TObject;
   var Key: Word; Shift: TShiftState);
 begin
    case Key of
@@ -198,8 +204,18 @@ begin
      begin
           //AddBarCode;
          // FParentSearch.BarCodeSearch(GetBarCodeList );
+         if (FVerifyHSPartNo=0) then
+         begin
            BtnSearchClick(sender);
-          self.EdtBarCode.SelectAll;
+           EdtHsBarCode.SetFocus;
+           self.EdtHsBarCode.SelectAll;
+         end;
+         if (FVerifyHSPartNo<>0) then
+         begin
+           BtnSearchClick(sender);
+           EdtJbLabelBarCode.SetFocus;
+           self.EdtJbLabelBarCode.SelectAll;
+         end;
      end;
    end;
 end;
@@ -220,13 +236,22 @@ begin
     end;
 end;
 
-procedure TFrmSearchBarCode.EdtBarCodeChange(Sender: TObject);
+procedure TFrmSearchBarCode.EdtHsBarCodeChange(Sender: TObject);
 begin
-    EdtBarCode.Text :=    StringReplace(trim(EdtBarCode.Text) ,' ','-',[]);
+    EdtHsBarCode.Text :=    StringReplace(trim(EdtHsBarCode.Text) ,' ','-',[]);
 end;
 
 procedure TFrmSearchBarCode.FormCreate(Sender: TObject);
+var sql,sqlformat:string;
+var parentParamCode:string;
 begin
+    parentParamCode:=  quotedstr( '02030301' ) ;
+    sqlformat := 'select  isnull(FParamValue,1) from TParamsAndValues where  FParamCode = %s  ';
+
+    sql := format(sqlformat ,[parentParamCode , quotedstr('paperWidth') ]);;
+    fhlknl1.Kl_GetUserQuery(sql);
+    FVerifyHSPartNo :=fhlknl1.User_Query.fields[0].AsInteger;
+
     BarCodeGrid:=TModelDbGrid.create (self);
     BarCodeGrid.DataSource :=self.DataSource1  ;
     BarCodeGrid.Align :=alclient;
@@ -243,6 +268,24 @@ end;
 procedure TFrmSearchBarCode.OpenBill(billcode: string);
 begin
  FhlKnl1.Ds_OpenDataSet(self.BarCodeDataSet,varArrayof([BillCode]));
+end;
+
+procedure TFrmSearchBarCode.EdtJbLabelBarCodeKeyDown(Sender: TObject;
+  var Key: Word; Shift: TShiftState);
+begin
+   case Key of
+     vk_Return:
+     begin
+     
+         if (FVerifyHSPartNo<>0) then
+         begin
+           EdtHsBarCode.SetFocus ;
+           self.EdtHsBarCode.SelectAll;
+
+         end;
+
+     end;
+   end;
 end;
 
 end.

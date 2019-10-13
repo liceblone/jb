@@ -4199,6 +4199,7 @@ begin
                 SourceGrid.Datasource.Dataset.Bookmark:= Items[Row];
                 for i:=0 to VarArrayHighBound(SourceFields,1) do
                 begin
+                  if  DestDataSet.FindField(DestFields[i])<>nil then
                     DestDataSet.FieldByName(DestFields[i]).Value:=SourceDataSet.FieldByName(SourceFields[i]).Value;
                 end;
           end;

@@ -50,6 +50,7 @@ type
     GrpBarCode: TScrollBox;
     lblTitle: TLabel;
     statLabel1: TLabel;
+    ActSaleQtyStatus: TAction;
     procedure ActCloseExecute(Sender: TObject);
     procedure DBGridDLDblClick(Sender: TObject);
     procedure OpnDlDsBtn1Click(Sender: TObject);
@@ -84,6 +85,7 @@ type
     procedure dlDataSet1AfterScroll(DataSet: TDataSet);
     procedure SetFocusEditor;
     procedure FocusGridColumn;
+    procedure ActSaleQtyStatusExecute(Sender: TObject);
   public
        DBGridDL:tdbgrid ;
        frmSearchBarCode:TFrmSearchBarCode ;
@@ -659,6 +661,18 @@ begin
   FhlUser.ShowTabEditorFrm('10006',varArrayof([dlDataSet1.FieldByName('id').asstring]),nil,false,-11,true,true,false);
 
 end;
+   
+procedure TFrmLoopUpImPortEx.ActSaleQtyStatusExecute(Sender: TObject);
+begin
+    if dlDataSet1.Active then
+    begin
+        sDefaultVals :='partno='  + dlDataSet1.FieldByName('partno').asstring  ;
+        sDefaultVals :=sDefaultVals+',brand='  + dlDataSet1.FieldByName('brand').asstring  ;
+        sDefaultVals :=sDefaultVals+',pack='  + dlDataSet1.FieldByName('pack').asstring  ;
+
+        FhlUser.ShowAnalyserExFrm('57' ,varArrayof([ ]));
+    end;
+end;
 
 procedure TFrmLoopUpImPortEx.ActNewSaleRefsExecute(Sender: TObject);
 var FrmNewOldRefs:TFrmNewOldRefs;
@@ -985,5 +999,6 @@ procedure TFrmLoopUpImPortEx.EnableDsCaculation(enabled: boolean);
 begin
 //
 end;
+
 
 end.

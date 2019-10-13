@@ -2405,11 +2405,12 @@ end;
 function TFrmBillEx.AddBarCode: boolean;
 var resultset: tdataset;
 var sql:string;
-var barcode :string;
+var barcode , JbLabelBarCode:string;
 var PackageCodeExisted:boolean ;
 var SumBarCodeQty : integer;
 begin
-   barcode :=  frmSearchBarCode.EdtBarCode.Text;
+   barcode :=  frmSearchBarCode.EdtHsBarCode.Text;
+   JbLabelBarCode :=  frmSearchBarCode.EdtJbLabelBarCode.Text;
    SumBarCodeQty :=0;
 
    { alter proc Pr_GetBarCodeInfomation
@@ -2427,6 +2428,8 @@ begin
    sql:= ' exec Pr_GetBarCodeInfomation  '+  quotedstr( barcode )   ;
    sql:= sql + ' , '+ quotedstr(leftstr(  barcode  ,length(Barcode)-4));
    sql:= sql + ' , '+ quotedstr(self.dlDataSet1.fieldbyname('invoicedlF_ID').AsString  );
+   sql:= sql + ' , -1 ' ;
+   sql:= sql + ' , '+ quotedstr( JbLabelBarCode  );
 
    fhlknl1.Kl_GetUserQuery(sql);
    resultset:=fhlknl1.User_Query;
@@ -2437,7 +2440,7 @@ begin
        if  dlDataSet1.Locate('wareid', resultset.FieldByName('wareid').Value,[])   then
            result := true;
 
-       PackageCodeExisted :=     frmSearchBarCode.BarCodeDataSet.Locate('FPackageBarCode',frmSearchBarCode.EdtBarCode.Text,[] );
+       PackageCodeExisted :=     frmSearchBarCode.BarCodeDataSet.Locate('FPackageBarCode',frmSearchBarCode.EdtHsBarCode.Text,[] );
 
        if  (( not   PackageCodeExisted ) and   result )  then
         begin
@@ -2445,10 +2448,10 @@ begin
             //self.BarCodeDataSet.FieldByName('FOutBillCode').Value :=fbillCode;
             frmSearchBarCode.BarCodeDataSet.FieldByName('wareid').Value :=resultset.FieldByName('wareid').Value;
             frmSearchBarCode.BarCodeDataSet.FieldByName('FBarCodeQty').Value :=resultset.FieldByName('FBarCodeQty').Value;
-            frmSearchBarCode.BarCodeDataSet.FieldByName('FPackageBarCode').Value :=frmSearchBarCode.EdtBarCode.Text;
+            frmSearchBarCode.BarCodeDataSet.FieldByName('FPackageBarCode').Value :=frmSearchBarCode.EdtHsBarCode.Text;
 
             if pos('-','frmSearchBarCode.EdtBarCode.Text')>0 then
-               frmSearchBarCode.BarCodeDataSet.FieldByName('FBarCode').Value :=frmSearchBarCode.EdtBarCode.Text;
+               frmSearchBarCode.BarCodeDataSet.FieldByName('FBarCode').Value :=frmSearchBarCode.EdtHsBarCode.Text;
             frmSearchBarCode.BarCodeDataSet.FieldByName('whid').Value :=self.mtDataSet1.fieldbyname('InWhId').Value;
             frmSearchBarCode.BarCodeDataSet.FieldByName('FIOType').Value :='MO';
             frmSearchBarCode.BarCodeDataSet.FieldByName('OutWhId').Value := self.mtDataSet1.fieldbyname('OutWhId').Value;

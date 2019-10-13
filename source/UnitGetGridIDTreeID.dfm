@@ -1,6 +1,6 @@
 object frmGetGridID: TfrmGetGridID
-  Left = 335
-  Top = 341
+  Left = 192
+  Top = 210
   Width = 1017
   Height = 477
   Caption = #21462#24471'dlgridID'
@@ -19,7 +19,7 @@ object frmGetGridID: TfrmGetGridID
     Top = 57
     Width = 1009
     Height = 393
-    ActivePage = ts1
+    ActivePage = ts6
     Align = alClient
     TabOrder = 0
     object ts1: TTabSheet
@@ -1512,16 +1512,16 @@ object frmGetGridID: TfrmGetGridID
         FocusControl = dbedt67
       end
       object lbl73: TLabel
-        Left = 424
-        Top = 48
+        Left = 304
+        Top = 216
         Width = 94
         Height = 13
         Caption = 'F18 PostSysParams'
         FocusControl = dbedt68
       end
       object lbl74: TLabel
-        Left = 424
-        Top = 88
+        Left = 304
+        Top = 256
         Width = 96
         Height = 13
         Caption = 'F19  PostUsrParams'
@@ -1611,7 +1611,7 @@ object frmGetGridID: TfrmGetGridID
       object dbedt65: TDBEdit
         Left = 304
         Top = 104
-        Width = 100
+        Width = 617
         Height = 21
         DataField = 'F14'
         DataSource = ds7
@@ -1620,7 +1620,7 @@ object frmGetGridID: TfrmGetGridID
       object dbedt66: TDBEdit
         Left = 304
         Top = 144
-        Width = 100
+        Width = 617
         Height = 21
         DataField = 'F15'
         DataSource = ds7
@@ -1629,25 +1629,25 @@ object frmGetGridID: TfrmGetGridID
       object dbedt67: TDBEdit
         Left = 304
         Top = 184
-        Width = 100
+        Width = 617
         Height = 21
         DataField = 'F17'
         DataSource = ds7
         TabOrder = 11
       end
       object dbedt68: TDBEdit
-        Left = 424
-        Top = 64
-        Width = 100
+        Left = 304
+        Top = 232
+        Width = 617
         Height = 21
         DataField = 'F18'
         DataSource = ds7
         TabOrder = 12
       end
       object dbedt69: TDBEdit
-        Left = 424
-        Top = 104
-        Width = 100
+        Left = 304
+        Top = 272
+        Width = 617
         Height = 21
         DataField = 'F19'
         DataSource = ds7
@@ -2384,7 +2384,7 @@ object frmGetGridID: TfrmGetGridID
     end
     object dsT204F15: TStringField
       FieldName = 'F15'
-      Size = 100
+      Size = 300
     end
     object dsT204F17: TStringField
       FieldName = 'F17'

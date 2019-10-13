@@ -293,6 +293,11 @@ object FrmLoopUpImPortEx: TFrmLoopUpImPortEx
       ImageIndex = 34
       OnExecute = ActBarCodeSearchExecute
     end
+    object ActSaleQtyStatus: TAction
+      Caption = #20986#24211#29366#20917#34920
+      ImageIndex = 28
+      OnExecute = ActSaleQtyStatusExecute
+    end
   end
   object mtDataSource1: TDataSource
     DataSet = mtDataSet1
