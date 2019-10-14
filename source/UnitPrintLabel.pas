@@ -3,7 +3,7 @@ unit UnitPrintLabel;
 interface
 
 uses Windows, SysUtils, Messages, Classes, Graphics, Controls,adodb, QRPrntr,
-     QRCtrls, QuickRpt, ExtCtrls, fhlknl, StdCtrls, Forms,Db,DbGrids;
+     QRCtrls, QuickRpt, ExtCtrls, fhlknl, StdCtrls, Forms,Db,DbGrids ,UPublicCtrl;
 
 
 type
@@ -20,26 +20,45 @@ type
      ColumnCount:integer;
      ColumnWidth:integer;
      PageContentHeight:integer;
+     BarCodePrintConfig: TBarCodePrintConfig;
   public
      procedure SetBillRep( fdataset:TCustomADODataSet);
      procedure GetPageCfg;
      function  CreateQrLabel(caption:string; left, top, fontsize:integer; parent:TWinControl): TQRLabel;
      function  CreateQrDbText(left, top:integer;   fieldName:string; fDataSet :TDataSet; parent:TWinControl ;i:integer):TQRDBText;
+     function  CreateQrDbBarCode(left, top:integer;   fieldName:string; fDataSet :TDataSet; parent:TWinControl ;i:integer):TQRDBBarCodeImage;
   end;
 
 var
   QrLabelPrinting: TQrLabelPrinting;
 
 implementation
-  uses datamodule, WinTypes, WinProcs,Printers, barcode,barcode2 ,unitBarCodeTest;
+  uses datamodule, WinTypes, WinProcs,Printers, barcode,barcode2 ,unitBarCodeTest ;
 
 {$R *.DFM}
-{ TQrLabel }
+function TQrLabelPrinting.CreateQrDbBarCode(left, top:integer;  fieldName:string; fDataSet :TDataSet; parent: TWinControl ; i:integer): TQRDBBarCodeImage;
+var dbImage:  TQRDBBarCodeImage ;
 
+begin
+     dbImage:=TQRDBBarCodeImage.Create(self.DetailBand1);
+    dbImage.ResetWidthHeight (800 ,  35);
+    dbimage.Parent:=self.DetailBand1;
+    dbimage.DataSet :=fdataset;
+    dbimage.DataField:= fieldName +inttostr(i+1);
+
+    dbimage.Top:=top ;
+    dbimage.Left:= left ;
+    dbimage.Ratio := 2;
+    dbimage.BarCodeType:=BarCodePrintConfig.BarCodeConfig.BarCodeType;
+    dbimage.LineWidth :=  BarCodePrintConfig.BarCodeConfig.LineWidth;
+    dbimage.FormatSerialText := false;// BarCodePrintConfig.BarCodeConfig.bFormatSerialText;
+    dbimage.CacheBarcodeImage := false;//BarCodePrintConfig.BarCodeConfig.bCacheBarcodeImage;
+end;
+{ TQrLabel }
 function TQrLabelPrinting.CreateQrDbText(left, top:integer;  fieldName:string; fDataSet :TDataSet; parent: TWinControl ; i:integer): TQRDBText;
 var dbText:  TQRDBText ;
 begin
-     dbText:= TQRDBText.Create(parent);
+  dbText:= TQRDBText.Create(parent);
      dbText.Font.Size:=pfontsize ;
      if (self.pFontBlod  =1) then
         dbText.Font.Style := [fsBold];
@@ -79,6 +98,7 @@ var
    dbText:TQRDBText;
    qrLabel:TQrlabel;
    sql:string;
+   dbImage:TQRDBBarCodeImage ;
 begin
    kvGap :=0;
    vGap:= self.RowMargin ;
@@ -116,6 +136,11 @@ begin
                //qrLabel:=  CreateQrLabel( 'Èë¿âÈÕÆÚ:', colGap*(i) , preTop , fontsize, DetailBand1);
                dbText:= CreateQrDbText ( colGap*(i)  , preTop , 'InvoiceDate', fdataset , DetailBand1, i);
 
+
+               preTop:= preTop  +dbText.Height +  vGap +5 ;
+                CreateQrDbBarcode( colGap*(i)  , preTop , 'FJBLabelMinBarCode', fdataset , DetailBand1, i);
+
+
            end;
         finally
         end;
@@ -130,6 +155,8 @@ procedure TQrLabelPrinting.GetPageCfg;
 var sql,sqlformat:string;
 var parentParamCode:string;
 begin
+    BarCodePrintConfig := TBarCodePrintConfig.Create;
+
     parentParamCode:=  quotedstr( '020301%' ) ;
     sqlformat := 'select  isnull(FParamValue,1) from TParamsAndValues where  FParamCode like %s and FParamDescription =%s';
 
