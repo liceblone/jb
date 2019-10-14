@@ -74,7 +74,7 @@ type
     procedure setTopBoxID(const Value: string);
     procedure SetMaxPrintModule(const Value: Integer);
     procedure PreviewMDTemplate;
-    procedure PreviewLabelTemplate;
+    procedure PrintLabelTemplate(IsPreview:Boolean);
     function  CreatePage(report: TfrReport ;width,height:integer): TfrPage;
 
   public
@@ -179,7 +179,7 @@ begin
   if ( FTopBoxID<>'') and (not dbChkLabelTemplate.Checked ) then
       PreviewMDTemplate
   else
-      PreviewLabelTemplate ;
+      PrintLabelTemplate(true) ;
       
 
 end;
@@ -436,7 +436,7 @@ begin
 self.Close;
 end;
 
-procedure TFrmMulModulePrint.PreviewLabelTemplate;
+procedure TFrmMulModulePrint.PrintLabelTemplate(IsPreview:Boolean);
 var newpage : TfrPage;
 fieldView  : TfrView;
 i,j:integer;
@@ -447,7 +447,7 @@ const ConstGap:Integer=1;
 var DLDataSourceType:boolean;
 begin
 
-    frReport1.Pages.Clear;
+
     ABeginTop :=  strtoint( self.edtTopMargin.Text );
     modelID:=StrGridPrintModule.Cols[0].Strings[StrGridPrintModule.Row];
 
@@ -469,17 +469,22 @@ begin
     self.FGrid.DataSource.DataSet.DisableControls;
     for j:=0 to 50 do
     begin
+        for i:=0 to frReport1.Pages.Count -1 do
+        begin
+          frReport1.Pages[i].Free;
+        end;
+        frReport1.Pages.Clear;
+
         if self.FGrid.DataSource.DataSet.Eof then   break;
-        for i:=0 to 256 do
+        for i:=0 to 199 do
         begin
               if self.FGrid.DataSource.DataSet.Eof then   break;
               self.ProgressBar1.Position := i+(j)*200 ;
 
-
               newpage:=CreatePage(frReport1 ,  strtoint( self.edtWidth.Text ) *10,  strtoint( self.edtHeight.Text )*10);
 
               newpage.Left  := strtoint( edtLeftMargin.text );    // newpage. := strtoint( self.edtRightMargin.Text );  //newpage.Bottom := strtoint( self.edtBtmMargin.Text );
-              newpage.Top  := strtoint( self.edtTopMargin.Text );
+              newpage.Top   := strtoint( self.edtTopMargin.Text );
 
 
               fDictDataSet.First;
@@ -510,16 +515,16 @@ begin
                   end
                   else
                       if  ( DLDataSourceType ) then
-                          FieldValue :=   self.FGrid.DataSource.DataSet.fieldbyname( fieldName ).AsString
+                          FieldValue :=  self.FGrid.DataSource.DataSet.fieldbyname( fieldName ).AsString
                       else
-                          FieldValue :=   self.FContentDataSet.fieldbyname( fieldName ).AsString  ;
+                          FieldValue :=  self.FContentDataSet.fieldbyname( fieldName ).AsString  ;
  
                   if fDictDataSet.FieldByName('F17').asInteger <=14 then
                   begin
                       fieldView := TfrMemoView.Create;
                       (fieldView as TfrMemoView).Font.Assign ( Fnt );
                   end;
-                   if fDictDataSet.FieldByName('F17').asInteger =15  then
+                  if fDictDataSet.FieldByName('F17').asInteger =15  then
                   begin
                       fieldView :=  TChyFrBarCodeView.Create;
                       with  (fieldView as TChyFrBarCodeView) do
@@ -551,58 +556,20 @@ begin
         end;
 
         frReport1.PrepareReport;
-        frReport1.ShowReport;
+        if IsPreview then
+        begin
+          frReport1.ShowReport;
+        end
+        else
+        begin
+          frReport1.PrintPreparedReportDlg() ;//frReport1.PrintPreparedReport('',1,true,;
+        end;
+
         frReport1.Clear;
      
      end;
      self.FGrid.DataSource.DataSet.EnableControls;
-      {FhlKnl1.Rp_SetRepCtrl(FhlKnl1.FreeQuery, FGrid.DataSource.DataSet,    TQRBand(TopBand1),0,fdbGrid);
-
-      chyBar:= TChyFrBarCodeView.Create;
-      chyBar.Memo.Text :=  FContentDataSet.fieldbyname( 'FWhinCOde' ).AsString  ;
-      chyBar.ParentPage :=newpage;
-      chyBar.x :=10;
-      chyBar.y :=15;
-      chybar.ResetWidthHeight(strtoint( self.edtWidth.Text ),  30)  ;
-      chyBar.LineWidth :=1;
-      chyBar.Ratio :=2;
-      chyBar.BarCodeType :=6;
-      chyBar.CacheBarcodeImage :=true;
-      chyBar.LoadPicture();
-
-
-      mm := TfrMemoView.Create;
-      mm.ParentPage := newpage;
-      mm.Memo.Text := FContentDataSet.fieldbyname( 'FWhinCOde' ).AsString  ;
-      mm.x := 80;//mm1.x ;
-      mm.y := 80;//mm1.y ;
-      mm.dx := 60;//mm1.dx ;
-      mm.dy := 30;//mm1.dy;
-         
-      newpage.Objects.Add( mm );
-
-
-
-
-
-
-
-      qrCode:= TChyFrQRCodeView.Create ;
-      with qrCode do
-      begin
-      Memo.Text :='[ADODataSet1."Id"]' ;
-      ParentPage :=newpage;
-      x :=0;
-      y :=60;
-      ResetWidthHeight(50,  50)  ;
-      CacheBarcodeImage :=true;
-      LoadPicture();
-      end;
-
-
-      newpage.Objects.Add( qrCode );
-      newpage.Objects.Add( chyBar );
-                                 }
+      
 
 end;
 function TFrmMulModulePrint.CreatePage(report: TfrReport ;width,height:integer): TfrPage;
@@ -610,6 +577,7 @@ var newPage1:TfrPage ;
 begin
   report.Pages.Add;
   newPage1 := report.Pages[report.Pages.Count -1] ;
+
   newPage1.pgWidth := width ;
   newPage1.pgHeight:= height;
   newPage1.pgSize  := 0;//report.Pages[ 0 ].pgSize ;
@@ -681,54 +649,29 @@ begin
 end;
 
 procedure TFrmMulModulePrint.btnLabelPrintClick(Sender: TObject);
-
-var frm:TQrClientBarCodePrint;
-var sql, barcodeFileName:string;
-var frmPrintingProgress : TfrmBarcodePrintingProgress;
-var image:TImage;
+var modelID:string;
 var i:integer;
-var filelist:Tstringlist ;
-var folder:string;
- {}
+var CurRow:integer;
+var GridPrt:TModelDbGrid;
+var CunCol:TChyColumn;
 begin
+  //   FhlUser.CheckRight(fDict.PrintRitId);
+  GridPrt:=TModelDbGrid.Create (nil);
+  GridPrt.DataSource :=fgrid.DataSource;
+  GridPrt.DataSource.DataSet.DisableControls ;
+  CurRow:= StrGridPrintModule.Row ;
+  modelID:=StrGridPrintModule.Cols[0].Strings[CurRow];
 
-    folder := './barcodeImages/'+ self.FPrintId +'/' ;
- //   GetBarcodeFolder(false);
-  //  ActSaveWoOwner.Execute;
-    frm:=TQrClientBarCodePrint.Create(nil);
-    try
-      frm.GetPageCfg();
+  if trim(modelID) ='' then
+  begin
+    ShowMessage('请选择正确打印模板');
+    exit;
+  end;
 
-      //sql:= 'exec Pr_ClientBarCodeLabelPrint  '+quotedstr(fBillex.BillCode)  ;
-      //fhlknl1.Kl_GetUserQuery(sql);
-
-
-      fhlknl1.User_Query.First;
-      for i:=1 to  fhlknl1.User_Query.RecordCount do
-      begin
-        barcodeFileName :=folder+fhlknl1.User_Query.fieldbyname('FBarCode0').AsString + '.jpg';
-        if not fileexists( barcodeFileName ) then
-        begin
-          image:=frm.ExportReport(  fhlknl1.User_Query );
-          ImageConverter.BmpToJpeg( image, barcodeFileName);
-          image.Free ;
-        end;
-        application.ProcessMessages ;
-        fhlknl1.User_Query.Next  ;
-      end;
-      //frm.InitialImageLoader(  fhlknl1.User_Query, fBillex.BillCode );
-      //frm.Preview;
-
-      frmPrintingProgress := TfrmBarcodePrintingProgress.Create(nil);
-      frmPrintingProgress.ImageDir := folder;
-      frmPrintingProgress.ShowModal;
-    finally
-      //self.PgBarSave.Visible := False;
-      FreeAndNil(frm);
-      FreeAndNil(frmPrintingProgress);
-      Screen.Cursor:=crDefault;
-    end;
-   { }
+  if ( FTopBoxID<>'') and (not dbChkLabelTemplate.Checked ) then
+      PreviewMDTemplate
+  else
+      PrintLabelTemplate(false) ;
 end;
 
 end.

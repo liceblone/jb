@@ -29,6 +29,7 @@ type
     dbGrid1: TDBGrid;
     statLabel1: TLabel;
     ChkPhoneticize: TCheckBox;
+    btnRefresh: TButton;
     procedure InitFilterObject;
     procedure Edit1Change(Sender: TObject);
     procedure ComboBox1Change(Sender: TObject);
@@ -43,6 +44,7 @@ type
     procedure ADODataSet1AfterScroll(DataSet: TDataSet);
     procedure dbGrid1DrawColumnCell(Sender: TObject; const Rect: TRect;
       DataCol: Integer; Column: TColumn; State: TGridDrawState);
+    procedure btnRefreshClick(Sender: TObject);
   private
     ft:TFieldType;
     fDict:TLookupDict;
@@ -395,6 +397,13 @@ begin
       self.ADODataSet1.Close;
       self.ADODataSet1.Open ;
     end;
+end;
+
+procedure TLookupFrm.btnRefreshClick(Sender: TObject);
+begin
+  self.dbGrid1.DataSource.DataSet.Close;
+  self.dbGrid1.DataSource.DataSet.Open;
+
 end;
 
 end.
