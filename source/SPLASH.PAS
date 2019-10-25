@@ -580,6 +580,7 @@ begin
                     FieldByName('Permit').AsBoolean:=False;
                     FieldByName('Version').AsString:=JbGetversion;
                     FieldByName('HDSerialNum').AsString:=HDSerialNumRead;
+                    FieldByName('ProcessID').AsInteger := GetProcessID('jingbei.exe');
                     Post;
                     WriteClientData(FieldByName('Id').AsInteger);
                 end
@@ -591,6 +592,7 @@ begin
                     FieldByName('ip').AsString:=ip;
                     FieldByName('Version').AsString:=JbGetversion;
                     FieldByName('HDSerialNum').AsString:=HDSerialNumRead;
+                    FieldByName('ProcessID').AsInteger := GetProcessID('jingbei.exe');
                     Post;
                 end;
 

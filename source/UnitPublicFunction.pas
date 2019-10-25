@@ -2,7 +2,7 @@ unit UnitPublicFunction;
 
 interface
    uses
-  Windows,SysUtils,Classes,WinSock,ActiveX,controls,shellapi;
+  Windows,SysUtils,Classes,WinSock,ActiveX,controls,shellapi ,TLHelp32;
   
   Function  GetHZPY(HZstr: String):String;     //将任意字符串中的汉字换成拼音首字母（大写）
   function  GetPYIndexChar(hzchar: string):char; //将一个汉字转化成拼音首字母（大写）
@@ -27,6 +27,7 @@ type
   Address             : Array[1..MAX_ADAPTER_ADDRESS_LENGTH] of Byte;
 End;
   function JBGetVersion: string;
+  function GetProcessID(TargetProcessName: string): integer;
   function HDSerialNumRead: PChar;
   function GetIPByName(AName:   String):   string;
   function GetGUID:string;
@@ -226,6 +227,41 @@ begin
     end;
   finally
   end;
+end;
+
+
+
+
+
+function GetProcessID(TargetProcessName: string): integer;
+var  ProcessName:string;
+ProcessID : integer; //进程表示符
+i : integer; 
+ContinueLoop:BOOL;
+FSnapshotHandle:THandle; //进程快照句柄
+FProcessEntry32:TProcessEntry32; //进程入口的结构体信息
+begin
+    result:=-1;
+    FSnapshotHandle:=CreateToolhelp32Snapshot(TH32CS_SNAPPROCESS,0); //创建一个进程快照
+    FProcessEntry32.dwSize:=Sizeof(FProcessEntry32);
+    ContinueLoop:=Process32First(FSnapshotHandle,FProcessEntry32); //得到系统中第一个进程
+    //循环例举
+    while ContinueLoop do
+    begin
+
+        ProcessName := FProcessEntry32.szExeFile;
+        ProcessID := FProcessEntry32.th32ProcessID;
+        if ProcessName= TargetProcessName then
+        begin
+       
+        result :=  ProcessID ;
+        break;
+    end
+    else
+        ContinueLoop:=Process32Next(FSnapshotHandle,FProcessEntry32);
+
+
+    end;
 end;
 
 function   JBGetVersion: string;
