@@ -19,6 +19,7 @@ type TChyFrBarCodeView = class(TFrDigitalImageView)
     FBarCodeType: integer;
     FBarcodeFileName: string;
      FImage:TImage;
+
     procedure SetBarcodeShowText(const Value: boolean);
     procedure setBarCodeType(const Value: integer);
     procedure SetCacheBarcodeImage(const Value: boolean);
@@ -32,6 +33,7 @@ type TChyFrBarCodeView = class(TFrDigitalImageView)
     constructor Create; override;
     destructor Destroy; override;
     procedure Draw(Canvas: TCanvas); override;
+    procedure StreamOut(Stream: TStream); override;
     procedure LoadPicture; override;
     procedure ResetWidthHeight(fwidth, fheight: Integer);
     procedure SaveToJpg(Bitmap:TBitmap);
@@ -123,7 +125,7 @@ begin
         Barcode1.Modul := self.LineWidth;
         Barcode1.Ratio := self.Ratio;
         Barcode1.Height := self.dx-Barcode1.Top;
-        Barcode1.Text:= self.Memo.Text ; 
+        Barcode1.Text:=  self.Memo1.Text ;
 
         Barcode1.DrawBarcode(self.FImage.Canvas );
 
@@ -200,6 +202,18 @@ end;
 procedure TChyFrBarCodeView.setRatio(const Value: double);
 begin
    FRatio := Value;
+end;
+
+procedure TChyFrBarCodeView.StreamOut(Stream: TStream);
+var s:string;
+begin
+  s := Memo.Text ;
+  ExpandVariables(s);
+  Memo1.Text :=   s ;
+
+  self.LoadPicture();
+
+  inherited; 
 end;
 
 { TChyFrQRCodeView }

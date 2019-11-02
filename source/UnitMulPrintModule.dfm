@@ -256,7 +256,7 @@ object FrmMulModulePrint: TFrmMulModulePrint
       end
       object ChkDrawGrid: TDBCheckBox
         Left = 147
-        Top = 56
+        Top = 80
         Width = 49
         Height = 17
         Caption = #36793#26694
@@ -267,7 +267,7 @@ object FrmMulModulePrint: TFrmMulModulePrint
         ValueUnchecked = 'False'
       end
       object dbChkLabelTemplate: TDBCheckBox
-        Left = 147
+        Left = 235
         Top = 80
         Width = 78
         Height = 17
@@ -278,6 +278,14 @@ object FrmMulModulePrint: TFrmMulModulePrint
         TabOrder = 9
         ValueChecked = 'True'
         ValueUnchecked = 'False'
+      end
+      object chkUseMargin: TCheckBox
+        Left = 144
+        Top = 56
+        Width = 97
+        Height = 17
+        Caption = #36793#36317
+        TabOrder = 10
       end
     end
   end
@@ -363,11 +371,16 @@ object FrmMulModulePrint: TFrmMulModulePrint
     Top = 368
   end
   object frReport1: TfrReport
+    Dataset = frDBDataSet1
     InitialZoom = pzDefault
     PreviewButtons = [pbZoom, pbLoad, pbSave, pbPrint, pbFind, pbHelp, pbExit]
     RebuildPrinter = False
     Left = 328
     Top = 368
     ReportForm = {19000000}
+  end
+  object frDBDataSet1: TfrDBDataSet
+    Left = 328
+    Top = 392
   end
 end

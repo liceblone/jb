@@ -5,7 +5,7 @@ interface
 uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
   Dialogs, StdCtrls, Grids, DBGrids, DB, ADODB, ExtCtrls, DBCtrls, Mask,
-  FR_Class, ComCtrls;
+  FR_Class, ComCtrls, FR_DSet, FR_DBSet;
 
 type
   TFrmMulModulePrint = class(TForm)
@@ -45,6 +45,8 @@ type
     frReport1: TfrReport;
     btnLabelPrint: TButton;
     ProgressBar1: TProgressBar;
+    frDBDataSet1: TfrDBDataSet;
+    chkUseMargin: TCheckBox;
     procedure FormDblClick(Sender: TObject);
     procedure BtnPreviewClick(Sender: TObject);
     procedure btnprintClick(Sender: TObject);
@@ -107,6 +109,7 @@ begin
     FBtmBoxID:=Btmboxid;
     FGrid:=Midgird;
     Result:=False;
+      self.frDBDataSet1.DataSet := FGrid.DataSource.DataSet;
    // TModelDbGrid(Midgird).ReflashSumValues;
 
     for i:= self.StrGridPrintModule.RowCount -1 to 0 do
@@ -170,6 +173,8 @@ begin
   CurRow:= StrGridPrintModule.Row ;
   modelID:=StrGridPrintModule.Cols[0].Strings[CurRow];
 
+  fgrid.DataSource.DataSet.First;
+  frDBDataSet1.DataSet := fgrid.DataSource.DataSet;
   if trim(modelID) ='' then
   begin
     ShowMessage('请选择正确打印模板');
@@ -445,16 +450,24 @@ var l,t,w ,h,ABeginTop :Integer;Fnt:TFont;
 fDictDataSet:TDataSet ;
 const ConstGap:Integer=1;
 var DLDataSourceType:boolean;
+var factor:double;
+var rect: TRect;
 begin
-
+    factor := (93 / 1.015)/254;
+    frReport1.Clear;
+    self.frReport1.LoadFromFile('.\resources\FrLabelTemplate.frf');
 
     ABeginTop :=  strtoint( self.edtTopMargin.Text );
     modelID:=StrGridPrintModule.Cols[0].Strings[StrGridPrintModule.Row];
 
+
+
     t:=0;
     Fnt:=TFont.Create;
     Fnt.Assign(self.Font);
+
     FGrid.DataSource.DataSet.First;
+
     self.ProgressBar1.Position :=0;
     self.ProgressBar1.Max := self.FGrid.DataSource.DataSet.RecordCount;
 
@@ -465,110 +478,97 @@ begin
     fDictDataSet := FhlKnl1.FreeQuery  ;
     fDictDataSet.DisableControls ;
 
+    newpage := frReport1.Pages[0];
+    newPage.pgWidth := round(  strtoint(edtwidth.Text )*10  /factor);
+    newPage.pgHeight := round( strtoint(edtheight.Text )*10  /factor);
 
-    self.FGrid.DataSource.DataSet.DisableControls;
-    for j:=0 to 50 do
+   newPage.UseMargins :=chkUseMargin.Checked;
+   rect.Left := round( strtoint(edtLeftMargin.Text )  );
+    rect.top := round( strtoint(edtTopMargin.Text ) );
+    rect.Right := round( strtoint(edtRightMargin.Text )  );
+    rect.Bottom := round( strtoint(edtBtmMargin.Text ));
+
+    newPage.pgMargins:= rect;
+                                 {     }
+                              
+
+    newPage.ChangePaper(256,   Round(  newPage.pgWidth  ), newPage.pgHeight  ,0, TPrinterOrientation(0));
+
+
+    fDictDataSet.First;
+    While not fDictDataSet.Eof do
     begin
-        for i:=0 to frReport1.Pages.Count -1 do
+        l:=fDictDataSet.FieldByName('F12').asInteger;
+        t:=fDictDataSet.FieldByName('F13').asInteger+ABeginTop;
+        Fnt.Size:=fDictDataSet.FieldByName('F07').asInteger;
+        Fnt.Name:=fDictDataSet.FieldByName('F08').asString;
+        w:=fDictDataSet.FieldByName('F14').asInteger;
+        h:= fDictDataSet.FieldByName('f15').asInteger;
+        fieldName := fDictDataSet.FieldByName('F04').AsString ;
+        DLDataSourceType := fDictDataSet.FieldByName('F23').AsBoolean   ;
+        if fDictDataSet.FieldByName('F10').asBoolean then
+            Fnt.Style:=Fnt.Style+[fsUnderLine]
+        else
+            Fnt.Style:=Fnt.Style-[fsUnderLine];
+        if fDictDataSet.FieldByName('F09').asBoolean then
+            Fnt.Style:=Fnt.Style+[fsBold]
+        else
+            Fnt.Style:=Fnt.Style-[fsBold];
+
+        if fDictDataSet.FieldByName('F17').asInteger =0 then
         begin
-          frReport1.Pages[i].Free;
-        end;
-        frReport1.Pages.Clear;
-
-        if self.FGrid.DataSource.DataSet.Eof then   break;
-        for i:=0 to 199 do
-        begin
-              if self.FGrid.DataSource.DataSet.Eof then   break;
-              self.ProgressBar1.Position := i+(j)*200 ;
-
-              newpage:=CreatePage(frReport1 ,  strtoint( self.edtWidth.Text ) *10,  strtoint( self.edtHeight.Text )*10);
-
-              newpage.Left  := strtoint( edtLeftMargin.text );    // newpage. := strtoint( self.edtRightMargin.Text );  //newpage.Bottom := strtoint( self.edtBtmMargin.Text );
-              newpage.Top   := strtoint( self.edtTopMargin.Text );
-
-
-              fDictDataSet.First;
-              While not fDictDataSet.Eof do
-              begin
-                  l:=fDictDataSet.FieldByName('F12').asInteger;
-                  t:=fDictDataSet.FieldByName('F13').asInteger+ABeginTop;
-                  Fnt.Size:=fDictDataSet.FieldByName('F07').asInteger;
-                  Fnt.Name:=fDictDataSet.FieldByName('F08').asString;
-                  w:=fDictDataSet.FieldByName('F14').asInteger;
-                  h:= fDictDataSet.FieldByName('f15').asInteger;
-                  fieldName := fDictDataSet.FieldByName('F04').AsString ;
-                  DLDataSourceType := fDictDataSet.FieldByName('F23').AsBoolean   ;
-                  if fDictDataSet.FieldByName('F10').asBoolean then
-                      Fnt.Style:=Fnt.Style+[fsUnderLine]
-                  else
-                      Fnt.Style:=Fnt.Style-[fsUnderLine];
-                  if fDictDataSet.FieldByName('F09').asBoolean then
-                      Fnt.Style:=Fnt.Style+[fsBold]
-                  else
-                      Fnt.Style:=Fnt.Style-[fsBold];
-
-                  if fDictDataSet.FieldByName('F17').asInteger =0 then
-                  begin
-                      w := w+13;
-                      h:= h+3;
-                      FieldValue := fieldName    ;
-                  end
-                  else
-                      if  ( DLDataSourceType ) then
-                          FieldValue :=  self.FGrid.DataSource.DataSet.fieldbyname( fieldName ).AsString
-                      else
-                          FieldValue :=  self.FContentDataSet.fieldbyname( fieldName ).AsString  ;
- 
-                  if fDictDataSet.FieldByName('F17').asInteger <=14 then
-                  begin
-                      fieldView := TfrMemoView.Create;
-                      (fieldView as TfrMemoView).Font.Assign ( Fnt );
-                  end;
-                  if fDictDataSet.FieldByName('F17').asInteger =15  then
-                  begin
-                      fieldView :=  TChyFrBarCodeView.Create;
-                      with  (fieldView as TChyFrBarCodeView) do
-                      begin
-                          BarCodeShowText:=false;
-                          ResetWidthHeight(w,  h)  ;
-                          LineWidth :=1;
-                          Ratio :=2;
-                          BarCodeType :=6;
-                          CacheBarcodeImage :=true;
-                      end;
-                  end;
-                  if fDictDataSet.FieldByName('F17').asInteger  =16   then
-                  begin
-                      fieldView := TChyFrQRCodeView.Create; 
-                  end;
-                  fieldView.Memo.Text := fieldValue ;
-                  fieldView.ParentPage :=newpage;
-                  fieldView.x :=l;
-                  fieldView.y :=t;
-                  fieldView.dx:=w;
-                  fieldView.dy:=h;
-                  if (fieldView is TFrDigitalImageView) then
-                      (fieldView as TFrDigitalImageView).LoadPicture();
-                  newpage.Objects.Add( fieldView );
-                  fDictDataSet.next;
-               end;
-          self.FGrid.DataSource.DataSet.Next;
-        end;
-
-        frReport1.PrepareReport;
-        if IsPreview then
-        begin
-          frReport1.ShowReport;
+            w := w+13;
+            h:= h+3;
+            FieldValue :=  fieldName    ;
         end
         else
+            if  ( DLDataSourceType ) then
+                FieldValue := '["'+fieldName+'"]' // self.FGrid.DataSource.DataSet.fieldbyname( fieldName ).AsString ;
+             else
+                FieldValue :=  self.FContentDataSet.fieldbyname( fieldName ).AsString  ;
+ 
+        if fDictDataSet.FieldByName('F17').asInteger <=14 then
         begin
-          frReport1.PrintPreparedReportDlg() ;//frReport1.PrintPreparedReport('',1,true,;
+            fieldView := TfrMemoView.Create;
+            (fieldView as TfrMemoView).Font.Assign ( Fnt );
         end;
-
-        frReport1.Clear;
-     
+        if fDictDataSet.FieldByName('F17').asInteger =15  then
+        begin
+            fieldView :=  TChyFrBarCodeView.Create;
+            with  (fieldView as TChyFrBarCodeView) do
+            begin
+                BarCodeShowText:=true;
+                ResetWidthHeight(w,  h)  ;
+                LineWidth :=1;
+                Ratio :=2;
+                BarCodeType :=6;
+                CacheBarcodeImage :=false;
+            end;
+        end;
+        if fDictDataSet.FieldByName('F17').asInteger  =16   then
+        begin
+            fieldView := TChyFrQRCodeView.Create; 
+        end;
+        fieldView.Memo.Text := fieldValue ;
+        fieldView.ParentPage :=newpage;
+        fieldView.x :=l;
+        fieldView.y :=t;
+        fieldView.dx:=w;
+        fieldView.dy:=h;
+        newpage.Objects.Add( fieldView );
+        fDictDataSet.next;
      end;
-     self.FGrid.DataSource.DataSet.EnableControls;
+    if IsPreview then
+    begin
+      frReport1.ShowReport;
+    end
+    else
+    begin
+      frReport1.PrintPreparedReportDlg() ;//frReport1.PrintPreparedReport('',1,true,;
+    end;
+
+
+     //self.FGrid.DataSource.DataSet.EnableControls;
       
 
 end;
