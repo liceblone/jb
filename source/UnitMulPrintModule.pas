@@ -380,8 +380,8 @@ procedure TFrmMulModulePrint.BtnPageSizeClick(Sender: TObject);
 var i:integer;
 var qry:TADOQuery;
 begin
-  if LoginInfo.isAdmin   then
-  begin
+    FhlUser.CheckRight('030100060304');
+
     DatasetReport.Edit ;
     DatasetReport.FieldByName('FTitleFontSize').AsInteger :=self.lblTitle.Font.Size;
     DatasetReport.FieldByName('FTitleFontName').AsString  :=self.lblTitle.Font.Name      ;
@@ -401,11 +401,7 @@ begin
     finally
       qry.Free ;
     end;
-  end
-  else
-  begin
-      showmessage('只有管理员才有权限');
-  end;
+
 end;
 
  
