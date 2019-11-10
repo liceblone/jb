@@ -38,9 +38,10 @@ type
     procedure SetQuietZone(NewQuietZone: Integer);
     function GetIsBlack(Row, Column: Integer): Boolean;
     procedure Update;
-    procedure SetSize( pRow, pColumn: Integer );
   public
     constructor Create;
+    
+    procedure SetSize( pRow, pColumn: Integer );
     property Data: WideString read FData write SetData;
     property Encoding: TQRCodeEncoding read FEncoding write SetEncoding;
     property QuietZone: Integer read FQuietZone write SetQuietZone;

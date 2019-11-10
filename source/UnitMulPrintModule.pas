@@ -543,7 +543,11 @@ begin
         end;
         if fDictDataSet.FieldByName('F17').asInteger  =16   then
         begin
-            fieldView := TChyFrQRCodeView.Create; 
+            fieldView := TChyFrQRCodeView.Create;
+            with  (fieldView as TChyFrQRCodeView) do
+            begin
+                ResetWidthHeight(w,h);
+            end
         end;
         fieldView.Memo.Text := fieldValue ;
         fieldView.ParentPage :=newpage;

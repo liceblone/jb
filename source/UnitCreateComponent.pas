@@ -3009,6 +3009,7 @@ grpSoruceParent :=   TWinControl( Timage(Sender).Parent) ;
             //if  self.chkUserMode.Checked then
             //CTRL.isUserMode :=True;
 
+           // CTRL.ReadOnly :=true;
             CTRL.Left :=x+lbl.Width +10;
             CTRL.Top :=y ;
             CTRL.ShowHint :=true;

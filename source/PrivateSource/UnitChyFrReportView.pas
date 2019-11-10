@@ -51,7 +51,7 @@ end;
 type TChyFrQRCodeView = class(TFrDigitalImageView)
     private
     FBarcodeFileName: string;
-    FImage:TImage; 
+    FImage:TImage;
     QRCode: TDelphiZXingQRCode;
     FCacheBarcodeImage: boolean;
     procedure SetCacheBarcodeImage(const Value: boolean);
@@ -60,10 +60,11 @@ type TChyFrQRCodeView = class(TFrDigitalImageView)
     constructor Create; override;
     destructor Destroy; override;
     procedure Draw(Canvas: TCanvas); override;
+    procedure StreamOut(Stream: TStream); override;
     procedure LoadPicture;override;
     procedure ResetWidthHeight(fwidth, fheight: Integer);
     procedure SaveToJpg(Bitmap:TBitmap);
-    
+
     property BarcodeFileName:string read FBarcodeFileName write SetBarcodeFileName ;
     property CacheBarcodeImage:boolean read FCacheBarcodeImage write SetCacheBarcodeImage   ;
     
@@ -255,7 +256,7 @@ begin
       if FBarcodeFileName='' then
           FBarcodeFileName := './barcodeImages/1.jpg';
 
-      QRCode.Data := self.Memo.Text;
+      QRCode.Data :=  self.Memo1.Text ; //self.Memo.Text;
       QRCode.Encoding := TQRCodeEncoding(0);   //4 utf8 ow bom
       QRCode.QuietZone := StrToIntDef('4', 4);
       FImage.Width := QRCode.Rows;
@@ -286,10 +287,12 @@ begin
 procedure TChyFrQRCodeView.ResetWidthHeight(fwidth, fheight: Integer);
 begin
   dx:=fwidth;
-   dy:=fheight;
+  dy:=fheight;
   FImage.Width:=fwidth;
   Fimage.Height:=fheight;
- 
+  QrCode.SetSize(fwidth, fheight);
+  //QRCode.Rows :=  fwidth ;
+  // QRCode.Columns := fheight;
 end;
 
 procedure TChyFrQRCodeView.SaveToJpg(Bitmap: TBitmap);
@@ -310,6 +313,18 @@ end;
 procedure TChyFrQRCodeView.SetCacheBarcodeImage(const Value: boolean);
 begin
 FCacheBarcodeImage := value;
+end;
+
+procedure TChyFrQRCodeView.StreamOut(Stream: TStream);
+var s:string;
+begin
+  s := Memo.Text ;
+  ExpandVariables(s);
+  Memo1.Text :=   s ;
+
+  self.LoadPicture();
+  inherited;
+
 end;
 
 { TFrDigitalImageView }
