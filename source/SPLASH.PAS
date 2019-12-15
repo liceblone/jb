@@ -567,7 +567,8 @@ begin
                 end;
                 SetClientData(id);
             end;
-            FhlKnl1.Kl_GetQuery2('select * from sys_client where HDSerialNum='+quotedstr(HDSerialNumRead)+' and id='+quotedstr(id),true,true);
+            FhlKnl1.Kl_GetQuery2('select * from sys_client where mac ='+quotedstr(mac)+' and id='+quotedstr(id),true,true);
+            //HDSerialNum='+quotedstr(HDSerialNumRead)+'
 
             with FhlKnl1.FreeQuery do
             begin
