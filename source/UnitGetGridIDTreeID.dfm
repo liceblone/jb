@@ -19,7 +19,7 @@ object frmGetGridID: TfrmGetGridID
     Top = 57
     Width = 1009
     Height = 393
-    ActivePage = ts6
+    ActivePage = ts8
     Align = alClient
     TabOrder = 0
     object ts1: TTabSheet
@@ -1875,7 +1875,7 @@ object frmGetGridID: TfrmGetGridID
       object dbedt82: TDBEdit
         Left = 176
         Top = 104
-        Width = 100
+        Width = 529
         Height = 21
         DataField = 'F04'
         DataSource = dsdsT205
@@ -1884,7 +1884,7 @@ object frmGetGridID: TfrmGetGridID
       object dbedt83: TDBEdit
         Left = 176
         Top = 144
-        Width = 100
+        Width = 529
         Height = 21
         DataField = 'F05'
         DataSource = dsdsT205
@@ -2483,8 +2483,9 @@ object frmGetGridID: TfrmGetGridID
       Size = 50
     end
     object dsT205F05: TStringField
+      DisplayWidth = 200
       FieldName = 'F05'
-      Size = 50
+      Size = 200
     end
     object dsT205F06: TStringField
       FieldName = 'F06'

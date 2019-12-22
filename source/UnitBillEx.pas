@@ -121,6 +121,7 @@ type
     ActDeliveryLabelPrint: TAction;
     ActMulFormatPrint: TAction;
     ActExportExcel: TAction;
+    ActSyncStickData: TAction;
     procedure OpenCloseAfter(IsOpened:Boolean);
     procedure SetCtrlStyle(fEnabled:Boolean);
     procedure SetRitBtn;
@@ -220,6 +221,7 @@ type
     procedure ActDeliveryLabelPrintExecute(Sender: TObject);
     procedure ActMulFormatPrintExecute(Sender: TObject);
     procedure ActExportExcelExecute(Sender: TObject);
+    procedure ActSyncStickDataExecute(Sender: TObject);
 
   private
     { Private declarations }
@@ -483,9 +485,9 @@ begin
   ActPrintEveryPackageLabel.Enabled   := ActPrintLabelCfg.Enabled   ;
   ActDeliveryLabelPrint.Enabled   := ActPrintLabelCfg.Enabled   ;
   ActMulFormatPrint.Enabled   := ActPrintLabelCfg.Enabled   ;
-  ActExportExcel.Enabled   := ActPrintLabelCfg.Enabled   ;
-  ActCreateWhmove.Enabled        :=not  SaveAction1.Enabled and IsChecked   ;
-
+  ActExportExcel.Enabled      := ActPrintLabelCfg.Enabled   ;
+  ActCreateWhmove.Enabled     :=not  SaveAction1.Enabled and IsChecked   ;
+  ActSyncStickData.Enabled    :=not  SaveAction1.Enabled  ;
 
   ActUncheck.Enabled :=IsChecked ;
   ActChkChg.Enabled :=IsChecked ;
@@ -867,8 +869,10 @@ begin
      ActPrintEveryPackageLabel.Enabled     := ActPrintLabelCfg.Enabled   ;
      ActDeliveryLabelPrint .Enabled         := ActPrintLabelCfg.Enabled   ;
      ActMulFormatPrint.Enabled   := ActPrintLabelCfg.Enabled   ;
-     ActExportExcel.Enabled   := ActPrintLabelCfg.Enabled   ;
-     ActCreateWhmove.Enabled               := not  SaveAction1.Enabled  and not CheckAction1.Enabled ;
+     ActExportExcel.Enabled      := ActPrintLabelCfg.Enabled   ;
+     ActCreateWhmove.Enabled     := not  SaveAction1.Enabled  and not CheckAction1.Enabled ;
+     ActSyncStickData.Enabled    := ActPrintLabelCfg.Enabled   ;
+
     end;
     OpenAction1.Enabled:=IsEnabled;
     RefreshAction1.Enabled:=IsEnabled;
@@ -3497,6 +3501,24 @@ begin
   begin
     PopDbgrid:=self.DBGridDL  ;
     QExportExcel(PopDbgrid,TForm(PopDbgrid.Parent).Caption+formatdatetime('yyyymmdd',now), true,strtoint(RepeatCnt));
+  end;
+end;
+
+procedure TFrmBillEx.ActSyncStickDataExecute(Sender: TObject);
+var procedureName:string;
+begin
+  if self.mtDataSet1.IsEmpty then exit;
+  procedureName :='Pr_SyncLabelDB';
+  Screen.Cursor:=CrSqlWait;
+  try
+    //FhlUser.CheckRight(fBillex.ChkRightId );
+    if   dmFrm.ExecStoredProc( procedureName,varArrayof([fBillex.billcode,LoginInfo.EmpId,LoginInfo.LoginId]), true) then
+    begin
+          MessageDlg('数据已成功发送给贴标系统。' ,mtInformation ,[mbOk],0);
+    end;
+    OpenBill(fBillex.BillCode);
+  finally
+    Screen.Cursor:=crDefault;
   end;
 end;
 

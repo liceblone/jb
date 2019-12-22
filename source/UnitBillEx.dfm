@@ -773,6 +773,11 @@ object FrmBillEx: TFrmBillEx
       ImageIndex = 38
       OnExecute = ActExportExcelExecute
     end
+    object ActSyncStickData: TAction
+      Caption = #36148#26631
+      ImageIndex = 34
+      OnExecute = ActSyncStickDataExecute
+    end
   end
   object MainMenu1: TMainMenu
     AutoMerge = True
