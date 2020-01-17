@@ -113,7 +113,9 @@ uses
   DelphiZXingQRCode in 'source\privatesource\DelphiZXingQRCode.pas',
   UnitBarcodeTemplate in 'source\UnitBarcodeTemplate.pas' {FrmBarCodeTemplate},
   UnitFrmWrArchive in 'source\UnitFrmWrArchive.pas' {FrmWrArchive: TFrame},
-  Md5 in 'source\Md5.pas';
+  Md5 in 'source\Md5.pas',
+  UnitDes in 'source\UnitDes.pas'
+  ;
 
 //UnitFrmWrArchive in 'source\UnitFrmWrArchive.pas' {FrmWrArchive};
 

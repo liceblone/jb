@@ -28,6 +28,7 @@ type
     procedure FormCreate(Sender: TObject);
     procedure HintLabel1DblClick(Sender: TObject);
     function GetRemoteConnStr:widestring;
+    function ConnectbyRawIP(AdoCnn:TADOConnection;rawIP:string):String;
     procedure xLabel1DblClick(Sender: TObject);
 
   private
@@ -362,22 +363,40 @@ Begin
   Result := strTemp;
 End;
 
+
+function TsplashFrm.ConnectbyRawIP(AdoCnn:TADOConnection;rawIP:string): String;
+
+begin
+
+    try
+
+       AdoCnn.properties['data source'].value := rawIP; 
+       AdoCnn.Connected:=true;
+
+       result:= AdoCnn.ConnectionString;
+    finally
+    end;
+
+end;
+
 function TsplashFrm.GetRemoteConnStr:widestring;
 var
   a:TMemoryStream;
-  fConnStr:widestring;
+  fConnStr:string;
+  rawip:widestring;
   inif:TIniFile;
   i:integer;
   AdoCnn:TADOConnection;
   objIdHttp:TIdHttp;
+  teststr:string;
 begin
     inif:=TIniFile.Create(ExtractFileDir(Application.ExeName)+'\Config.ini');
     AdoCnn:=TADOConnection.Create (nil);
-
+    AdoCnn.CommandTimeout :=1;
 try
     //showmessage('begin GetRemoteConnStr');
 
-    for i:=1 to 5 do
+    for i:=1 to 1 do
     begin
       try
         objIdHttp :=TIdHttp.Create(nil);
@@ -390,16 +409,32 @@ try
               AdoCnn.LoginPrompt :=false;
               AdoCnn.Connected:=False;
 
-              AdoCnn.ConnectionString :=FhlKnl1.St_encrypt_Chy(fConnStr);
+             // teststr:= 'OYijpMhi72MiEHtRp/8tY00vlgz3Fn83V+FvLKtDY+QDC4Q0YUfihKm0jQaVHmMe6LBXbZa4qJh7RtpB6fYIBP5T7m/psxUnIMnNNbbgUaKETv+LlV4x+ZdbU4QCIdPUS+5xTpXRhAcxJQVVWTER29HbVaXozqLCdwyHO3TBlCI=';
+              // teststr:='DHOnT2u6PaQ=';
+               //FhlKnl1.st_DesDecrypt(teststr);
+
+              AdoCnn.ConnectionString :=FhlKnl1.st_DesDecrypt(fConnStr);
              // showmessage(fConnStr);
               FhlKnl1.Kl_SetReg4Mssql(AdoCnn.ConnectionString);
+
+              cStation:=inif.ReadString('FTP'+inttostr(i),'FTPFileNameRaw','');
+              if cStation<>'' then
+              begin
+                cStation:=  FhlKnl1.St_encrypt_Chy(cStation);
+                rawIP:=objIdHttp.Get(cStation)   ;
+                rawIp:= stringreplace(stringreplace(rawIP,#$D,'',[]),#$A,'',[]);
+              end;
+              
               if pos( AdoCnn.ConnectionString ,'Provider')>=0 then
               AdoCnn.Connected:=true;
               if AdoCnn.Connected then
               break;
             except
-              on err:exception do
+              //on err:exception do
               begin
+                 AdoCnn.properties['data source'].value := rawIP;
+                  //  AdoCnn.ConnectionString := ConnectbyRawIP(AdoCnn ,rawIP) ;
+
                 //showmessage(err.Message );
                 fConnStr:='';
               end;
@@ -536,6 +571,7 @@ begin
 
         logininfo.IsLocalServer :=false;
         LoginInfo.LastReceiveStr:= GetRemoteConnStr ;
+
         st:=pos('Data Source',LoginInfo.LastReceiveStr)+length('Data Source')+1;
         ed:=pos('Use Procedure for Prepare',LoginInfo.LastReceiveStr)-1;
 

@@ -778,6 +778,11 @@ object FrmBillEx: TFrmBillEx
       ImageIndex = 34
       OnExecute = ActSyncStickDataExecute
     end
+    object ActPkgCompleted: TAction
+      Caption = 'ActPkgCompleted'
+      ImageIndex = 21
+      OnExecute = ActPkgCompletedExecute
+    end
   end
   object MainMenu1: TMainMenu
     AutoMerge = True

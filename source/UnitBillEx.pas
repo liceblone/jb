@@ -122,6 +122,7 @@ type
     ActMulFormatPrint: TAction;
     ActExportExcel: TAction;
     ActSyncStickData: TAction;
+    ActPkgCompleted: TAction;
     procedure OpenCloseAfter(IsOpened:Boolean);
     procedure SetCtrlStyle(fEnabled:Boolean);
     procedure SetRitBtn;
@@ -222,6 +223,7 @@ type
     procedure ActMulFormatPrintExecute(Sender: TObject);
     procedure ActExportExcelExecute(Sender: TObject);
     procedure ActSyncStickDataExecute(Sender: TObject);
+    procedure ActPkgCompletedExecute(Sender: TObject);
 
   private
     { Private declarations }
@@ -311,6 +313,8 @@ begin
      end;
      if (self.fBillex.ChkFieldName ='' )  then
          LblState.Visible :=false;
+
+    (NextAction1).Visible :=F_ParamData <> nil;
 
 end;
 
@@ -487,7 +491,9 @@ begin
   ActMulFormatPrint.Enabled   := ActPrintLabelCfg.Enabled   ;
   ActExportExcel.Enabled      := ActPrintLabelCfg.Enabled   ;
   ActCreateWhmove.Enabled     :=not  SaveAction1.Enabled and IsChecked   ;
-  ActSyncStickData.Enabled    :=not  SaveAction1.Enabled  ;
+  ActSyncStickData.Enabled    :=    self.mtDataSet1.State in [dsBrowse];
+  ActPkgCompleted.Enabled    :=   self.mtDataSet1.State in [dsBrowse]  ;
+
 
   ActUncheck.Enabled :=IsChecked ;
   ActChkChg.Enabled :=IsChecked ;
@@ -871,7 +877,8 @@ begin
      ActMulFormatPrint.Enabled   := ActPrintLabelCfg.Enabled   ;
      ActExportExcel.Enabled      := ActPrintLabelCfg.Enabled   ;
      ActCreateWhmove.Enabled     := not  SaveAction1.Enabled  and not CheckAction1.Enabled ;
-     ActSyncStickData.Enabled    := ActPrintLabelCfg.Enabled   ;
+     ActSyncStickData.Enabled    :=    self.mtDataSet1.State in [dsBrowse];
+     ActPkgCompleted.Enabled    :=   self.mtDataSet1.State in [dsBrowse]  ;
 
     end;
     OpenAction1.Enabled:=IsEnabled;
@@ -3512,7 +3519,7 @@ begin
   Screen.Cursor:=CrSqlWait;
   try
     //FhlUser.CheckRight(fBillex.ChkRightId );
-    if   dmFrm.ExecStoredProc( procedureName,varArrayof([fBillex.billcode,LoginInfo.EmpId,LoginInfo.LoginId]), true) then
+    if   dmFrm.ExecStoredProc( procedureName,varArrayof([LoginInfo.EmpId,LoginInfo.LoginId,fBillex.billcode]), true) then
     begin
           MessageDlg('数据已成功发送给贴标系统。' ,mtInformation ,[mbOk],0);
     end;
@@ -3520,6 +3527,27 @@ begin
   finally
     Screen.Cursor:=crDefault;
   end;
+end;
+
+procedure TFrmBillEx.ActPkgCompletedExecute(Sender: TObject);
+var i:integer;
+begin
+//  inherited;
+if self.dlDataSet1.Active then
+begin
+    dlDataSet1.Close;
+    dlDataSet1.Open;
+    dlDataSet1.First;
+    for i:=0 to self.dlDataSet1.RecordCount -1 do
+    begin
+        self.dlDataSet1.Edit;
+        if  self.dlDataSet1.fieldbyname('FlabeledQty').AsInteger>0 then
+          self.dlDataSet1.FieldByName('Qty').Value := self.dlDataSet1.fieldbyname('FlabeledQty').Value;
+        dlDataSet1.Next;
+    end;
+    //self.dlDataSet1.Post;
+end;
+
 end;
 
 end.

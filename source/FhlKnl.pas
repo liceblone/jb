@@ -6,7 +6,7 @@ uses
   Windows, Messages, SysUtils, Classes,Controls,Dialogs, Forms, Graphics,
   Db, ADODB, ImgList, grids,dbgrids, ComCtrls, DbCtrls,StdCtrls, Variants,Menus,  DBClient ,
   ActnList, QrCtrls, QuickRpt, winsock, Printers,IdTCPConnection, IdTCPClient,  UnitPublicFunction,
-  Registry,IdHTTP,StrUtils,UnitDBImage;
+  Registry,IdHTTP,StrUtils,UnitDBImage, unitDes;
 type TcontrolEx=class(Tcontrol)
 
 end;
@@ -847,6 +847,9 @@ type
     function  St_GetBigMoney(Aje:Currency):string;
     function  St_Encrypt(str:string):string;
     function  St_encrypt_Chy(str:string):string;
+    function  st_DesEncrypt(str:string):string;
+    function  st_DesDecrypt(str:string):string;
+
     function  St_GetPrimaryKey(ARandom:integer):string;
     function  St_GetCalcFld(AExpression:string;var ABeginPos:integer):string;
     function  St_Repeat(ASon:string;ANum:integer):widestring;
@@ -5996,5 +5999,23 @@ begin
 
 end;
 
+
+function TFhlKnl.st_DesDecrypt(str: string): string;
+const iv : array[0..7] of byte = ($12, $34,$56,$78,$90,$AB,$CD,$EF);
+var cnn:string;
+var key:string;
+begin
+  key:=   'CHY12345';
+  cnn:= unitDes.DecryStr(str, key , iv);
+  result:= cnn;//unitDes.DecryStr(str,'CYH12345', iv);
+end;
+
+function TFhlKnl.st_DesEncrypt(str: string): string;
+const iv : array[0..7] of byte = ($12, $34,$56,$78,$90,$AB,$CD,$EF);
+var    cnn :string;
+begin
+  cnn := unitDes.EncryStr(str,'CYH12345', iv);
+  result := cnn;
+end;
 
 end.
