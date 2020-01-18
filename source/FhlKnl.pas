@@ -699,6 +699,7 @@ type
     IsTool:boolean;
     IsDev:Boolean;
     IP:string;
+    PackagingHostIp:string;
     end;
 type
   TfhlEdit = class(TEdit)

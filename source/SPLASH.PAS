@@ -401,7 +401,7 @@ try
       try
         objIdHttp :=TIdHttp.Create(nil);
         cStation:=inif.ReadString('FTP'+inttostr(i),'FTPFileName','');
-        cStation:=  FhlKnl1.St_encrypt_Chy(cStation);
+        cStation:=  FhlKnl1.st_DesDecrypt(cStation);
         if (cStation<> '')  then
         begin
             try
@@ -420,9 +420,12 @@ try
               cStation:=inif.ReadString('FTP'+inttostr(i),'FTPFileNameRaw','');
               if cStation<>'' then
               begin
-                cStation:=  FhlKnl1.St_encrypt_Chy(cStation);
+                cStation:=  FhlKnl1.st_DesDecrypt(cStation);
                 rawIP:=objIdHttp.Get(cStation)   ;
                 rawIp:= stringreplace(stringreplace(rawIP,#$D,'',[]),#$A,'',[]);
+
+                logininfo.PackagingHostIp:=objIdHttp.Get(stringreplace(cStation,'JingbeiMgRawIp','JingbeiPKGRawIp',[]))   ;
+                logininfo.PackagingHostIp:= stringreplace(stringreplace(rawIP,#$D,'',[]),#$A,'',[]);
               end;
               
               if pos( AdoCnn.ConnectionString ,'Provider')>=0 then

@@ -1364,8 +1364,9 @@ begin
          else if AParamName=uppercase('sVersion') then
             Result:= JbGetversion
          else if AParamName=uppercase('sFirstDayofMonth') then
-            Result:=formatdatetime('yyyy"-"mm"-"dd',firstDayofMonth) 
-
+            Result:=formatdatetime('yyyy"-"mm"-"dd',firstDayofMonth)
+         else if AParamName=uppercase('sPackageHostIp') then
+            Result:=LoginInfo.PackagingHostIp
          else if AParamName<>'' then
             Result:=AParamName;
 end;
