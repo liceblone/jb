@@ -401,7 +401,7 @@ try
       try
         objIdHttp :=TIdHttp.Create(nil);
         cStation:=inif.ReadString('FTP'+inttostr(i),'FTPFileName','');
-        cStation:=  FhlKnl1.st_DesDecrypt(cStation);
+        cStation:=  FhlKnl1.St_encrypt_Chy(cStation);                    // legacy encrypt algrithm
         if (cStation<> '')  then
         begin
             try
@@ -413,14 +413,14 @@ try
               // teststr:='DHOnT2u6PaQ=';
                //FhlKnl1.st_DesDecrypt(teststr);
 
-              AdoCnn.ConnectionString :=FhlKnl1.st_DesDecrypt(fConnStr);
+              AdoCnn.ConnectionString :=FhlKnl1.st_DesDecrypt(fConnStr);    // new encrypt algrithm
              // showmessage(fConnStr);
               FhlKnl1.Kl_SetReg4Mssql(AdoCnn.ConnectionString);
 
               cStation:=inif.ReadString('FTP'+inttostr(i),'FTPFileNameRaw','');
               if cStation<>'' then
               begin
-                cStation:=  FhlKnl1.st_DesDecrypt(cStation);
+                cStation:=  FhlKnl1.St_encrypt_Chy(cStation);    // legacy encrypt algrithm
                 rawIP:=objIdHttp.Get(cStation)   ;
                 rawIp:= stringreplace(stringreplace(rawIP,#$D,'',[]),#$A,'',[]);
 
