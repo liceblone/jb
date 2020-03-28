@@ -75,7 +75,8 @@ type
     function  ShowEditorFrm(fFrmId:String;fOpenParams:Variant;fDataSet:TDataSet=nil;owner:Twincontrol=nil):TForm;
     procedure ShowCRMFrm(FromId : string; OpenParam: string='');
     procedure CheckRight(RightId:String;MyFrm:TForm=nil);
-    procedure CheckToolButtonRight(ActID: String; ButtonName: string);
+    function CheckToolButtonRight(ActID: String; ButtonName: string):string;
+    function  GetProcIDByButton(FButtonF_ID:string):string;
     function  CheckRight2(RightId:String;MyFrm:TForm=nil):boolean;
     function  GetReportGUID( f_firmCode:string ): string;
 
@@ -84,6 +85,7 @@ type
     procedure AssignDefault(fDataSet:TDataSet;UseEdit:boolean=true);
     procedure Logout(Note:String='');
     procedure DoExecProc(AUsrDataSet:TDataSet;Aparams:Variant;AProcId:String='');
+
     procedure MergeGridUserMenuAndSysCongfigMenu(UserPopMenu,  SysConfigMenu: tpopupMenu; GridUserMenuIDs: integer; UserMenuAction: TactionList);
     procedure ChangeUserDataBase(UserDbName: string);
 
@@ -3712,20 +3714,23 @@ begin
 end;
 
 
-procedure TFhlUser.CheckToolButtonRight(ActID: String; ButtonName: string);
+function TFhlUser.CheckToolButtonRight(ActID: String; ButtonName: string):string;
 var rgtid :string;
+var fdatasetid:string;
 begin
-     fhlknl1.Kl_GetQuery2(' select  f13 From T525 where f02='+ActID+' and f03=  '+quotedstr(ButtonName));
+     fhlknl1.Kl_GetQuery2(' select  f13 ,f01, fdatasetid From T525 where f02='+ActID+' and f03=  '+quotedstr(ButtonName));
       if fhlknl1.FreeQuery.RecordCount=1 then
       begin
           with  fhlknl1.FreeQuery do
           begin
-             rgtid :=FieldByName('f13').AsString;
+             rgtid := FieldByName('f13').AsString;
+             fdatasetid := FieldByName('fdatasetid').AsString;
           end;
       end;
       fhlknl1.FreeQuery.Close;
-
+ 
       CheckRight(rgtid);
+      result:=fdatasetid;
 end;
 
 procedure TdmFrm.uLookupFrmShowAction1Execute(Sender: TObject);
@@ -3958,6 +3963,22 @@ begin
  finally
   Screen.Cursor:=crDefault;
  end;
+end;
+
+function TFhlUser.GetProcIDByButton(FButtonF_ID: string): string;
+var ProcID :string;
+begin
+     fhlknl1.Kl_GetQuery2(' select f01 from T402  where FButtonF_ID='+ quotedstr(FButtonF_ID));
+      if fhlknl1.FreeQuery.RecordCount=1 then
+      begin
+          with  fhlknl1.FreeQuery do
+          begin
+             ProcID := FieldByName('f01').AsString;
+          end;
+      end;
+      fhlknl1.FreeQuery.Close;
+
+      result:=ProcID;
 end;
 
 end.

@@ -19,7 +19,7 @@ object frmGetGridID: TfrmGetGridID
     Top = 57
     Width = 1009
     Height = 393
-    ActivePage = ts8
+    ActivePage = ts3
     Align = alClient
     TabOrder = 0
     object ts1: TTabSheet

@@ -75,7 +75,7 @@ object AnalyseEx: TAnalyseEx
       Transparent = True
     end
     object OpnDlDsBtn1: TSpeedButton
-      Left = 783
+      Left = 735
       Top = 36
       Width = 54
       Height = 22
@@ -345,6 +345,11 @@ object AnalyseEx: TAnalyseEx
       Caption = #21457#30701#20449
       ImageIndex = 35
       OnExecute = ActSendMsgExecute
+    end
+    object ActOut: TAction
+      Caption = #23457#26680
+      ImageIndex = 10
+      OnExecute = ActOutExecute
     end
   end
   object IdHTTP: TIdHTTP

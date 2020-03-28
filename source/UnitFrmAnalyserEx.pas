@@ -54,6 +54,7 @@ type
     ActWrArchive: TAction;
     ActSendMsg: TAction;
     IdHTTP: TIdHTTP;
+    ActOut: TAction;
 
     procedure OpnDlDsBtn1Click(Sender: TObject);
     procedure printAction0Execute(Sender: TObject);
@@ -92,6 +93,7 @@ type
     procedure ActWrArchiveExecute(Sender: TObject);
     procedure ActSendMsgExecute(Sender: TObject);
     function SendSms(sms, MobilePhoneNo:string):boolean;
+    procedure ActOutExecute(Sender: TObject);
   private
     fDict:TAnalyserDictEX;
     FrmWrArchive : TFrmWrArchive ;
@@ -264,6 +266,8 @@ begin
 
     if self.BtnSum.Down then
     self.DBGdCurrent.ReflashSumValues;
+
+    self.pbIteration.Visible := false;
 end;
 
 procedure TAnalyseEx.printAction0Execute(Sender: TObject);
@@ -731,13 +735,20 @@ begin
   if  DBGdCurrent.DataSource.DataSet.IsEmpty then Exit;
   fBillType:=DBGdCurrent.DataSource.DataSet.FieldByName('BillType').AsString  ;
   frmid:=DBGdCurrent.DataSource.DataSet.FieldByName('FormID').AsString      ;
-  tmpWindowsFID:=DBGdCurrent.DataSource.DataSet.FieldByName('FWindowsFID').AsString      ;
+
+  if DBGdCurrent.DataSource.DataSet.FindField('FWindowsFID') <> nil then
+     tmpWindowsFID := DBGdCurrent.DataSource.DataSet.FieldByName('FWindowsFID').AsString;
+
+
+
   if Trim( frmid )='' then Exit;
 
   try
       try
         LstParameterFLDs:=Tstringlist.Create ;
- 
+        if DBGdCurrent.DataSource.DataSet.FindField('ParameterFLDs') <> nil then
+            LstParameterFLDs.CommaText :=self.DBGdCurrent.DataSource.DataSet.FieldByName('ParameterFLDs').AsString      ;//  fDict.QryParamsFLDs ;
+
         if uppercase(fBillType)=uppercase('Analyser') then
         begin
             if DBGdCurrent.DataSource.DataSet .FindField('sDefaultVals')<>nil then
@@ -758,16 +769,8 @@ begin
             form.InitFrm(frmid,null);
             form.Showmodal;
         end;
-           {
-        if uppercase(fBillType)=uppercase('Editor') then
-        begin
-            if DBGdCurrent.DataSource.DataSet.FindField('sDefaultVals')<>nil then
-              sDefaultVals:=DBGdCurrent.DataSource.DataSet.fieldbyname('sDefaultVals').AsString;
-            EditorFrm:=TEditorFrm.Create(self);
-            EditorFrm.InitFrm(FrmId,DBGdCurrent.DataSource.DataSet.fieldbyname(fhlknl1.FreeQuery.FieldByName('F20').AsString).AsString,DBGdCurrent.DataSource.DataSet ,DBGdCurrent ,fhlknl1.FreeQuery.FieldByName('F20').AsString  ) ;
-            EditorFrm.ShowModal ;
-            EditorFrm.Free ;
-        end;
+           
+  {
         if uppercase(fBillType)=uppercase('CRM') then
         begin
 
@@ -776,22 +779,29 @@ begin
             FhlUser.ShowCRMFrm(frmid);
         end;
         }
-        if (uppercase(fBillType)=uppercase('BillEx') ) or ( uppercase(fBillType)=uppercase('bill') ) then
-            if not self.DBGdCurrent.DataSource.DataSet.IsEmpty then
-                begin
-                  LstParameterFLDs.CommaText :=self.DBGdCurrent.DataSource.DataSet.FieldByName('ParameterFLDs').AsString      ;//  fDict.QryParamsFLDs ;
-                  for i:=0 to  LstParameterFLDs.Count -1 do
-                  begin
-                    if   self.DBGdCurrent.DataSource.DataSet.FindField (LstParameterFLDs[i])<>nil then
-                    begin
-                       if self.DBGdCurrent.DataSource.DataSet.FieldByName (LstParameterFLDs[i]).AsString <>'' then
-                       begin
-                           Code:=self.DBGdCurrent.DataSource.DataSet.FieldByName (LstParameterFLDs[i]).AsString  ;
-                           break;
-                       end;
-                    end;
-                  end;
-                end;
+        if LstParameterFLDs.count>0 then
+            for i:=0 to  LstParameterFLDs.Count -1 do
+            begin
+              if   self.DBGdCurrent.DataSource.DataSet.FindField (LstParameterFLDs[i])<>nil then
+              begin
+                 if self.DBGdCurrent.DataSource.DataSet.FieldByName (LstParameterFLDs[i]).AsString <>'' then
+                 begin
+                     Code:=self.DBGdCurrent.DataSource.DataSet.FieldByName (LstParameterFLDs[i]).AsString  ;
+                     break;
+                 end;
+              end;
+            end;
+            
+
+        if uppercase(fBillType)=uppercase('Editor') then
+        begin
+            if DBGdCurrent.DataSource.DataSet.FindField('sDefaultVals')<>nil then
+              sDefaultVals:=DBGdCurrent.DataSource.DataSet.fieldbyname('sDefaultVals').AsString;
+            EditorFrm:=TEditorFrm.Create(self);
+            EditorFrm.InitFrm(FrmId,code ,DBGdCurrent.DataSource.DataSet ,DBGdCurrent    ) ;
+            EditorFrm.ShowModal ;
+            EditorFrm.Free ;
+        end;
 
         if uppercase(fBillType)=uppercase('Bill') then
         begin
@@ -1060,25 +1070,47 @@ end;
 procedure TAnalyseEx.ActSendMsgExecute(Sender: TObject);
 var sms, MobilePhoneNo:string;
 var BookMark :TBookMark;
+var i:integer;
 begin
   if  (DBGdCurrent.DataSource.DataSet.FindField('FSms')<>nil )  and
        (DBGdCurrent.DataSource.DataSet.FindField('FMobilePhoneNo')<>nil) then
   begin
-    sms := DBGdCurrent.DataSource.DataSet.FieldByName('FSms').AsString ;
-    MobilePhoneNo :=  DBGdCurrent.DataSource.DataSet.FieldByName('FMobilePhoneNo').AsString ;
-    if DBGdCurrent.DataSource.DataSet.FieldByName('ActualPaymentCAL').AsFloat >0 then
-    if ( sms <> '' ) and ( MobilePhoneNo <>'' ) then
+    if (DBGdCurrent.SelectedRows.Count =0) then
     begin
-      SendSms  ('【浙江晶贝电子】'+sms, MobilePhoneNo) ;
-      BookMark := DBGdCurrent.DataSource.DataSet.GetBookMark;
-      DBGdCurrent.DataSource.DataSet.Edit;
-      DBGdCurrent.DataSource.DataSet.FieldByName('FSmsSendTime').Value := now;// smalldatetime
-      DBGdCurrent.DataSource.DataSet.Post;
+        MessageDlg('请先点选记录', mtInformation, [mbok],0);
+        abort;
+    end;
+    Screen.Cursor:=crHourGlass;
+    if dgMultiSelect in DBGdCurrent.Options then
+    begin
+      pbIteration.Visible :=true;
+      pbIteration.Max :=DBGdCurrent.SelectedRows.Count-1 ;
+
+      for i:=0 to DBGdCurrent.SelectedRows.Count-1 do
+      begin
+        Application.ProcessMessages;
+        pbIteration.Position :=i;
+        DBGdCurrent.DataSource.DataSet.GotoBookMark(Pointer(DBGdCurrent.SelectedRows.Items[i]));
+
+        sms := DBGdCurrent.DataSource.DataSet.FieldByName('FSms').AsString ;
+        MobilePhoneNo :=  DBGdCurrent.DataSource.DataSet.FieldByName('FMobilePhoneNo').AsString ;
+        if DBGdCurrent.DataSource.DataSet.FieldByName('ActualPaymentCAL').AsFloat >0 then
+        if ( sms <> '' ) and ( MobilePhoneNo <>'' ) then
+        begin
+          SendSms  ('【浙江晶贝电子】'+sms, MobilePhoneNo) ;
+          DBGdCurrent.DataSource.DataSet.Edit;
+          DBGdCurrent.DataSource.DataSet.FieldByName('FSmsSendTime').Value := now;// smalldatetime
+
+        end;
+      end;
+      if ( DBGdCurrent.DataSource.DataSet.State in [dsedit]) then
+        DBGdCurrent.DataSource.DataSet.Post;
       DBGdCurrent.DataSource.DataSet.Close;
       DBGdCurrent.DataSource.DataSet.Open;
-      DBGdCurrent.DataSource.DataSet.GotoBookmark(BookMark);
+      //DBGdCurrent.DataSource.DataSet.GotoBookmark(BookMark);
     end;
   end;
+  Screen.Cursor:=crDefault;
 end;
 
 function TAnalyseEx.SendSms(sms, MobilePhoneNo: string): boolean;
@@ -1113,6 +1145,42 @@ begin
 
     Screen.Cursor := crDefault;
     ParamLst.Free;
+  end;
+end;
+
+procedure TAnalyseEx.ActOutExecute(Sender: TObject);
+var
+  fbk:TBookmark;
+  i:integer;
+  ProcID,fdatasetid:string;
+begin
+
+  fdatasetid := FhlUser.CheckToolButtonRight(self.fDict.Actions, (sender as Taction).Name );
+  try
+    Screen.Cursor:=crHourGlass;
+    fbk:=DBGdCurrent.DataSource.DataSet .GetBookmark;
+
+    if dgMultiSelect in DBGdCurrent.Options then
+    begin
+      pbIteration.Visible :=true;
+      if DBGdCurrent.SelectedRows.Count>=1 then
+      pbIteration.Max :=DBGdCurrent.SelectedRows.Count-1 ;
+      for i:=0 to DBGdCurrent.SelectedRows.Count-1 do
+      begin
+        pbIteration.Position :=i;
+        DBGdCurrent.DataSource.DataSet.GotoBookMark(Pointer(DBGdCurrent.SelectedRows.Items[i]));
+        FhlUser.DoExecProc(DBGdCurrent.DataSource.DataSet ,null, fdatasetid);
+      end;
+    end
+    else
+    begin
+      FhlUser.DoExecProc(DBGdCurrent.DataSource.DataSet ,null,fdatasetid);
+    end;
+    FhlKnl1.Ds_RefreshDataSet(DBGdCurrent.DataSource.DataSet );
+    pbIteration.Visible :=false;
+    DBGdCurrent.DataSource.DataSet .GotoBookmark(fbk);
+  finally
+    Screen.Cursor:=crDefault;
   end;
 end;
 

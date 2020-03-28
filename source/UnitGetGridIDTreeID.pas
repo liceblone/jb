@@ -367,6 +367,8 @@ type
     procedure lstFieldsClick(Sender: TObject);
     procedure btnT205Click(Sender: TObject);
     procedure dbedt85Change(Sender: TObject);
+    procedure OpenDatasetConfig();
+    procedure OpenGridConfig();
   private
     { Private declarations }
   public
@@ -385,37 +387,18 @@ implementation
 procedure TfrmGetGridID.btnopenClick(Sender: TObject);
 begin
     case pgc1.TabIndex of
-    0:
-        begin
-             if self.dlgridid<>'' then
-                fhlknl1.Ds_OpenDataSet(dsT504,self.dlgridid )    ;
-             if self.edtgridID.text<>''   then
-                fhlknl1.Ds_OpenDataSet(dsT504,self.edtgridID.Text  )
-             else fhlknl1.Ds_OpenDataSet(dsT504,'0') ;
-        end;
-    1:   begin
+      0:
+          begin
+               OpenGridConfig();
+          end;
+      1:   begin
 
+               OpenDatasetConfig()  ;
 
+           end;
+      2:   if self.treeviewid<>'' then          fhlknl1.Ds_OpenDataSet(dsGetTreeIDT507,self.treeviewid  )         else          fhlknl1.Ds_OpenDataSet(dsGetTreeIDT507,'7'  );
 
-                if self.mtdatasetid<>''
-                then fhlknl1.Ds_OpenDataSet(dsT201,self.mtdatasetid )  ;
-
-                if edtmtdatasetID.Text ='' then
-                   edtmtdatasetID.Text:='1';
-
-                  fhlknl1.Ds_OpenDataSet(dsT201, edtmtdatasetID.Text );
-                  GetExistFields(lstFields,edtmtdatasetID.Text);
-                  fhlknl1.Ds_OpenDataSet(dsT204, edtmtdatasetID.Text );    //befor post
-                  fhlknl1.Ds_OpenDataSet(dsT203, edtmtdatasetID.Text );    //befor delete
-
-
-                   fhlknl1.Ds_OpenDataSet(dsT402, edtmtdatasetID.Text  );
-
-
-         end;
-    2:   if self.treeviewid<>'' then          fhlknl1.Ds_OpenDataSet(dsGetTreeIDT507,self.treeviewid  )         else          fhlknl1.Ds_OpenDataSet(dsGetTreeIDT507,'7'  );
-
-    3:   if self.edtmtdatasetID.Text <>'' then          fhlknl1.Ds_OpenDataSet(dsT402,edtmtdatasetID.Text   )         else          fhlknl1.Ds_OpenDataSet(dsT402,'628'  );
+      3:   if self.edtmtdatasetID.Text <>'' then          fhlknl1.Ds_OpenDataSet(dsT402,edtmtdatasetID.Text   )         else          fhlknl1.Ds_OpenDataSet(dsT402,'628'  );
 
 
     end;
@@ -608,6 +591,31 @@ procedure TfrmGetGridID.dbedt85Change(Sender: TObject);
 begin
 if    dbedt85.Text <>'' then
 lstfieldtype.ItemIndex :=strtoint(dbedt85.Text );
+end;
+
+procedure TfrmGetGridID.OpenDatasetConfig;
+begin
+    if self.mtdatasetid<>'' then fhlknl1.Ds_OpenDataSet(dsT201,self.mtdatasetid )  ;
+
+    if edtmtdatasetID.Text ='' then  edtmtdatasetID.Text:='1';
+
+    fhlknl1.Ds_OpenDataSet(dsT201, edtmtdatasetID.Text );
+    GetExistFields(lstFields,edtmtdatasetID.Text);
+    fhlknl1.Ds_OpenDataSet(dsT204, edtmtdatasetID.Text );    //befor post
+    fhlknl1.Ds_OpenDataSet(dsT203, edtmtdatasetID.Text );    //befor delete
+
+    fhlknl1.Ds_OpenDataSet(dsT402, edtmtdatasetID.Text  );
+end;
+
+procedure TfrmGetGridID.OpenGridConfig;
+begin
+    if self.dlgridid<>'' then
+      fhlknl1.Ds_OpenDataSet(dsT504,self.dlgridid )    ;
+    if self.edtgridID.text<>''   then
+      fhlknl1.Ds_OpenDataSet(dsT504,self.edtgridID.Text  )
+    else fhlknl1.Ds_OpenDataSet(dsT504,'0') ;
+
+    OpenDatasetConfig();
 end;
 
 end.
