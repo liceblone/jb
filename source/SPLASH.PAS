@@ -425,7 +425,7 @@ try
                 rawIp:= stringreplace(stringreplace(rawIP,#$D,'',[]),#$A,'',[]);
 
                 logininfo.PackagingHostIp:=objIdHttp.Get(stringreplace(cStation,'JingbeiMgRawIp','JingbeiPKGRawIp',[]))   ;
-                logininfo.PackagingHostIp:= stringreplace(stringreplace(rawIP,#$D,'',[]),#$A,'',[]);
+                logininfo.PackagingHostIp:= stringreplace(stringreplace(logininfo.PackagingHostIp,#$D,'',[]),#$A,'',[]);
               end;
               
               if pos( AdoCnn.ConnectionString ,'Provider')>=0 then

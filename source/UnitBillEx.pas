@@ -2085,7 +2085,7 @@ begin
 if self.fBillex.ID   ='6' then
   GeneratorBarcode('PhOrdFID') ;
 
-if self.fBillex.ID   ='23' then
+if ( (self.fBillex.ID   ='23') or (self.fBillex.ID   ='31')) then
   GeneratorBarcode('F_ID')  ;
 
 end;
