@@ -137,6 +137,7 @@ type
     procedure  SetLock(lock:boolean);
     procedure ActPrint2Execute(Sender: TObject);
     procedure HidePriceAmtFields(hide:boolean);
+        procedure SetIsPrinted;
   private
 
     fBtmBoxMaxHeight,fBtmBoxMinHeight:Integer;
@@ -530,7 +531,7 @@ begin
   Screen.Cursor:=crSqlWait;
   bk:=dlDataSet1.GetBookmark;
   dlDataSet1.DisableControls;
-
+  SetIsPrinted;
   //hide field
   RepBillFrm:=TRepBillFrm.Create(Application);
   try
@@ -1519,7 +1520,7 @@ begin
   Screen.Cursor:=crSqlWait;
   bk:=dlDataSet1.GetBookmark;
   dlDataSet1.DisableControls;
-
+  SetIsPrinted;
   HidePriceAmtFields(true);
   //hide field
   RepBillFrm:=TRepBillFrm.Create(Application);
@@ -1547,6 +1548,27 @@ begin
           dbgrid1.Columns[i].Visible := not hide;
        end
   end;
+end;
+
+procedure TBillFrm.SetIsPrinted;
+var msg:string;
+begin
+    if  mtDataSet1.Active  and ( mtDataSet1.FindField('isprinted')<>nil ) then
+    begin
+       //if not mtdataset1.FieldByName('isprinted' ).AsBoolean then
+       begin
+            if not  dmFrm.ExecStoredProc('Pr_sl_invoice_Print',varArrayof([LoginInfo.WhId, fbilldict.BillCode,LoginInfo.EmpId])) then
+            begin
+                  if dmFrm.FreeStoredProc1.Parameters.Items[1].Direction  =pdOutput then
+                  begin
+                    Msg:=dmFrm.FreeStoredProc1.Parameters.Items[1].Value;
+                    MessageDlg(#13#10+Msg,mtError,[mbOk],0);
+                    Abort;
+                  end;
+            end;
+            // fhlknl1.Kl_GetUserQuery('update   sl_invoice set isprinted= 1 where code ='+quotedstr(self.fBillex.BillCode), false);
+       end;
+    end;
 end;
 
 end.
