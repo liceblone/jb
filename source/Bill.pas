@@ -137,7 +137,7 @@ type
     procedure  SetLock(lock:boolean);
     procedure ActPrint2Execute(Sender: TObject);
     procedure HidePriceAmtFields(hide:boolean);
-        procedure SetIsPrinted;
+    procedure SetIsPrinted;
   private
 
     fBtmBoxMaxHeight,fBtmBoxMinHeight:Integer;
@@ -531,10 +531,11 @@ begin
   Screen.Cursor:=crSqlWait;
   bk:=dlDataSet1.GetBookmark;
   dlDataSet1.DisableControls;
-  SetIsPrinted;
-  //hide field
-  RepBillFrm:=TRepBillFrm.Create(Application);
+
   try
+    //hide field
+    RepBillFrm:=TRepBillFrm.Create(Application);
+    SetIsPrinted;
     RepBillFrm.SetBillRep(fbilldict.TopBoxId,fbilldict.BtmBoxId,mtDataSet1,DbGrid1);
     RepBillFrm.PreviewModal;//Preview;
   finally
@@ -1519,12 +1520,12 @@ begin
   FhlUser.CheckRight(fbilldict.PrintRitId);
   Screen.Cursor:=crSqlWait;
   bk:=dlDataSet1.GetBookmark;
-  dlDataSet1.DisableControls;
-  SetIsPrinted;
-  HidePriceAmtFields(true);
-  //hide field
-  RepBillFrm:=TRepBillFrm.Create(Application);
+  dlDataSet1.DisableControls; 
   try
+     //hide field
+    RepBillFrm:=TRepBillFrm.Create(Application);
+    SetIsPrinted;
+    HidePriceAmtFields(true);
     RepBillFrm.SetBillRep(fbilldict.TopBoxId,'145',mtDataSet1,DbGrid1);
     RepBillFrm.PreviewModal;//Preview;
 
@@ -1555,8 +1556,11 @@ var msg:string;
 begin
     if  mtDataSet1.Active  and ( mtDataSet1.FindField('isprinted')<>nil ) then
     begin
-       //if not mtdataset1.FieldByName('isprinted' ).AsBoolean then
+       if   mtdataset1.FindField('isprinted' )<>nil then
        begin
+            if (mtdataset1.FieldByName('isprinted').Value <> null) and  (MessageDlg('该单据已经打印，确定需要再次打印？',mtConfirmation,[mbYes,mbNo],0)=mrNo)   then
+              abort;
+              
             if not  dmFrm.ExecStoredProc('Pr_sl_invoice_Print',varArrayof([LoginInfo.WhId, fbilldict.BillCode,LoginInfo.EmpId])) then
             begin
                   if dmFrm.FreeStoredProc1.Parameters.Items[1].Direction  =pdOutput then

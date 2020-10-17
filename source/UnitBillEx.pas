@@ -2220,6 +2220,7 @@ begin
     mtDataSet1.Open;
     RepBillFrm.SetBillRep(self.fBillex .TopBoxId,fBillex.BtmBoxId,mtDataSet1,self.DBGridDL);
     RepBillFrm.PreviewModal;//Preview;
+    
   finally
     FreeAndNil(RepBillFrm);
     dlDataSet1.EnableControls;
@@ -2301,7 +2302,7 @@ begin
     mtDataSet1.Open;
     RepBillFrm.SetBillRep(fBillex.TopBoxId,'145',mtDataSet1, self.DBGridDL);
     RepBillFrm.PreviewModal;//Preview;
-
+    
     HidePriceAmtFields(false);
   finally
     FreeAndNil(RepBillFrm);
@@ -2507,9 +2508,12 @@ var msg:string;
 begin
     if  mtDataSet1.Active  and ( mtDataSet1.FindField('isprinted')<>nil ) then
     begin
-       //if not mtdataset1.FieldByName('isprinted' ).AsBoolean then
+       if   mtdataset1.FindField('isprinted' )<>nil then
        begin
-            if not  dmFrm.ExecStoredProc('Pr_sl_invoice_Print',varArrayof([LoginInfo.WhId,fBillex.billcode,LoginInfo.EmpId])) then
+            if (mtdataset1.FieldByName('isprinted').Value <> null) and  (MessageDlg('该单据已经打印，确定需要再次打印？',mtConfirmation,[mbYes,mbNo],0)=mrNo)   then
+              abort;
+
+            if  not  dmFrm.ExecStoredProc('Pr_sl_invoice_Print',varArrayof([LoginInfo.WhId,fBillex.billcode,LoginInfo.EmpId])) then
             begin
                   if dmFrm.FreeStoredProc1.Parameters.Items[1].Direction  =pdOutput then
                   begin

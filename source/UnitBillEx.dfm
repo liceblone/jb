@@ -1,6 +1,6 @@
 object FrmBillEx: TFrmBillEx
-  Left = 383
-  Top = 197
+  Left = 217
+  Top = 100
   Width = 1215
   Height = 647
   Caption = 'FrmBillEx'
@@ -25,8 +25,8 @@ object FrmBillEx: TFrmBillEx
   object Panel1: TPanel
     Left = 0
     Top = 43
-    Width = 1207
-    Height = 561
+    Width = 1199
+    Height = 549
     Align = alClient
     BevelOuter = bvLowered
     Caption = 'Panel1'
@@ -34,7 +34,7 @@ object FrmBillEx: TFrmBillEx
     object Splitter1: TSplitter
       Left = 1
       Top = 421
-      Width = 1205
+      Width = 1197
       Height = 8
       Cursor = crVSplit
       Align = alTop
@@ -42,7 +42,7 @@ object FrmBillEx: TFrmBillEx
     object Splitter2: TSplitter
       Left = 1
       Top = 49
-      Width = 1205
+      Width = 1197
       Height = 2
       Cursor = crVSplit
       Align = alTop
@@ -50,8 +50,8 @@ object FrmBillEx: TFrmBillEx
     object ScrollBtm: TScrollBox
       Left = 1
       Top = 429
-      Width = 1205
-      Height = 131
+      Width = 1197
+      Height = 119
       Align = alClient
       AutoSize = True
       BorderStyle = bsNone
@@ -63,7 +63,7 @@ object FrmBillEx: TFrmBillEx
     object ScrollTop: TScrollBox
       Left = 1
       Top = 1
-      Width = 1205
+      Width = 1197
       Height = 48
       Align = alTop
       BorderStyle = bsNone
@@ -72,12 +72,12 @@ object FrmBillEx: TFrmBillEx
       TabOrder = 0
       OnDblClick = ScrollTopDblClick
       DesignSize = (
-        1205
+        1197
         48)
       object Label3: TLabel
         Left = 0
         Top = 21
-        Width = 1205
+        Width = 1197
         Height = 4
         Align = alTop
         Alignment = taRightJustify
@@ -106,7 +106,7 @@ object FrmBillEx: TFrmBillEx
       object LblTitle: TLabel
         Left = 0
         Top = 0
-        Width = 1205
+        Width = 1197
         Height = 21
         Align = alTop
         Alignment = taCenter
@@ -131,7 +131,7 @@ object FrmBillEx: TFrmBillEx
     object PnlFunction: TPanel
       Left = 1
       Top = 51
-      Width = 1205
+      Width = 1197
       Height = 50
       Align = alTop
       TabOrder = 1
@@ -139,7 +139,7 @@ object FrmBillEx: TFrmBillEx
       object GroupBox1: TGroupBox
         Left = 1
         Top = 1
-        Width = 1203
+        Width = 1195
         Height = 48
         Align = alClient
         Caption = #35760#24405#23450#20301
@@ -185,7 +185,7 @@ object FrmBillEx: TFrmBillEx
     object PnlContent: TPanel
       Left = 1
       Top = 101
-      Width = 1205
+      Width = 1197
       Height = 320
       Align = alTop
       Caption = 'PnlContent'
@@ -209,14 +209,14 @@ object FrmBillEx: TFrmBillEx
       object PnlGrid: TPanel
         Left = 205
         Top = 1
-        Width = 852
+        Width = 844
         Height = 318
         Align = alClient
         Caption = 'PnlGrid'
         TabOrder = 1
       end
       object PnlRight: TPanel
-        Left = 1057
+        Left = 1049
         Top = 1
         Width = 147
         Height = 318
@@ -229,8 +229,8 @@ object FrmBillEx: TFrmBillEx
     object PnlBtm: TPanel
       Left = 1
       Top = 429
-      Width = 1205
-      Height = 131
+      Width = 1197
+      Height = 119
       Align = alClient
       TabOrder = 3
       OnDblClick = PnlBtmDblClick
@@ -239,7 +239,7 @@ object FrmBillEx: TFrmBillEx
   object ControlBar1: TControlBar
     Left = 0
     Top = 0
-    Width = 1207
+    Width = 1199
     Height = 43
     Align = alTop
     AutoSize = True
@@ -355,8 +355,8 @@ object FrmBillEx: TFrmBillEx
   end
   object PgBarSave: TProgressBar
     Left = 0
-    Top = 604
-    Width = 1207
+    Top = 592
+    Width = 1199
     Height = 16
     Align = alBottom
     TabOrder = 2
