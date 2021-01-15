@@ -23,3 +23,12 @@ source/functions/*.dcu
 
 source/fastreport/*.~*
 source/fastreport/*.dcu
+/quickrpt/*.dcu
+/fr252D7/Source/*.dcu
+/BarCode/*.dcu
+/Cache/*.inf
+/*.ini
+/*.ini
+/jingbei.~dpr
+/jingbei.exe
+/Config.inf
