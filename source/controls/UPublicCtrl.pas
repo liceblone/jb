@@ -255,6 +255,9 @@ end;
     property CacheBarcodeImage:boolean read FCacheBarcodeImage write SetCacheBarcodeImage;
     property BarCodeShowText :boolean read FBarCodeShowText Write SetFBarCodeShowText; 
     end;
+
+TPrintEvent = procedure (sender: TObject) of object;
+
 implementation
 
 { Tedit_Mtn }

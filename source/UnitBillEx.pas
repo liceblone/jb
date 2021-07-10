@@ -224,7 +224,7 @@ type
     procedure ActExportExcelExecute(Sender: TObject);
     procedure ActSyncStickDataExecute(Sender: TObject);
     procedure ActPkgCompletedExecute(Sender: TObject);
-
+    procedure IncreasePrintCnt(sender: TObject);
   private
     { Private declarations }
     F_ParamData:TDataset;
@@ -255,6 +255,8 @@ type
     function   AddBarCode :boolean;
     function   RemoveBarCode :boolean;
     procedure  EnableDsCaculation(enabled:boolean) ;
+
+    procedure NeedApproval;
     procedure SetIsPrinted;
     function  AftSaveBillExecute:boolean;
     procedure RefreshLookUpDataset;
@@ -424,7 +426,7 @@ end;
 procedure TFrmBillEx.SetRitBtn;
 var LstChkState:Tstrings;
 begin
-    PrintAction1.Enabled:= ( mtDataSet1.Active ) and ( not mtDataSet1.IsEmpty  ) ;
+    PrintAction1.Enabled:= ( mtDataSet1.Active ) and ( not mtDataSet1.IsEmpty  )  and ( not (mtDataSet1.State in  [dsinsert,dsedit])  );
     ActSort.Enabled:= ( mtDataSet1.Active ) and ( not mtDataSet1.IsEmpty  ) ;
     ActOri.Enabled :=  ( mtDataSet1.Active ) and ( not mtDataSet1.IsEmpty  ) ;
     ActSLPrint.Enabled :=printAction1.Enabled;
@@ -852,6 +854,10 @@ begin
        SetRitBtn
     else
     begin
+     PrintAction1.Enabled:= ( mtDataSet1.Active ) and ( not mtDataSet1.IsEmpty  )  and ( not (mtDataSet1.State in  [dsBrowse ]));
+     ActSLPrint.Enabled :=printAction1.Enabled;
+     ActSLPrint2.Enabled :=printAction1.Enabled;
+
      NewAction1.Enabled:=IsEnabled;
      RemoveAction1.Enabled:=IsEnabled and (not mtDataSet1.IsEmpty );
      ActRemoveBill.Enabled :=  RemoveAction1.Enabled;
@@ -2209,13 +2215,16 @@ var
 begin
   RefreshAction1.Execute;     //refresh first
   FhlUser.CheckToolButtonRight(inttostr(fBillex.ActID),  (sender as Taction).Name );
+  NeedApproval;
+  
   Screen.Cursor:=crSqlWait;
   bk:=dlDataSet1.GetBookmark;
   dlDataSet1.DisableControls;
-   SetIsPrinted;
+   //SetIsPrinted;
   //hide field
   RepBillFrm:=TRepBillFrm.Create(Application);
   try
+    RepBillFrm.OnPrint := self.IncreasePrintCnt;
     mtDataSet1.Close;
     mtDataSet1.Open;
     RepBillFrm.SetBillRep(self.fBillex .TopBoxId,fBillex.BtmBoxId,mtDataSet1,self.DBGridDL);
@@ -2290,14 +2299,17 @@ var
 begin
   RefreshAction1.Execute;     //refresh first
   FhlUser.CheckToolButtonRight(inttostr(fBillex.ActID),  (sender as Taction).Name );
+  NeedApproval;
+  
   Screen.Cursor:=crSqlWait;
   bk:=dlDataSet1.GetBookmark;
   dlDataSet1.DisableControls;
-   SetIsPrinted;
+   //SetIsPrinted;
   HidePriceAmtFields(true);
   //hide field
   RepBillFrm:=TRepBillFrm.Create(Application);
   try
+    RepBillFrm.OnPrint := self.IncreasePrintCnt;
     mtDataSet1.Close;
     mtDataSet1.Open;
     RepBillFrm.SetBillRep(fBillex.TopBoxId,'145',mtDataSet1, self.DBGridDL);
@@ -2510,9 +2522,6 @@ begin
     begin
        if   mtdataset1.FindField('isprinted' )<>nil then
        begin
-            if (mtdataset1.FieldByName('isprinted').Value <> null) and  (MessageDlg('该单据已经打印，确定需要再次打印？',mtConfirmation,[mbYes,mbNo],0)=mrNo)   then
-              abort;
-
             if  not  dmFrm.ExecStoredProc('Pr_sl_invoice_Print',varArrayof([LoginInfo.WhId,fBillex.billcode,LoginInfo.EmpId])) then
             begin
                   if dmFrm.FreeStoredProc1.Parameters.Items[1].Direction  =pdOutput then
@@ -3552,6 +3561,26 @@ begin
     //self.dlDataSet1.Post;
 end;
 
+end;
+
+ 
+procedure TFrmBillEx.IncreasePrintCnt(sender: TObject);
+begin
+  SetIsPrinted;
+end;
+
+procedure TFrmBillEx.NeedApproval;
+var msg:string;
+begin
+    if  not  dmFrm.ExecStoredProc('Pr_CheckApproval',varArrayof([LoginInfo.WhId, fBillex.billcode, LoginInfo.EmpId, 'DeliveryBillPrintCount'])) then
+    begin
+        if dmFrm.FreeStoredProc1.Parameters.Items[1].Direction  =pdOutput then
+        begin
+          Msg:=dmFrm.FreeStoredProc1.Parameters.Items[1].Value;
+          MessageDlg(#13#10+Msg,mtError,[mbOk],0);
+          Abort;
+        end;
+    end;
 end;
 
 end.

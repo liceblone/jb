@@ -3,7 +3,7 @@ unit RepBill;
 interface
 
 uses Windows, SysUtils, Messages, Classes, Graphics, Controls,
-  StdCtrls, ExtCtrls, Forms, QuickRpt, QRCtrls,Db,DbGrids;
+  StdCtrls, ExtCtrls, Forms, QuickRpt, QRCtrls,Db,DbGrids ,UPublicCtrl;
 
 type
   TRepBillFrm = class(TQuickRep)
@@ -23,10 +23,11 @@ type
     pgcount: TQRLabel;
     ColumnHeaderBand1: TQRBand;
     procedure SetBillRep(fTopBoxId,fBtmBoxId:String;fMasterDataSet:TDataSet;fdbGrid:TDbGrid);
+    procedure QuickRepAfterPrint(Sender: TObject);
   private
 
   public
-
+    OnPrint:TPrintEvent;
   end;
 
 var
@@ -75,6 +76,11 @@ begin                  //2513
     QRPrinter:=Nil;
   end;
  
+end;
+
+procedure TRepBillFrm.QuickRepAfterPrint(Sender: TObject);
+begin
+  OnPrint(sender);
 end;
 
 end.
