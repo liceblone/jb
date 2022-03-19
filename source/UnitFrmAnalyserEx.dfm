@@ -312,7 +312,7 @@ object AnalyseEx: TAnalyseEx
       OnExecute = ActBatCodeListExecute
     end
     object ActExImport: TAction
-      Caption = 'Excel'#23548#20837
+      Caption = 'Excel'#23548#20837#30005#38459
       ImageIndex = 40
       OnExecute = ActExImportExecute
     end
@@ -350,6 +350,11 @@ object AnalyseEx: TAnalyseEx
       Caption = #23457#26680
       ImageIndex = 10
       OnExecute = ActOutExecute
+    end
+    object ImportRsExcel: TAction
+      Caption = #29790#33832#36164#26009#23548#20837
+      ImageIndex = 40
+      OnExecute = ImportRsExcelExecute
     end
   end
   object IdHTTP: TIdHTTP

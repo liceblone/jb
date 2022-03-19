@@ -55,6 +55,7 @@ type
     ActSendMsg: TAction;
     IdHTTP: TIdHTTP;
     ActOut: TAction;
+    ImportRsExcel: TAction;
 
     procedure OpnDlDsBtn1Click(Sender: TObject);
     procedure printAction0Execute(Sender: TObject);
@@ -94,6 +95,7 @@ type
     procedure ActSendMsgExecute(Sender: TObject);
     function SendSms(sms, MobilePhoneNo:string):boolean;
     procedure ActOutExecute(Sender: TObject);
+    procedure ImportRsExcelExecute(Sender: TObject);
   private
     fDict:TAnalyserDictEX;
     FrmWrArchive : TFrmWrArchive ;
@@ -1183,5 +1185,108 @@ begin
     Screen.Cursor:=crDefault;
   end;
 end;
+
+procedure TAnalyseEx.ImportRsExcelExecute(Sender: TObject);
+const
+  BeginRow = 2; BeginCol = 1;
+var
+  Excel: OleVariant;
+  iRow,iCol ,j : integer;
+  xlsFilename,cellValue,msg,ShortFileName,sql: string;
+  dlg:Topendialog;
+  ADOQuery1: TADOQuery; 
+begin
+  try
+      Screen.Cursor:=crSqlwait;
+      try
+        Excel := CreateOLEObject('Excel.Application');
+      except
+        Application.MessageBox('excel没有安装', '提示信息', MB_OK+MB_ICONASTERISK+MB_DEFBUTTON1+MB_APPLMODAL);
+        Exit;
+      end;
+
+     ADOQuery1:= TADOQuery.Create(nil);
+     ADOQuery1.Connection :=dmFrm.ADOConnection1;
+     dlg:= Topendialog.Create(nil);
+     dlg.Filter:='Excel文件(*.xls)|*.xls|Excel文件(*.xlsx)|*.xlsx'  ;
+     if not  dlg.Execute then
+        abort;
+
+        xlsFilename := dlg.FileName;
+        ShortFileName  := ExtractFileName(xlsFilename) ;
+
+        sql := 'if exists(select *  from TPesistorImport where FFileName ='+quotedstr(ShortFileName)+') select 1  else select 0';
+        fhlknl1.Kl_GetUserQuery( sql);
+        if fhlknl1.User_Query.Fields[0].Value>0 then
+        begin
+            showmessage(  ShortFileName +' 已经存在!');
+            abort;
+        end;
+
+
+
+        Excel.Visible := false;
+        Excel.WorkBooks.Open(xlsFilename);
+        try
+          iRow := BeginRow;
+          iCol := BeginCol;
+          ADOQuery1.close;
+          ADOQuery1.SQL.Clear;
+          ADOQuery1.SQL.Add('delete    TRsBarcodeImport where FFileName='+quotedstr(ShortFileName)) ;
+          ADOQuery1.ExecSQL;
+
+
+          ADOQuery1.close;
+          ADOQuery1.SQL.Clear;
+
+          ADOQuery1.SQL.Add('select ');
+          ADOQuery1.SQL.Add(' FBigPkgSeq,FSmallPkgSeq,OBNo,PDC_DN,Sold_To,Sold_ToName,PartNo,PartNo2,');
+          ADOQuery1.SQL.Add(' CustomerPO,PartNo3,PrintType,FQty,BatchNo,DateCode2,DateCode3,LOTNo1,LOTNo2,LOTNo3, ');
+          ADOQuery1.SQL.Add(' COO,CartonNo,SerialNo,PrintDate,VendorSpecialCode,EnvIcon1,EnvIcon2,EnvIcon3,CustomerPoItem ');
+          ADOQuery1.SQL.Add(' RowNo,FFileName ');
+          ADOQuery1.SQL.Add('  from TRsBarcodeImport  where 1<>1');
+
+          ADOQuery1.Open;
+          application.HandleMessage;
+          VerifyBarCodeExcelFormat(Excel);
+          cellValue:=  trim( Excel.WorkSheets[1].Cells[iRow,1].value );
+          while  ( cellValue ) <> '' do begin
+              ADOQuery1.Append;
+              for j:=0 to  ADOQuery1.FieldCount-1 do begin
+                with ADOQuery1 do begin
+                  cellValue:= trim(Excel.WorkSheets[1].Cells[iRow,j+1].value);
+                  Fields[j].AsString := cellValue ;
+                end;
+              end;
+              if (IRow mod 50 =0)   then
+                  application.HandleMessage;
+
+              ADOQuery1.FieldByName('RowNo').Value := iRow;
+              ADOQuery1.FieldByName('FFileName').Value := ShortFileName;
+             
+              iRow := iRow + 1;
+              ADOQuery1.post; 
+              cellValue:=  trim( Excel.WorkSheets[1].Cells[iRow,1].value );
+          end;
+          
+          ADOQuery1.UpdateStatus ;
+          msg :=   '数据导入成功,'+inttostr(iRow-BeginRow)+'行'   ;
+          MessageBox(GetActiveWindow(),pchar( msg) , '提示信息', MB_OK + MB_ICONWARNING);
+       except on E:Exception do
+            begin
+                msg := '导入数据出错'+E.Message ;
+               MessageDlg(#13#10+E.Message,mtError,[mbOk],0);
+            end;
+        end;
+
+  finally
+      Excel.Quit;
+      freeandnil(dlg);
+      freeandnil(ADOQuery1);
+      Screen.Cursor:=crDefault;
+  end;
+
+end;
+
 
 end.
