@@ -54,6 +54,7 @@ end;
 procedure TRepBarCodeFrm.SetBillRep( fdataset:TCustomADODataSet);
 var
    Barcode1 : TAsBarcode;
+   qrCode: TQRDBQRCodeImage;
    i, BarcodeColumnCnt, topMargin, VGap,VLeft :integer;
    ImageBarCode:TQRImage;
    dbText:TQRDBText;
@@ -84,8 +85,25 @@ begin
                dbText.Top:=topMargin;
                dbText.Left:=VLeft+ 1;//round(dbimage.Height/2)- round(dbText.Width/2);
 
+               qrCode:= TQRDBQRCodeImage.Create(self.DetailBand1);
+               qrCode.ResetWidthHeight (100,100);
+               qrCode.Parent:=self.DetailBand1;
+               qrCode.DataSet :=fdataset;
+               qrCode.DataField:='FBarCode';//+inttostr(i+1);
+               qrCode.Top:=topMargin;
+               qrCode.Left:=VLeft+ 170;//round(dbimage.Height/2)- round(dbText.Width/2);
+               qrCode.CacheQrcodeImage := BarCodePrintConfig.BarCodeConfig.bCacheBarcodeImage;
+
                dbText:= TQRDBText.Create(self.DetailBand1);
-               
+               dbText.Font.Size:=self.BarCodePrintConfig.BarCodeConfig.FontSize;
+               dbText.AutoSize:=true;
+               dbText.Parent:=self.DetailBand1;
+               dbText.DataSet :=fdataset;
+               dbText.DataField:='Brand';
+               dbText.Top:=topMargin ;;
+               dbText.Left:=VLeft + 120;
+
+               dbText:= TQRDBText.Create(self.DetailBand1);
                dbText.Font.Size:=self.BarCodePrintConfig.BarCodeConfig.FontSize;
                dbText.AutoSize:=true;
                dbText.Parent:=self.DetailBand1;
@@ -95,7 +113,6 @@ begin
                dbText.Left:=VLeft+ 100;//round(dbimage.Height/2)- round(dbText.Width/2);
 
                dbText:= TQRDBText.Create(self.DetailBand1);
-               
                dbText.Font.Size:=self.BarCodePrintConfig.BarCodeConfig.FontSize;
                dbText.AutoSize:=true;
                dbText.Parent:=self.DetailBand1;
@@ -114,14 +131,7 @@ begin
                dbText.Top:=topMargin +VGap;;
                dbText.Left:=VLeft;
 
-               dbText:= TQRDBText.Create(self.DetailBand1);
-               dbText.Font.Size:=self.BarCodePrintConfig.BarCodeConfig.FontSize;
-               dbText.AutoSize:=true;
-               dbText.Parent:=self.DetailBand1;
-               dbText.DataSet :=fdataset;
-               dbText.DataField:='Brand';
-               dbText.Top:=topMargin +VGap;;
-               dbText.Left:=VLeft + 60;
+
 
                dbText:= TQRDBText.Create(self.DetailBand1);
                dbText.Font.Size:=self.BarCodePrintConfig.BarCodeConfig.FontSize;
@@ -130,7 +140,7 @@ begin
                dbText.DataSet :=fdataset;
                dbText.DataField:='RsSurfix';
                dbText.Top:=topMargin +VGap;
-               dbText.Left:=VLeft+ 120;
+               dbText.Left:=VLeft+ 100;
 
 
                  dbText:= TQRDBText.Create(self.DetailBand1);

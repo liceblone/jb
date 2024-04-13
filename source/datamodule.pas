@@ -1565,7 +1565,7 @@ begin
     try
       dmFrm.ExecStoredProc('sys_Logout',varArrayof([LoginInfo.LoginTime,Note]));
     except
-//      MessageDlg(#13#10'不能写入登出日志!',mtError,[mbOk],0);
+      MessageDlg(#13#10'不能写入登出日志!',mtError,[mbOk],0);
     end;
 end;
 

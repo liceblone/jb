@@ -5,7 +5,8 @@ interface
   Dialogs,UnitAdoDataset,StdCtrls,Buttons,ExtCtrls,DBCtrls,Menus,winsock,UnitGrid,
   ComCtrls,ADODB,Grids,Editor,UPublicFunction,   QRPrntr,       barcode,barcode2 ,unitBarCodeTest ,
   QRCtrls, QuickRpt,  jpeg ,
-   DB,FhlKnl,datamodule,DBGrids,ActnList;
+  DB,FhlKnl,datamodule,DBGrids,ActnList,
+  DelphiZXingQRCode;
 
   function isinteger(value:string):boolean;
   function LocalIP:string;
@@ -256,6 +257,50 @@ end;
     property BarCodeShowText :boolean read FBarCodeShowText Write SetFBarCodeShowText; 
     end;
 
+ type TQRDBQRCodeImage=class(TQRPrintable)
+ private
+    FField : TField;
+    FDataSet : TDataSet;
+    FDataField : string;
+
+    FPictureLoaded: boolean;
+    FRatio:double;
+    FCacheQrcodeImage: boolean;
+
+    QRCode: TDelphiZXingQRCode;
+    FStretch: boolean;
+
+    procedure PictureChanged(Sender: TObject);
+    procedure SetDataField(const Value: string);
+    procedure SetDataSet(Value: TDataSet);
+    procedure setRatio(const Value: double);
+    procedure SetCacheBarcodeImage(const Value: boolean);
+    procedure SetStretch(const Value: boolean);
+  protected
+    function GetPalette: HPALETTE; override;
+    procedure Notification(AComponent: TComponent; Operation: TOperation); override;
+    procedure Paint; override;
+    procedure Prepare; override;
+    procedure Print(OfsX, OfsY : integer); override;
+    procedure UnPrepare; override;
+  public
+    FImage:TImage;
+    constructor Create(AOwner: TComponent); override;
+    destructor Destroy; override;
+    procedure DrawQrCode(code:string);
+    procedure GetExpandedHeight(var newheight : extended ); override;
+    procedure GetFieldString( var DataStr : string); override;
+    procedure ResetWidthHeight(fwidth,fheight:Integer);
+    procedure LoadPicture;
+    property Field: TField read FField;
+  published
+    property DataField: string read FDataField write SetDataField;
+    property DataSet: TDataSet read FDataSet write SetDataSet;
+    property Ratio:double read FRatio write setRatio;
+    property CacheQRcodeImage:boolean read FCacheQrcodeImage write FCacheQrcodeImage;
+    property Stretch: boolean read FStretch write SetStretch default False;
+    end;
+
 TPrintEvent = procedure (sender: TObject) of object;
 
 implementation
@@ -266,14 +311,6 @@ type
  pulong = ^u_long;
 function SendARP(DestIP: ipaddr; SrcIP: ipaddr; pMacAddr: pulong;
  PhyAddrLen: pulong): DWORD; stdcall; external 'IPHLPAPI.DLL'     ;
-
-
-
-
-
-
-
-
 
 
 
@@ -1612,6 +1649,281 @@ begin
 
 //====================================================================
 
+end;
+
+{ TQRDBQRCodeImage }
+
+constructor TQRDBQRCodeImage.Create(AOwner: TComponent);
+begin
+  inherited Create(AOwner);
+  QRCode := TDelphiZXingQRCode.Create;
+
+  ControlStyle := ControlStyle + [csFramed, csOpaque];
+  FImage:=TImage.Create(nil);
+  Fimage.Top:=0;
+  FImage.Left:=0;
+
+end;
+
+destructor TQRDBQRCodeImage.Destroy;
+begin
+  freeandnil(QRCode);
+  FImage.Free;
+  inherited;
+end;
+
+
+
+procedure TQRDBQRCodeImage.GetExpandedHeight(var newheight: extended);
+var
+  DrawPict: TPicture;
+begin
+    newheight := self.Height; // default in case of failure.
+    DrawPict := TPicture.Create;
+    try
+      if assigned(FField) and (FField is TBlobField) then
+      begin
+        DrawPict.Assign(FField);
+        newheight := DrawPict.Bitmap.Height;
+      end
+    finally
+       drawpict.free;
+    end;
+end;
+
+procedure TQRDBQRCodeImage.GetFieldString(var DataStr: string);
+begin
+  inherited;
+
+end;
+
+function TQRDBQRCodeImage.GetPalette: HPALETTE;
+begin
+        Result := 0;
+end;
+
+procedure TQRDBQRCodeImage.DrawQrCode(code:string);
+var Row, Column: Integer;
+begin 
+    QRCode.Data := code;//edtText.Text;
+    QRCode.Encoding := TQRCodeEncoding(5); //TQRCodeEncoding(cmbEncoding.ItemIndex);
+    QRCode.QuietZone := StrToIntDef('4', 4);
+    FImage.Width :=QRCode.Rows  *3    ;
+    FImage.Height:= QRCode.Columns*3;
+    FImage.Invalidate;
+    for Row := 0 to QRCode.Rows - 1 do
+    begin
+      for Column := 0 to (QRCode.Columns - 1) do
+      begin
+        if (QRCode.IsBlack[Row, Column]) then
+        BEGIN
+          FImage.Canvas.Pixels[Column*2, Row*2] := clBlack;
+          FImage.Canvas.Pixels[Column*2 , Row*2+1] := clBlack;
+          FImage.Canvas.Pixels[Column*2+1 , Row*2] := clBlack;
+          FImage.Canvas.Pixels[Column*2+1, Row*2+1] := clBlack;
+        end else
+        begin
+          FImage.Canvas.Pixels[Column*2, Row*2] := CLWHITE;
+          FImage.Canvas.Pixels[Column*2, Row*2+1] := CLWHITE;
+          FImage.Canvas.Pixels[Column*2+1, Row*2] := CLWHITE;
+          FImage.Canvas.Pixels[Column*2+1, Row*2+1] := CLWHITE;
+        end;
+      end;
+    end;
+end;
+
+procedure TQRDBQRCodeImage.LoadPicture;
+var qrcodeFileName:string;
+var JPeg: TJPegImage;
+begin
+    if not DirectoryExists('barcodeImages') then
+      createdir('barcodeImages');
+
+    qrcodeFileName := './barcodeImages/qr_'+DataSet.fieldbyname(self.FDataField).AsString +'.jpg';
+
+    self.FImage.Refresh;
+    if DataSet.fieldbyname(self.FDataField).AsString <>'' then
+    begin
+
+      if self.CacheQRcodeImage then
+      begin
+          if not fileExists(qrcodeFileName) then
+          begin
+              self.FImage.Picture:=nil;
+           
+              DrawQrCode(DataSet.fieldbyname(self.FDataField).AsString);
+              try
+                JPeg:= TJPegImage.Create;
+                JPeg.Assign( self.FImage.Picture.Bitmap);
+                JPeg.SaveToFile(qrcodeFileName);
+              finally
+                freeandnil(JPeg);
+              end;
+              //self.FImage.Picture.SaveToFile(qrcodeFileName);
+           end
+           else
+              self.FImage.Picture.LoadFromFile(  qrcodeFileName );
+      end
+      else
+        DrawQrCode(DataSet.fieldbyname(self.FDataField).AsString); 
+    end;
+
+      if self.FImage.Picture.Graphic= nil then
+       fhlknl1.WriteLog('Graphic nil ')  ;
+
+
+end;
+
+procedure TQRDBQRCodeImage.Notification(AComponent: TComponent;
+  Operation: TOperation);
+begin
+  inherited Notification(AComponent, Operation);
+  if (Operation = opRemove) and (AComponent = DataSet) then
+    DataSet := nil;
+end;
+
+procedure TQRDBQRCodeImage.Paint;
+begin
+ Inherited Paint;
+
+end;
+
+procedure TQRDBQRCodeImage.PictureChanged(Sender: TObject);
+begin
+  FPictureLoaded := True;
+  Invalidate;
+
+  fhlknl1.WriteLog('picture changed')
+end;
+
+procedure TQRDBQRCodeImage.Prepare;
+begin
+  inherited Prepare;
+  if assigned(FDataSet) then
+  begin
+    FField := DataSet.FindField(FDataField);
+    if Field is TBlobField then
+    begin
+      Caption := '';
+    end;
+  end else
+    FField := nil;
+end;
+
+procedure TQRDBQRCodeImage.Print(OfsX, OfsY: integer);
+var
+  H: integer;
+  Dest: TRect;
+  DrawPict: TPicture;
+begin
+  LoadPicture;
+
+  if parentreport.Exporting then
+  begin
+       QRPrntr.TQRExportFilter(ParentReport.ExportFilter).acceptgraphic(
+                              qrprinter.XPos(OfsX + self.Size.Left),
+                              qrprinter.YPos(OfsY+ self.size.top ), self );
+  end;
+  with QRPrinter.Canvas do
+  begin
+    Brush.Style := bsSolid;
+    Brush.Color := Color;
+    //DrawPict := TPicture.Create;
+    H := 0;
+    try
+      {if assigned(FField) and (FField is TBlobField) then
+      begin
+        DrawPict.Assign(FField);
+        if //(DrawPict.Graphic is TBitmap) and
+          (DrawPict.Bitmap.Palette <> 0) then
+        begin
+          H := SelectPalette(Handle, DrawPict.Bitmap.Palette, false);
+          RealizePalette(Handle);
+        end; }
+
+        // DrawPict.Assign(Fimage.Picture);
+        DrawPict := Fimage.Picture ;
+        Dest.Left := QRPrinter.XPos(OfsX + Size.Left);
+        Dest.Top := QRPrinter.YPos(OfsY + Size.Top);
+        Dest.Right := QRPrinter.XPos(OfsX + Size.Width + Size.Left);
+        Dest.Bottom := QRPrinter.YPos(OfsY + Size.Height + Size.Top);
+        if Stretch then
+        begin
+          if (DrawPict.Graphic = nil) or DrawPict.Graphic.Empty then
+            FillRect(Dest)
+          else
+            with QRPrinter.Canvas do
+              StretchDraw(Dest, DrawPict.Graphic);
+        end else
+        begin
+          IntersectClipRect(Handle, Dest.Left, Dest.Top, Dest.Right, Dest.Bottom);
+          Dest.Right := Dest.Left +
+            round(DrawPict.Width / Screen.PixelsPerInch * 254 * ParentReport.QRPrinter.XFactor);
+          Dest.Bottom := Dest.Top +
+            round(DrawPict.Height / Screen.PixelsPerInch * 254 * ParentReport.QRPrinter.YFactor);
+
+          if true then OffsetRect
+          (Dest,
+            (QRPrinter.XSize(Size.Width) -
+              round(DrawPict.Width / Screen.PixelsPerInch * 254 * ParentReport.QRPrinter.XFactor)) div 2,
+            (QRPrinter.YSize(Size.Height) -
+              round(DrawPict.Height / Screen.PixelsPerInch * 254 * ParentReport.QRPrinter.YFactor)) div 2); { }
+          QRPrinter.Canvas.StretchDraw(Dest, DrawPict.Graphic); 
+
+          //QRPrinter.Canvas.Draw(0,0, DrawPict.Graphic);
+          SelectClipRgn(Handle, 0);
+        end;
+
+    finally
+      if H <> 0 then SelectPalette(Handle, H, True);
+      //DrawPict.Free;
+    end;
+  end;
+  inherited Print(OfsX,OfsY);
+end;
+
+procedure TQRDBQRCodeImage.ResetWidthHeight(fwidth, fheight: Integer);
+begin
+  width:=fwidth;
+  height:=fheight;
+  FImage.Width:=self.Width;
+  Fimage.Height:=self.Height;
+
+ // self.QRCode.Columns := self.Width;
+ // self.QRCode.Rows := self.Height;
+end;
+
+
+procedure TQRDBQRCodeImage.SetCacheBarcodeImage(const Value: boolean);
+begin
+  FCacheQrcodeImage := Value;
+end;
+
+procedure TQRDBQRCodeImage.SetDataField(const Value: string);
+begin
+    FDataField := Value;
+end;
+
+procedure TQRDBQRCodeImage.SetDataSet(Value: TDataSet);
+begin
+  FDataSet := Value;
+  if Value <> nil then Value.FreeNotification(Self);
+end;
+ 
+procedure TQRDBQRCodeImage.setRatio(const Value: double);
+begin
+      FRatio := Value;
+end;
+
+procedure TQRDBQRCodeImage.SetStretch(const Value: boolean);
+begin
+  FStretch := Value;
+end;
+
+procedure TQRDBQRCodeImage.UnPrepare;
+begin
+  FField := nil;
+  inherited Unprepare;
 end;
 
 end.

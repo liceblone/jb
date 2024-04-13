@@ -21,8 +21,8 @@ object frmCreateComponent: TfrmCreateComponent
   object pgc1: TPageControl
     Left = 0
     Top = 41
-    Width = 834
-    Height = 524
+    Width = 826
+    Height = 511
     ActivePage = ts3
     Align = alClient
     TabOrder = 0
@@ -109,8 +109,8 @@ object frmCreateComponent: TfrmCreateComponent
       end
       object grp1: TGroupBox
         Left = 0
-        Top = 439
-        Width = 826
+        Top = 426
+        Width = 818
         Height = 57
         Align = alBottom
         Caption = 'grp1'
@@ -1492,7 +1492,7 @@ object frmCreateComponent: TfrmCreateComponent
       object Splitter1: TSplitter
         Left = 0
         Top = 425
-        Width = 826
+        Width = 818
         Height = 8
         Cursor = crVSplit
         Align = alTop
@@ -1500,7 +1500,7 @@ object frmCreateComponent: TfrmCreateComponent
       object grpGrpParent: TGroupBox
         Left = 0
         Top = 0
-        Width = 826
+        Width = 818
         Height = 425
         Align = alTop
         Caption = 'grpGrpParent'
@@ -1525,8 +1525,8 @@ object frmCreateComponent: TfrmCreateComponent
       end
       object grp2: TGroupBox
         Left = 0
-        Top = 441
-        Width = 826
+        Top = 428
+        Width = 818
         Height = 55
         Align = alBottom
         Caption = 'grp2'
@@ -1655,7 +1655,7 @@ object frmCreateComponent: TfrmCreateComponent
       object grpGrpParent_Btm: TGroupBox
         Left = 0
         Top = 433
-        Width = 826
+        Width = 818
         Height = 56
         Align = alTop
         Caption = 'grpGrpParent_Btm'
@@ -1771,8 +1771,8 @@ object frmCreateComponent: TfrmCreateComponent
       Caption = #35774#32622#25968#25454#26694
       ImageIndex = 2
       DesignSize = (
-        826
-        496)
+        818
+        483)
       object lbl26: TLabel
         Left = 8
         Top = 8
@@ -1965,8 +1965,8 @@ object frmCreateComponent: TfrmCreateComponent
       end
       object grp6: TGroupBox
         Left = 0
-        Top = 430
-        Width = 826
+        Top = 417
+        Width = 818
         Height = 66
         Align = alBottom
         Caption = 'grp6'
@@ -2466,7 +2466,7 @@ object frmCreateComponent: TfrmCreateComponent
   object ToolBar1: TToolBar
     Left = 0
     Top = 0
-    Width = 834
+    Width = 826
     Height = 41
     ButtonHeight = 21
     ButtonWidth = 75

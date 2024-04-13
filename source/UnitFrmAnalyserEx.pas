@@ -1240,9 +1240,9 @@ begin
           ADOQuery1.SQL.Clear;
 
           ADOQuery1.SQL.Add('select ');
-          ADOQuery1.SQL.Add(' FBigPkgSeq,FSmallPkgSeq,OBNo,PDC_DN,Sold_To,Sold_ToName,PartNo,PartNo2,');
-          ADOQuery1.SQL.Add(' CustomerPO,PartNo3,PrintType,FQty,BatchNo,DateCode2,DateCode3,LOTNo1,LOTNo2,LOTNo3, ');
-          ADOQuery1.SQL.Add(' COO,CartonNo,SerialNo,PrintDate,VendorSpecialCode,EnvIcon1,EnvIcon2,EnvIcon3,CustomerPoItem ');
+          ADOQuery1.SQL.Add(' FBigPkgSeq,FSmallPkgSeq,OBNo,Sold_To,Sold_ToName,PartNo,PartNo2,');
+          ADOQuery1.SQL.Add(' CustomerPO,PartNo3,FQty,DateCode1,LOTNo1,LOTNo2,LOTNo3,   '); //BatchNo,DateCode2,DateCode3,
+          ADOQuery1.SQL.Add(' COO,CartonNo,CustomerPoItem, ActualGrossWeight,BillingNo,GuiNo,BillingDate,OTHER01,OTHER02,OTHER03');
           ADOQuery1.SQL.Add(' RowNo,FFileName ');
           ADOQuery1.SQL.Add('  from TRsBarcodeImport  where 1<>1');
 

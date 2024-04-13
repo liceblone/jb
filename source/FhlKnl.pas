@@ -3183,14 +3183,16 @@ begin
   if (FDataLink.Field <> nil) and (FDataLink.CanModify) then
   begin
       s := FDataLink.Field.Text;
-      if s='' then s:=FormatDateTime('yyyy"-"mm"-"dd',Now);
-      Date :=StrToDate(s);
+      if s='' then
+        Date :=  Now  
+      else
+        Date :=StrToDate(s);
   end else
   begin
 //    if csDesigning in ComponentState then
 //      EditText := Name else
 //      EditText := '';
-      Date := StrToDate(FormatDateTime('yyyy"-"mm"-"dd',Now));
+      Date :=  Now ;
   end;
 end;
 

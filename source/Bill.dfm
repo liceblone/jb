@@ -24,16 +24,16 @@ object BillFrm: TBillFrm
   object Panel1: TPanel
     Left = 0
     Top = 39
-    Width = 860
-    Height = 429
+    Width = 852
+    Height = 417
     Align = alClient
     BevelOuter = bvLowered
     Caption = 'Panel1'
     TabOrder = 1
     object Splitter1: TSplitter
       Left = 1
-      Top = 335
-      Width = 858
+      Top = 323
+      Width = 850
       Height = 2
       Cursor = crVSplit
       Align = alBottom
@@ -41,7 +41,7 @@ object BillFrm: TBillFrm
     object Splitter2: TSplitter
       Left = 1
       Top = 121
-      Width = 858
+      Width = 850
       Height = 2
       Cursor = crVSplit
       Align = alTop
@@ -49,7 +49,7 @@ object BillFrm: TBillFrm
     object ScrollBox1: TScrollBox
       Left = 1
       Top = 1
-      Width = 858
+      Width = 850
       Height = 120
       Align = alTop
       BorderStyle = bsNone
@@ -57,12 +57,12 @@ object BillFrm: TBillFrm
       OnCanResize = ScrollBox1CanResize
       OnDblClick = ScrollBox1DblClick
       DesignSize = (
-        858
+        850
         120)
       object Label2: TLabel
         Left = 0
         Top = 0
-        Width = 858
+        Width = 850
         Height = 7
         Align = alTop
         Caption = 
@@ -80,7 +80,7 @@ object BillFrm: TBillFrm
       object Label3: TLabel
         Left = 0
         Top = 27
-        Width = 858
+        Width = 850
         Height = 4
         Align = alTop
         Alignment = taRightJustify
@@ -94,7 +94,7 @@ object BillFrm: TBillFrm
       object TitleLabel: TLabel
         Left = 0
         Top = 7
-        Width = 858
+        Width = 850
         Height = 20
         Align = alTop
         Alignment = taCenter
@@ -239,8 +239,8 @@ object BillFrm: TBillFrm
     end
     object ScrollBox2: TScrollBox
       Left = 1
-      Top = 337
-      Width = 858
+      Top = 325
+      Width = 850
       Height = 91
       Align = alBottom
       BorderStyle = bsNone
@@ -250,8 +250,8 @@ object BillFrm: TBillFrm
     object DBGrid1: TDBGrid
       Left = 1
       Top = 123
-      Width = 858
-      Height = 212
+      Width = 850
+      Height = 200
       TabStop = False
       Align = alClient
       Color = clWhite
@@ -285,7 +285,7 @@ object BillFrm: TBillFrm
   object CoolBar1: TCoolBar
     Left = 0
     Top = 0
-    Width = 860
+    Width = 852
     Height = 39
     AutoSize = True
     Bands = <
@@ -293,12 +293,12 @@ object BillFrm: TBillFrm
         Control = ToolBar1
         ImageIndex = -1
         MinHeight = 35
-        Width = 856
+        Width = 848
       end>
     object ToolBar1: TToolBar
       Left = 9
       Top = 0
-      Width = 843
+      Width = 835
       Height = 35
       ButtonHeight = 35
       ButtonWidth = 40
@@ -341,18 +341,18 @@ object BillFrm: TBillFrm
         Style = tbsDropDown
       end
       object NewBtn: TToolButton
-        Left = 144
+        Left = 148
         Top = 0
         Action = NewAction1
         AutoSize = True
       end
       object RemoveBtn: TToolButton
-        Left = 181
+        Left = 185
         Top = 0
         Action = RemoveAction1
       end
       object ToolButton4: TToolButton
-        Left = 221
+        Left = 225
         Top = 0
         Width = 8
         Caption = 'ToolButton4'
@@ -361,12 +361,12 @@ object BillFrm: TBillFrm
         Style = tbsSeparator
       end
       object CelBtn: TToolButton
-        Left = 229
+        Left = 233
         Top = 0
         Action = CancelAction1
       end
       object ToolButton2: TToolButton
-        Left = 269
+        Left = 273
         Top = 0
         Width = 9
         Caption = 'ToolButton2'
@@ -374,27 +374,27 @@ object BillFrm: TBillFrm
         Style = tbsSeparator
       end
       object SavBtn: TToolButton
-        Left = 278
+        Left = 282
         Top = 0
         Action = SaveAction1
       end
       object BtnLock: TToolButton
-        Left = 318
+        Left = 322
         Top = 0
         Action = ActLock
       end
       object chkBtn: TToolButton
-        Left = 358
+        Left = 362
         Top = 0
         Action = CheckAction1
       end
       object Refreshbtn: TToolButton
-        Left = 398
+        Left = 402
         Top = 0
         Action = RefreshAction1
       end
       object ToolButton1: TToolButton
-        Left = 438
+        Left = 442
         Top = 0
         Width = 8
         Caption = 'ToolButton1'
@@ -403,27 +403,27 @@ object BillFrm: TBillFrm
         Style = tbsSeparator
       end
       object linkBtn: TToolButton
-        Left = 446
+        Left = 450
         Top = 0
         Action = LinkAction1
       end
       object importBtn: TToolButton
-        Left = 486
+        Left = 490
         Top = 0
         Action = ImportAction1
       end
       object AddBtn: TToolButton
-        Left = 526
+        Left = 530
         Top = 0
         Action = AppendAction1
       end
       object DelBtn: TToolButton
-        Left = 566
+        Left = 570
         Top = 0
         Action = DeleteAction1
       end
       object ToolButton5: TToolButton
-        Left = 606
+        Left = 610
         Top = 0
         Width = 8
         Caption = 'ToolButton5'
@@ -432,12 +432,12 @@ object BillFrm: TBillFrm
         Style = tbsSeparator
       end
       object ExtBtn: TToolButton
-        Left = 614
+        Left = 618
         Top = 0
         Action = CloseAction1
       end
       object btn2: TToolButton
-        Left = 654
+        Left = 658
         Top = 0
         Width = 8
         Caption = 'btn2'
@@ -446,7 +446,7 @@ object BillFrm: TBillFrm
         Style = tbsSeparator
       end
       object HelpBtn: TToolButton
-        Left = 662
+        Left = 666
         Top = 0
         Action = HelpAction1
       end

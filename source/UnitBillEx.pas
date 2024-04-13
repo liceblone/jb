@@ -2091,7 +2091,7 @@ begin
 if self.fBillex.ID   ='6' then
   GeneratorBarcode('PhOrdFID') ;
 
-if ( (self.fBillex.ID   ='23') or (self.fBillex.ID   ='31')) then
+if ((self.fBillex.ID   ='11') or (self.fBillex.ID   ='23') or (self.fBillex.ID   ='31')) then
   GeneratorBarcode('F_ID')  ;
 
 end;
@@ -2353,7 +2353,7 @@ begin
      begin
          frmSearchBarCode:=TFrmSearchBarCode.Create(nil);
          frmSearchBarCode.BtnImport.Visible :=false;
-         frmSearchBarCode.Width:=260;
+         frmSearchBarCode.Width:=360;
          frmSearchBarCode.Parent  :=pnlleft;
          frmSearchBarCode.IniForm(self ,self.fBillex.BillCode);
      end;
@@ -2433,8 +2433,15 @@ var barcode , JbLabelBarCode:string;
 var PackageCodeExisted:boolean ;
 var SumBarCodeQty : integer;
 begin
+   if (self.mtDataSet1.fieldbyname('InWhId').value =null) then
+   begin
+      if MessageDlg('ÇëÏÈÑ¡Ôñ³ö¿â²Ö¿â£¡',mtWarning,[mbOK],0)=mrYes then
+      abort;
+   end;
+
    barcode :=  frmSearchBarCode.EdtHsBarCode.Text;
    JbLabelBarCode :=  frmSearchBarCode.EdtJbLabelBarCode.Text;
+
    SumBarCodeQty :=0;
 
    { alter proc Pr_GetBarCodeInfomation
