@@ -5,7 +5,9 @@ interface
 uses
   Windows, Messages, SysUtils, Classes, Graphics, Controls, Forms, Dialogs,
   ExtCtrls, jpeg, StdCtrls,inifiles,shellapi, IdBaseComponent, IdComponent,  ADODB,   
-  IdTCPConnection, IdTCPClient, IdFTP, Sockets, WinSock, IdHTTP,NB30,UPublic,unitPublicFunction;
+  IdTCPConnection, IdTCPClient, IdFTP, Sockets, WinSock, IdHTTP,NB30,UPublic,unitPublicFunction,
+  UnitHttps
+   ;
 
 type
   TClientData = packed record
@@ -388,7 +390,7 @@ var
   i:integer;
   AdoCnn:TADOConnection;
   objIdHttp:TIdHttp;
-  teststr:string;
+  teststr:string; 
 begin
     inif:=TIniFile.Create(ExtractFileDir(Application.ExeName)+'\Config.ini');
     AdoCnn:=TADOConnection.Create (nil);
@@ -405,7 +407,7 @@ try
         if (cStation<> '')  then
         begin
             try
-              fConnStr:=objIdHttp.Get(cStation)   ;
+              fConnStr:=GetHttps(cStation)   ;
               AdoCnn.LoginPrompt :=false;
               AdoCnn.Connected:=False;
 
@@ -413,7 +415,7 @@ try
               // teststr:='DHOnT2u6PaQ=';
                //FhlKnl1.st_DesDecrypt(teststr);
 
-              AdoCnn.ConnectionString :=FhlKnl1.st_DesDecrypt(fConnStr);    // new encrypt algrithm
+              AdoCnn.ConnectionString := FhlKnl1.St_encrypt_Chy(fConnStr);//  FhlKnl1.st_DesDecrypt(fConnStr);    // new encrypt algrithm
              // showmessage(fConnStr);
               FhlKnl1.Kl_SetReg4Mssql(AdoCnn.ConnectionString);
 
@@ -435,11 +437,11 @@ try
             except
               //on err:exception do
               begin
-                 AdoCnn.properties['data source'].value := rawIP;
+                 AdoCnn.properties['data source'].value := 'jb99999.xicp.net';
                   //  AdoCnn.ConnectionString := ConnectbyRawIP(AdoCnn ,rawIP) ;
 
                 //showmessage(err.Message );
-                fConnStr:='';
+                //fConnStr:='';
               end;
             end;
         end;
