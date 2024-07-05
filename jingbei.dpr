@@ -115,7 +115,7 @@ uses
   UnitFrmWrArchive in 'source\UnitFrmWrArchive.pas' {FrmWrArchive: TFrame},
   Md5 in 'source\Md5.pas',
   UnitDes in 'source\UnitDes.pas',
-  UnitHttps in 'E:\chy\github\jb\source\functions\UnitHttps.pas';
+  UnitHttps in 'D:\chy\github\jb\source\functions\UnitHttps.pas';
 
 {$R *.res}
 

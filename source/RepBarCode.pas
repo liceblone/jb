@@ -91,7 +91,7 @@ begin
                qrCode.DataSet :=fdataset;
                qrCode.DataField:='FBarCode';//+inttostr(i+1);
                qrCode.Top:=topMargin;
-               qrCode.Left:=VLeft+ 180;//round(dbimage.Height/2)- round(dbText.Width/2);
+               qrCode.Left:=VLeft+ 200;//round(dbimage.Height/2)- round(dbText.Width/2);
                qrCode.CacheQrcodeImage := BarCodePrintConfig.BarCodeConfig.bCacheBarcodeImage;
 
                dbText:= TQRDBText.Create(self.DetailBand1);
