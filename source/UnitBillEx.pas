@@ -2978,6 +2978,8 @@ begin
                  FrmBillEx.dlDataSet1.FieldByName('Origin').Value := fhlknl1.User_Query.FieldByName('Origin').Value ;
                  FrmBillEx.dlDataSet1.FieldByName('pack').Value   := fhlknl1.User_Query.FieldByName('pack').Value ;
                  FrmBillEx.dlDataSet1.FieldByName('Qty').Value    := fhlknl1.User_Query.FieldByName('remainQty').Value ;
+                 FrmBillEx.dlDataSet1.FieldByName('Resistance').Value   := fhlknl1.User_Query.FieldByName('Resistance').Value ;
+                 FrmBillEx.dlDataSet1.FieldByName('accuracy').Value    := fhlknl1.User_Query.FieldByName('accuracy').Value ;
                  FrmBillEx.dlDataSet1.FieldByName('Price').Value    := fhlknl1.User_Query.FieldByName('Price').value ;
                  FrmBillEx.dlDataSet1.FieldByName('bhnote').Value    := fhlknl1.User_Query.FieldByName('dlnote').Value ;
                  FrmBillEx.dlDataSet1.FieldByName('SLOrderID').Value    := fhlknl1.User_Query.FieldByName('F_ID').Value ;
