@@ -1,8 +1,8 @@
 object BillOpenDlgFrm: TBillOpenDlgFrm
   Left = 556
   Top = 162
-  Width = 645
-  Height = 404
+  Width = 776
+  Height = 455
   BorderIcons = [biSystemMenu, biMaximize]
   Caption = #25171#24320
   Color = clBtnFace
@@ -20,13 +20,13 @@ object BillOpenDlgFrm: TBillOpenDlgFrm
   OnDblClick = FormDblClick
   OnKeyDown = FormKeyDown
   DesignSize = (
-    637
-    377)
+    760
+    416)
   PixelsPerInch = 96
   TextHeight = 13
   object Label1: TLabel
     Left = 18
-    Top = 326
+    Top = 369
     Width = 67
     Height = 13
     Anchors = [akLeft, akBottom]
@@ -35,7 +35,7 @@ object BillOpenDlgFrm: TBillOpenDlgFrm
   end
   object Label2: TLabel
     Left = 18
-    Top = 353
+    Top = 396
     Width = 80
     Height = 13
     Anchors = [akLeft, akBottom]
@@ -59,7 +59,7 @@ object BillOpenDlgFrm: TBillOpenDlgFrm
     FocusControl = EdtKey1
   end
   object Label5: TLabel
-    Left = 464
+    Left = 595
     Top = 8
     Width = 26
     Height = 13
@@ -67,8 +67,8 @@ object BillOpenDlgFrm: TBillOpenDlgFrm
     Caption = #20854#23427
   end
   object BtnOpen: TButton
-    Left = 515
-    Top = 320
+    Left = 646
+    Top = 363
     Width = 97
     Height = 23
     Anchors = [akRight, akBottom]
@@ -78,8 +78,8 @@ object BillOpenDlgFrm: TBillOpenDlgFrm
     OnClick = BtnOpenClick
   end
   object Button2: TButton
-    Left = 515
-    Top = 348
+    Left = 646
+    Top = 391
     Width = 97
     Height = 22
     Anchors = [akRight, akBottom]
@@ -92,8 +92,8 @@ object BillOpenDlgFrm: TBillOpenDlgFrm
   object DBGrid1: TDBGrid
     Left = 4
     Top = 31
-    Width = 617
-    Height = 285
+    Width = 748
+    Height = 326
     Anchors = [akLeft, akTop, akRight, akBottom]
     Ctl3D = True
     DataSource = DataSource1
@@ -112,8 +112,8 @@ object BillOpenDlgFrm: TBillOpenDlgFrm
   end
   object FileNameComboBox: TComboBox
     Left = 101
-    Top = 322
-    Width = 404
+    Top = 365
+    Width = 535
     Height = 21
     BevelKind = bkSoft
     Anchors = [akLeft, akRight, akBottom]
@@ -125,8 +125,8 @@ object BillOpenDlgFrm: TBillOpenDlgFrm
   end
   object FileTypeComboBox: TComboBox
     Left = 101
-    Top = 348
-    Width = 404
+    Top = 391
+    Width = 535
     Height = 21
     BevelKind = bkSoft
     Style = csDropDownList
@@ -147,13 +147,13 @@ object BillOpenDlgFrm: TBillOpenDlgFrm
   object EdtKey1: TEdit
     Left = 241
     Top = 4
-    Width = 216
+    Width = 347
     Height = 21
     Anchors = [akLeft, akTop, akRight]
     TabOrder = 0
   end
   object ComboBox1: TComboBox
-    Left = 496
+    Left = 627
     Top = 5
     Width = 129
     Height = 21
