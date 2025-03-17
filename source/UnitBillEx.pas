@@ -2989,6 +2989,8 @@ begin
                     FrmBillEx.dlDataSet1.FieldByName('FMinPackageQty').Value    := fhlknl1.User_Query.FieldByName('FMinPackageQty').Value ;
                  if ( (fhlknl1.User_Query.FindField('FPesistorPartNo')  <>nil) and (fhlknl1.User_Query.findfield('FPesistorPartNo')<>nil) ) then
                     FrmBillEx.dlDataSet1.FieldByName('FPesistorPartNo').Value    := fhlknl1.User_Query.FieldByName('FPesistorPartNo').Value ;
+                        if ( (fhlknl1.User_Query.FindField('batchNo')  <>nil) and (fhlknl1.User_Query.findfield('batchNo')<>nil) ) then
+                    FrmBillEx.dlDataSet1.FieldByName('batchNo').Value    := fhlknl1.User_Query.FieldByName('batchNo').Value ;
 
 
 

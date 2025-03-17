@@ -138,6 +138,7 @@ type
     procedure ActPrint2Execute(Sender: TObject);
     procedure HidePriceAmtFields(hide:boolean);
     procedure SetIsPrinted;
+    function  IsBranch:boolean;
   private
 
     fBtmBoxMaxHeight,fBtmBoxMinHeight:Integer;
@@ -700,13 +701,7 @@ begin
                                  break;
                        end;
        end;
-{       if (self.mtDataSet1.FindField('Istax')<>nil )and (self.mtDataSet1.FieldByName('IsTax').Value <>null)then
-       if  self.mtDataSet1.FieldByName('IsTax'). =true  then
-       if MessageBox(0, '确定不含税吗?', '', MB_YESNO + MB_ICONQUESTION) = IDNO then
-       begin
-           exit;
-       end;
-       }
+
 
       //  // 做到存储过程里去吧
       //  select isbill from sys_id where tblid='385'
@@ -743,6 +738,7 @@ begin
      if strToint(fBillDict.Id) in [3,19] then//零售和发货单
      begin
            //开始售价检测
+           if (self.IsBranch) then
            with dlDataSet1 do
            begin
                DisableControls;
@@ -1561,7 +1557,7 @@ begin
             if (mtdataset1.FieldByName('isprinted').Value <> null) and  (MessageDlg('该单据已经打印，确定需要再次打印？',mtConfirmation,[mbYes,mbNo],0)=mrNo)   then
               abort;
               
-            if not  dmFrm.ExecStoredProc('Pr_sl_invoice_Print',varArrayof([LoginInfo.WhId, fbilldict.BillCode,LoginInfo.EmpId])) then
+            if not  dmFrm.ExecStoredProc('Pr_sl_invoice_Print',varArrayof([LoginInfo.WhId, fbilldict.BillCode, LoginInfo.EmpId])) then
             begin
                   if dmFrm.FreeStoredProc1.Parameters.Items[1].Direction  =pdOutput then
                   begin
@@ -1574,7 +1570,14 @@ begin
        end;
     end;
 end;
-
+function  TBillFrm.IsBranch;
+begin
+  result:=  false;
+  if ((mtDataset1.fieldbyname('clientid').asstring='hz000382') and (LoginInfo.YdId ='0')) then
+  begin
+      result:=  true;
+  end;
+end;
 end.
 
 
