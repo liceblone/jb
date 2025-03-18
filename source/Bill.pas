@@ -138,7 +138,7 @@ type
     procedure ActPrint2Execute(Sender: TObject);
     procedure HidePriceAmtFields(hide:boolean);
     procedure SetIsPrinted;
-    function  IsBranch:boolean;
+
   private
 
     fBtmBoxMaxHeight,fBtmBoxMinHeight:Integer;
@@ -738,7 +738,7 @@ begin
      if strToint(fBillDict.Id) in [3,19] then//零售和发货单
      begin
            //开始售价检测
-           if (self.IsBranch) then
+
            with dlDataSet1 do
            begin
                DisableControls;
@@ -1570,14 +1570,7 @@ begin
        end;
     end;
 end;
-function  TBillFrm.IsBranch;
-begin
-  result:=  false;
-  if ((mtDataset1.fieldbyname('clientid').asstring='hz000382') and (LoginInfo.YdId ='0')) then
-  begin
-      result:=  true;
-  end;
-end;
+ 
 end.
 
 
