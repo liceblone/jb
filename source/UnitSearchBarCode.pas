@@ -6,7 +6,7 @@ uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
   Dialogs, StdCtrls, Grids, DBGrids, DB, ADODB,UnitCommonInterface,strutils,UnitGrid,
    MMSystem,
-  ExtCtrls;
+  ExtCtrls, ComCtrls;
 
 
 
@@ -16,11 +16,12 @@ type
     DataSource1: TDataSource;
     PnlLeft: TPanel;
     Label1: TLabel;
-    EdtHsBarCode: TEdit;
     BtnSearch: TButton;
     BtnImport: TButton;
     EdtJbLabelBarCode: TEdit;
     Label2: TLabel;
+    chkJiejieQrCode: TCheckBox;
+    EdtHsBarCode: TEdit;
     procedure EdtHsBarCodeEnter(Sender: TObject);
     procedure BtnSearchClick(Sender: TObject);
     procedure BarCodeGridDblClick(Sender: TObject);
@@ -31,8 +32,8 @@ type
     procedure BarCodeGridKeyUp(Sender: TObject; var Key: Word;  Shift: TShiftState);
     procedure EdtHsBarCodeChange(Sender: TObject);
     procedure FormCreate(Sender: TObject);
-    procedure EdtJbLabelBarCodeKeyDown(Sender: TObject; var Key: Word;
-      Shift: TShiftState);
+    procedure EdtJbLabelBarCodeKeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);
+    function  CountChar(const S: string; C: Char): Integer;
     private
     FBillCode:Variant;
     FParentSearch:  IParentSearch;
@@ -196,26 +197,47 @@ self.BarCodeDataSet.Close;
 self.BarCodeDataSet.Open;
 end;
 
+function TFrmSearchBarCode.CountChar(const S: string; C: Char): Integer;
+var
+  I: Integer;
+begin
+  Result := 0;
+  for I := 1 to Length(S) do
+    if S[I] = C then
+      Inc(Result);
+end;
+
 procedure TFrmSearchBarCode.EdtHsBarCodeKeyDown(Sender: TObject;
   var Key: Word; Shift: TShiftState);
 begin
    case Key of
      vk_Return:
      begin
-          //AddBarCode;
-         // FParentSearch.BarCodeSearch(GetBarCodeList );
-         if (FVerifyHSPartNo=0) then
+         if (not chkJiejieQrCode.Checked) then
          begin
-           BtnSearchClick(sender);
-           EdtHsBarCode.SetFocus;
-           self.EdtHsBarCode.SelectAll;
-         end;
-         if (FVerifyHSPartNo<>0) then
-         begin
-           BtnSearchClick(sender);
-           EdtJbLabelBarCode.SetFocus;
-           self.EdtJbLabelBarCode.SelectAll;
-         end;
+             if (FVerifyHSPartNo=0) then
+             begin
+              BtnSearchClick(sender);
+               EdtHsBarCode.SetFocus;
+               self.EdtHsBarCode.SelectAll;
+             end;
+             if (FVerifyHSPartNo<>0) then
+             begin
+               BtnSearchClick(sender);
+               EdtJbLabelBarCode.SetFocus;
+               self.EdtJbLabelBarCode.SelectAll;
+             end;
+          end
+          else
+          begin
+              if (CountChar(EdtHsBarCode.Text,'|')>=3) then
+              begin
+                  EdtHsBarCode.Text := stringreplace( EdtHsBarCode.Text, chr(13),'',[]);
+                  BtnSearchClick(sender);
+                  EdtJbLabelBarCode.SetFocus;
+                  self.EdtJbLabelBarCode.SelectAll;
+              end;
+          end;
      end;
    end;
 end;
@@ -238,7 +260,10 @@ end;
 
 procedure TFrmSearchBarCode.EdtHsBarCodeChange(Sender: TObject);
 begin
-    EdtHsBarCode.Text :=    StringReplace(trim(EdtHsBarCode.Text) ,' ','-',[]);
+    if (not chkJiejieQrCode.Checked) then
+    begin
+        EdtHsBarCode.Text :=    StringReplace(trim(EdtHsBarCode.Text) ,' ','-',[]);
+    end;
 end;
 
 procedure TFrmSearchBarCode.FormCreate(Sender: TObject);
@@ -276,14 +301,15 @@ begin
    case Key of
      vk_Return:
      begin
-     
+      if ( not chkJiejieQrCode.Checked) then
+       begin
          if (FVerifyHSPartNo<>0) then
          begin
            EdtHsBarCode.SetFocus ;
            self.EdtHsBarCode.SelectAll;
 
          end;
-
+        end;
      end;
    end;
 end;

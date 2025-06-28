@@ -1,7 +1,7 @@
 object FrmSearchBarCode: TFrmSearchBarCode
   Left = 411
   Top = 294
-  Width = 316
+  Width = 382
   Height = 297
   Align = alClient
   Caption = 'FrmSearchBarCode'
@@ -18,7 +18,7 @@ object FrmSearchBarCode: TFrmSearchBarCode
   object PnlLeft: TPanel
     Left = 0
     Top = 0
-    Width = 308
+    Width = 366
     Height = 65
     Align = alTop
     Ctl3D = False
@@ -53,30 +53,13 @@ object FrmSearchBarCode: TFrmSearchBarCode
       Font.Style = []
       ParentFont = False
     end
-    object EdtHsBarCode: TEdit
-      Left = 32
-      Top = 32
-      Width = 170
-      Height = 30
-      Font.Charset = DEFAULT_CHARSET
-      Font.Color = clWindowText
-      Font.Height = -20
-      Font.Name = 'MS Sans Serif'
-      Font.Style = []
-      ParentFont = False
-      TabOrder = 0
-      Text = '1234567890123456'
-      OnChange = EdtHsBarCodeChange
-      OnEnter = EdtHsBarCodeEnter
-      OnKeyDown = EdtHsBarCodeKeyDown
-    end
     object BtnSearch: TButton
       Left = 204
       Top = 33
       Width = 41
       Height = 25
       Caption = #25628#32034
-      TabOrder = 1
+      TabOrder = 0
       OnClick = BtnSearchClick
     end
     object BtnImport: TButton
@@ -85,24 +68,49 @@ object FrmSearchBarCode: TFrmSearchBarCode
       Width = 41
       Height = 25
       Caption = #23548#20837
-      TabOrder = 2
+      TabOrder = 1
       OnClick = BtnImportClick
     end
     object EdtJbLabelBarCode: TEdit
       Left = 32
       Top = 1
       Width = 170
-      Height = 30
+      Height = 31
       Font.Charset = DEFAULT_CHARSET
       Font.Color = clWindowText
       Font.Height = -20
       Font.Name = 'MS Sans Serif'
       Font.Style = []
       ParentFont = False
-      TabOrder = 3
+      TabOrder = 2
       Text = '1234567890123456'
       OnChange = EdtHsBarCodeChange
       OnKeyDown = EdtJbLabelBarCodeKeyDown
+    end
+    object chkJiejieQrCode: TCheckBox
+      Left = 256
+      Top = 8
+      Width = 97
+      Height = 17
+      TabStop = False
+      Caption = 'jiejie'
+      TabOrder = 3
+    end
+    object EdtHsBarCode: TEdit
+      Left = 32
+      Top = 32
+      Width = 169
+      Height = 31
+      Font.Charset = DEFAULT_CHARSET
+      Font.Color = clWindowText
+      Font.Height = -20
+      Font.Name = 'MS Sans Serif'
+      Font.Style = []
+      ParentFont = False
+      TabOrder = 4
+      Text = '1234567890123456'
+      OnChange = EdtHsBarCodeChange
+      OnKeyDown = EdtHsBarCodeKeyDown
     end
   end
   object BarCodeDataSet: TADODataSet
