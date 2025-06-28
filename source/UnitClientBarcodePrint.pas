@@ -244,6 +244,9 @@ begin
                dbText.Font.Name :=  printPagePaperConfig.FontName ;
                preTop:= preTop +dbText.Height  +  vGap  ;
 
+               dbText:=CreateQrDbText (  colGap*(i)  , preTop  ,   'Brand', fdataset , DetailBand1, i);
+               dbText.Font.Name :=  printPagePaperConfig.FontName ;
+               preTop:= preTop +dbText.Height  +  vGap  ;
                
                dbImagebhNote:=TQRDBBarCodeImage.Create(self.DetailBand1);
                dbImagebhNote.Parent:=self.DetailBand1;

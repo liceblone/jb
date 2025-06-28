@@ -129,6 +129,11 @@ begin
                dbText:=CreateQrDbText (  colGap*(i)  , preTop  ,   'PartNo', fdataset , DetailBand1, i);
                preTop:= preTop + dbText.Height + vGap ;
 
+               qrLabel:=  CreateQrLabel( 'Æ·ÅÆ:', colGap*(i) , preTop , fontsize, DetailBand1);
+               dbText:=CreateQrDbText (  colGap*(i)  , preTop  ,   'Brand', fdataset , DetailBand1, i);
+               preTop:= preTop + dbText.Height + vGap ;
+
+
                //qrLabel:=  CreateQrLabel( 'ÊýÁ¿:', colGap*(i) , preTop , fontsize, DetailBand1);
                dbText:=CreateQrDbText (  colGap*(i)  , preTop  ,   'FMinPackageQty', fdataset , DetailBand1, i);
                preTop:= preTop + dbText.Height + vGap ;
