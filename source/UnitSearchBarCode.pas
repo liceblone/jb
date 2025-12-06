@@ -224,8 +224,6 @@ begin
              if (FVerifyHSPartNo<>0) then
              begin
                BtnSearchClick(sender);
-               EdtJbLabelBarCode.SetFocus;
-               self.EdtJbLabelBarCode.SelectAll;
              end;
           end
           else
@@ -234,10 +232,11 @@ begin
               begin
                   EdtHsBarCode.Text := stringreplace( EdtHsBarCode.Text, chr(13),'',[]);
                   BtnSearchClick(sender);
-                  EdtJbLabelBarCode.SetFocus;
-                  self.EdtJbLabelBarCode.SelectAll;
+
               end;
           end;
+          EdtHsBarCode.SetFocus;
+          EdtHsBarCode.SelectAll;
      end;
    end;
 end;

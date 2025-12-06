@@ -1194,7 +1194,8 @@ var
   iRow,iCol ,j : integer;
   xlsFilename,cellValue,msg,ShortFileName,sql: string;
   dlg:Topendialog;
-  ADOQuery1: TADOQuery; 
+  ADOQuery1: TADOQuery;
+  validRecord:bool;
 begin
   try
       Screen.Cursor:=crSqlwait;
@@ -1242,17 +1243,25 @@ begin
           ADOQuery1.SQL.Add('select ');
           ADOQuery1.SQL.Add(' FBigPkgSeq,FSmallPkgSeq,OBNo,Sold_To,Sold_ToName,PartNo,PartNo2,');
           ADOQuery1.SQL.Add(' CustomerPO,PartNo3,FQty,DateCode1,LOTNo1,LOTNo2,LOTNo3,   '); //BatchNo,DateCode2,DateCode3,
-          ADOQuery1.SQL.Add(' COO,CartonNo,CustomerPoItem, ActualGrossWeight,BillingNo,GuiNo,BillingDate,OTHER01,OTHER02,OTHER03');
+          ADOQuery1.SQL.Add(' COO,');  //CartonNo,CustomerPoItem, ActualGrossWeight,BillingNo,GuiNo,BillingDate,OTHER01,OTHER02,OTHER03'
           ADOQuery1.SQL.Add(' RowNo,FFileName ');
           ADOQuery1.SQL.Add('  from TRsBarcodeImport  where 1<>1');
 
           ADOQuery1.Open;
           application.HandleMessage;
           VerifyBarCodeExcelFormat(Excel);
-          cellValue:=  trim( Excel.WorkSheets[1].Cells[iRow,1].value );
-          while  ( cellValue ) <> '' do begin
+          validRecord := true;//  //停止导入条件
+
+          while  validRecord do begin
+              if (trim( Excel.WorkSheets[1].Cells[iRow,1].value)='') then               
+              begin
+                iRow := iRow + 1;
+                validRecord :=  trim( Excel.WorkSheets[1].Cells[iRow,3].value)<>'';            //停止导入条件
+                continue;
+              end;
+
               ADOQuery1.Append;
-              for j:=0 to  ADOQuery1.FieldCount-1 do begin
+              for j:=0 to  14  do begin         // Cells[iRow,14] ="COO"
                 with ADOQuery1 do begin
                   cellValue:= trim(Excel.WorkSheets[1].Cells[iRow,j+1].value);
                   Fields[j].AsString := cellValue ;
@@ -1263,10 +1272,10 @@ begin
 
               ADOQuery1.FieldByName('RowNo').Value := iRow;
               ADOQuery1.FieldByName('FFileName').Value := ShortFileName;
-             
+
               iRow := iRow + 1;
-              ADOQuery1.post; 
-              cellValue:=  trim( Excel.WorkSheets[1].Cells[iRow,1].value );
+              ADOQuery1.post;
+              validRecord :=  trim( Excel.WorkSheets[1].Cells[iRow,3].value)<>'';     //停止导入条件
           end;
           
           ADOQuery1.UpdateStatus ;
